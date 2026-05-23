@@ -1,0 +1,135 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ── Usuarios ──────────────────────────────────────────────────
+model User {
+  id          String   @id @default(cuid())
+  name        String
+  email       String   @unique
+  password    String
+  role        Role     @default(viewer)
+  zone        String?
+  companyId   String
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  company     Company  @relation(fields: [companyId], references: [id])
+  audits      Audit[]
+
+  @@map("users")
+}
+
+enum Role {
+  admin
+  auditor
+  viewer
+}
+
+// ── Empresas ──────────────────────────────────────────────────
+model Company {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+
+  users     User[]
+  stores    Store[]
+
+  @@map("companies")
+}
+
+// ── Tiendas ───────────────────────────────────────────────────
+model Store {
+  id        String      @id
+  name      String
+  city      String
+  zone      Zone
+  lat       Float?
+  lng       Float?
+  status    StoreStatus @default(active)
+  companyId String
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  company   Company        @relation(fields: [companyId], references: [id])
+  audits    Audit[]
+  findings  AuditFinding[]
+
+  @@map("stores")
+}
+
+enum Zone {
+  Norte
+  Sur
+  Oriente
+  Occidente
+  Centro
+}
+
+enum StoreStatus {
+  active
+  inactive
+  critical
+}
+
+// ── Auditorías ────────────────────────────────────────────────
+model Audit {
+  id        String      @id @default(cuid())
+  storeId   String
+  auditorId String
+  score     Int
+  status    AuditStatus @default(scheduled)
+  date      DateTime
+  notes     String?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  store     Store          @relation(fields: [storeId],   references: [id])
+  auditor   User           @relation(fields: [auditorId], references: [id])
+  findings  AuditFinding[]
+
+  @@map("audits")
+}
+
+enum AuditStatus {
+  scheduled
+  in_progress
+  completed
+  cancelled
+}
+
+// ── Categorías de hallazgos ───────────────────────────────────
+model FindingCategory {
+  id          String @id @default(cuid())
+  title       String
+  description String
+  icon        String
+  color       String
+  category    String
+
+  findings    AuditFinding[]
+
+  @@map("finding_categories")
+}
+
+// ── Hallazgos por auditoría ───────────────────────────────────
+model AuditFinding {
+  id         String   @id @default(cuid())
+  auditId    String
+  storeId    String
+  categoryId String
+  count      Int      @default(1)
+  notes      String?
+  createdAt  DateTime @default(now())
+
+  audit      Audit           @relation(fields: [auditId],    references: [id])
+  store      Store           @relation(fields: [storeId],    references: [id])
+  category   FindingCategory @relation(fields: [categoryId], references: [id])
+
+  @@map("audit_findings")
+}
