@@ -20,7 +20,6 @@ function makePinSVG(score: number, selected: boolean): string {
   const size = selected ? 44 : 36
   const fontSize = selected ? 11 : 10
   const ringWidth = selected ? 3 : 1.5
-
   return `
     <svg width="${size}" height="${size + 8}" viewBox="0 0 ${size} ${size + 8}" xmlns="http://www.w3.org/2000/svg">
       <circle cx="${size/2}" cy="${size/2}" r="${size/2 - 2}" fill="${fill}" stroke="${border}" stroke-width="${ringWidth}"/>
@@ -32,48 +31,39 @@ function makePinSVG(score: number, selected: boolean): string {
 }
 
 export default function StoreMap({ stores, selectedId, onSelect }: StoreMapProps) {
-  const mapRef   = useRef<HTMLDivElement>(null)
-  const leafRef  = useRef<any>(null)
+  const mapRef    = useRef<HTMLDivElement>(null)
+  const leafRef   = useRef<any>(null)
   const markersRef = useRef<Map<string, any>>(new Map())
 
   useEffect(() => {
     if (!mapRef.current || leafRef.current) return
 
-    // Importar Leaflet dinámicamente (SSR safe)
     import('leaflet').then(L => {
-      // Fix default icon path issue con Next.js
       delete (L.Icon.Default.prototype as any)._getIconUrl
-      L.Icon.Default.mergeOptions({
-        iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-        iconUrl:       'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-        shadowUrl:     'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-      })
 
       const map = L.map(mapRef.current!, {
-        center:         [5.5, -74.5],
-        zoom:           6,
-        zoomControl:    false,
+        center:    [5.5, -74.5],
+        zoom:      6,
+        zoomControl: false,
         attributionControl: false,
       })
 
-      // Tile layer — Stamen Toner Light (blanco y negro)
+      // CartoDB Positron — minimalista, blanco y negro, sin API key
       L.tileLayer(
-        'https://tiles.stadiamaps.com/tiles/stamen_toner_lite/{z}/{x}/{y}{r}.png',
-        { maxZoom: 18 }
+        'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+        {
+          maxZoom: 19,
+          subdomains: 'abcd',
+        }
       ).addTo(map)
 
-      // Zoom control — esquina inferior derecha
       L.control.zoom({ position: 'bottomright' }).addTo(map)
-
-      // Atribución mínima
       L.control.attribution({ position: 'bottomleft', prefix: false })
-        .addAttribution('© OpenStreetMap')
+        .addAttribution('© OpenStreetMap © CARTO')
         .addTo(map)
 
-      // Agregar markers
       stores.forEach(store => {
         if (!store.lat || !store.lng) return
-
         const isSelected = store.id === selectedId
         const icon = L.divIcon({
           html:      makePinSVG(store.score, isSelected),
@@ -81,12 +71,10 @@ export default function StoreMap({ stores, selectedId, onSelect }: StoreMapProps
           iconAnchor:[isSelected ? 22 : 18, isSelected ? 52 : 44],
           className: '',
         })
-
         const marker = L.marker([store.lat, store.lng], { icon })
           .addTo(map)
           .on('click', () => onSelect?.(store))
 
-        // Tooltip
         marker.bindTooltip(`
           <div style="font-family:system-ui;font-size:12px;padding:2px 0">
             <strong>${store.id} ${store.name}</strong><br/>
@@ -124,7 +112,6 @@ export default function StoreMap({ stores, selectedId, onSelect }: StoreMapProps
       marker.setIcon(icon)
     })
 
-    // Centrar en la tienda seleccionada
     if (selectedId) {
       const store = stores.find(s => s.id === selectedId)
       if (store?.lat && store?.lng) {
@@ -135,14 +122,8 @@ export default function StoreMap({ stores, selectedId, onSelect }: StoreMapProps
 
   return (
     <>
-      <link
-        rel="stylesheet"
-        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-      />
-      <div
-        ref={mapRef}
-        style={{ width: '100%', height: '100%', background: '#f5f5f5' }}
-      />
+      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+      <div ref={mapRef} style={{ width: '100%', height: '100%', background: '#f5f5f0' }} />
     </>
   )
 }
