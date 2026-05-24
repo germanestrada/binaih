@@ -1,0 +1,57 @@
+'use client'
+import { useEffect, useState } from 'react'
+import Icon from '@/components/ui/Icon'
+
+interface Stats { plan:any; usage:any }
+
+export default function PlanPage() {
+  const [stats,setStats] = useState<Stats|null>(null)
+  const [loading,setLoading] = useState(true)
+  useEffect(()=>{fetch('/api/admin/stats').then(r=>r.json()).then(d=>{setStats(d);setLoading(false)})},[])
+  if(loading) return <div style={{padding:32,color:'var(--subtle)',fontSize:13}}>Cargando…</div>
+  if(!stats)  return <div style={{padding:32,color:'var(--subtle)',fontSize:13}}>Error al cargar.</div>
+  const {plan,usage} = stats
+
+  return (
+    <div style={{padding:'24px 28px'}}>
+      <div style={{fontSize:10,fontWeight:600,color:'var(--subtle)',textTransform:'uppercase',letterSpacing:'1.2px',marginBottom:20}}>Plan activo</div>
+      <div style={{background:'var(--white)',border:'1px solid var(--border)',borderRadius:'var(--r-lg)',padding:24,marginBottom:20}}>
+        <div style={{display:'flex',alignItems:'baseline',gap:12,marginBottom:20}}>
+          <span style={{fontFamily:'var(--font-serif)',fontSize:32,color:'var(--ink)'}}>{plan.name}</span>
+          <span style={{fontSize:12,fontWeight:600,padding:'3px 12px',borderRadius:20,background:'var(--ink)',color:'white'}}>{plan.tier?.toUpperCase()}</span>
+          <span style={{fontSize:12,fontWeight:600,padding:'3px 12px',borderRadius:20,background:plan.status==='active'?'var(--ok-bg)':'var(--warn-bg)',color:plan.status==='active'?'var(--ok)':'var(--warn)'}}>{plan.status}</span>
+        </div>
+        {plan.trialEndsAt&&(
+          <div style={{fontSize:13,color:'var(--warn)',marginBottom:16,padding:'10px 14px',background:'var(--warn-bg)',borderRadius:'var(--r-md)'}}>
+            ⏰ Trial vence el {new Date(plan.trialEndsAt).toLocaleDateString('es-CO',{day:'2-digit',month:'long',year:'numeric'})}
+          </div>
+        )}
+        <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:12,marginBottom:20}}>
+          {[
+            {label:'Locaciones máx.',   value:plan.maxLocations,    used:usage.locations},
+            {label:'Usuarios máx.',     value:plan.maxUsers,        used:usage.users},
+            {label:'Auditorías/mes',    value:plan.maxAuditsMonth,  used:usage.auditsThisMonth},
+          ].map(s=>(
+            <div key={s.label} style={{border:'1px solid var(--border)',borderRadius:'var(--r-md)',padding:14}}>
+              <div style={{fontSize:10,color:'var(--subtle)',textTransform:'uppercase',letterSpacing:'1px',marginBottom:6,fontWeight:600}}>{s.label}</div>
+              <div style={{fontFamily:'var(--font-serif)',fontSize:28,color:'var(--ink)',lineHeight:1,marginBottom:8}}>{s.value}</div>
+              <div style={{height:4,background:'var(--border2)',borderRadius:2,overflow:'hidden'}}>
+                <div style={{height:'100%',width:`${Math.min(100,Math.round(s.used/s.value*100))}%`,background:s.used/s.value>.9?'var(--err)':'var(--ok)',borderRadius:2}}/>
+              </div>
+              <div style={{fontSize:11,color:'var(--subtle)',marginTop:4}}>{s.used} en uso</div>
+            </div>
+          ))}
+        </div>
+        <div style={{display:'flex',gap:10,flexWrap:'wrap'}}>
+          {[{label:'Mapa',enabled:plan.mapEnabled},{label:'API',enabled:plan.apiEnabled},{label:'IA / Visión',enabled:plan.aiEnabled}].map(f=>(
+            <div key={f.label} style={{display:'flex',alignItems:'center',gap:7,padding:'8px 14px',borderRadius:'var(--r-md)',border:'1px solid var(--border)',background:f.enabled?'var(--ok-bg)':'var(--surface)'}}>
+              <Icon name={f.enabled?'check':'x'} size={13} color={f.enabled?'var(--ok)':'var(--subtle)'}/>
+              <span style={{fontSize:12,color:f.enabled?'var(--ok)':'var(--subtle)',fontWeight:500}}>{f.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div style={{fontSize:12,color:'var(--subtle)',textAlign:'center'}}>Para cambiar de plan contacta a soporte@binaih.co</div>
+    </div>
+  )
+}

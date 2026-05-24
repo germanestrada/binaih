@@ -6,94 +6,24 @@ datasource db {
   provider = "postgresql"
 }
 
-// ── Usuarios ──────────────────────────────────────────────────
-model User {
-  id          String   @id @default(cuid())
-  name        String
-  email       String   @unique
-  password    String
-  role        Role     @default(viewer)
-  zone        String?
-  companyId   String
-  active      Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  company     Company  @relation(fields: [companyId], references: [id])
-  audits      Audit[]
-
-  @@map("users")
+enum TenantStatus {
+  trial
+  active
+  suspended
+  cancelled
 }
 
-enum Role {
-  admin
-  auditor
-  viewer
+enum UserStatus {
+  active
+  inactive
+  pending
 }
 
-// ── Empresas ──────────────────────────────────────────────────
-model Company {
-  id        String   @id @default(cuid())
-  name      String
-  createdAt DateTime @default(now())
-
-  users     User[]
-  stores    Store[]
-
-  @@map("companies")
-}
-
-// ── Tiendas ───────────────────────────────────────────────────
-model Store {
-  id        String      @id
-  name      String
-  city      String
-  zone      Zone
-  lat       Float?
-  lng       Float?
-  status    StoreStatus @default(active)
-  companyId String
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-
-  company   Company        @relation(fields: [companyId], references: [id])
-  audits    Audit[]
-  findings  AuditFinding[]
-
-  @@map("stores")
-}
-
-enum Zone {
-  Norte
-  Sur
-  Oriente
-  Occidente
-  Centro
-}
-
-enum StoreStatus {
+enum LocationStatus {
   active
   inactive
   critical
-}
-
-// ── Auditorías ────────────────────────────────────────────────
-model Audit {
-  id        String      @id @default(cuid())
-  storeId   String
-  auditorId String
-  score     Int
-  status    AuditStatus @default(scheduled)
-  date      DateTime
-  notes     String?
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-
-  store     Store          @relation(fields: [storeId],   references: [id])
-  auditor   User           @relation(fields: [auditorId], references: [id])
-  findings  AuditFinding[]
-
-  @@map("audits")
+  closed
 }
 
 enum AuditStatus {
@@ -101,35 +31,317 @@ enum AuditStatus {
   in_progress
   completed
   cancelled
+  rejected
 }
 
-// ── Categorías de hallazgos ───────────────────────────────────
-model FindingCategory {
-  id          String @id @default(cuid())
-  title       String
-  description String
-  icon        String
-  color       String
-  category    String
+enum FindingSeverity {
+  low
+  medium
+  high
+  critical
+}
 
-  findings    AuditFinding[]
+enum FindingStatus {
+  open
+  in_progress
+  resolved
+  accepted
+}
+
+enum ConfigType {
+  string
+  number
+  boolean
+  json
+  url
+  secret
+}
+
+enum PlanTier {
+  starter
+  professional
+  enterprise
+}
+
+model Plan {
+  id               String    @id @default(cuid())
+  name             String
+  tier             PlanTier  @default(starter)
+  maxLocations     Int       @default(5)  @map("max_locations")
+  maxUsers         Int       @default(3)  @map("max_users")
+  maxAuditsMonth   Int       @default(10) @map("max_audits_month")
+  mapEnabled       Boolean   @default(false) @map("map_enabled")
+  apiEnabled       Boolean   @default(false) @map("api_enabled")
+  aiEnabled        Boolean   @default(false) @map("ai_enabled")
+  priceUsd         Decimal   @default(0)  @map("price_usd")
+  active           Boolean   @default(true)
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt      @map("updated_at")
+  createdBy        String?   @map("created_by")
+
+  tenants          Tenant[]
+
+  @@map("plans")
+}
+
+model Tenant {
+  id             String        @id @default(cuid())
+  name           String
+  nit            String?       @unique
+  sector         String?
+  logoUrl        String?       @map("logo_url")
+  planId         String        @map("plan_id")
+  status         TenantStatus  @default(trial)
+  trialEndsAt    DateTime?     @map("trial_ends_at")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt      @map("updated_at")
+  createdBy      String?       @map("created_by")
+
+  plan           Plan          @relation(fields: [planId], references: [id])
+  users          User[]
+  locations      Location[]
+  locationTypes  LocationType[]
+  findingCategories FindingCategory[]
+  rolePermissions RolePermission[]
+  systemConfigs  SystemConfig[]
+  audits         Audit[]
+
+  @@map("tenants")
+}
+
+model RolePermission {
+  id        String   @id @default(cuid())
+  tenantId  String   @map("tenant_id")
+  roleName  String   @map("role_name")
+  resource  String
+  action    String
+  allowed   Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt      @map("updated_at")
+  createdBy String?  @map("created_by")
+
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, roleName, resource, action])
+  @@map("role_permissions")
+}
+
+model User {
+  id          String     @id @default(cuid())
+  tenantId    String     @map("tenant_id")
+  roleName    String     @map("role_name")
+  name        String
+  email       String
+  password    String
+  phone       String?
+  avatarUrl   String?    @map("avatar_url")
+  zone        String?
+  status      UserStatus @default(active)
+  lastLogin   DateTime?  @map("last_login")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt      @map("updated_at")
+  createdBy   String?    @map("created_by")
+
+  tenant      Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  auditsAsAuditor  Audit[] @relation("AuditorAudits")
+  auditsAsReviewer Audit[] @relation("ReviewerAudits")
+  locationsCreated Location[]
+  auditResultsCreated AuditResult[]
+  auditFindingsCreated AuditFinding[]
+  scoreHistoryCreated LocationScoreHistory[]
+  locationTypesCreated LocationType[]
+  findingCategoriesCreated FindingCategory[]
+  systemConfigsCreated SystemConfig[]
+  systemConfigsUpdated SystemConfig[] @relation("UpdatedByUser")
+
+  @@unique([tenantId, email])
+  @@map("users")
+}
+
+model LocationType {
+  id          String   @id @default(cuid())
+  tenantId    String   @map("tenant_id")
+  name        String
+  icon        String?
+  description String?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt      @map("updated_at")
+  createdBy   String?  @map("created_by")
+
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  createdByUser User?  @relation(fields: [createdBy], references: [id])
+  locations   Location[]
+
+  @@unique([tenantId, name])
+  @@map("location_types")
+}
+
+model Location {
+  id            String         @id @default(cuid())
+  tenantId      String         @map("tenant_id")
+  typeId        String?        @map("type_id")
+  name          String
+  address       String?
+  city          String
+  zone          String?
+  lat           Float?
+  lng           Float?
+  status        LocationStatus @default(active)
+  managerName   String?        @map("manager_name")
+  managerPhone  String?        @map("manager_phone")
+  areaSqm       Int?           @map("area_sqm")
+  currentScore  Int?           @map("current_score")
+  lastAuditAt   DateTime?      @map("last_audit_at")
+  notes         String?
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt      @map("updated_at")
+  createdBy     String?        @map("created_by")
+
+  tenant        Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  locationType  LocationType?  @relation(fields: [typeId], references: [id])
+  createdByUser User?          @relation(fields: [createdBy], references: [id])
+  audits        Audit[]
+  findings      AuditFinding[]
+  scoreHistory  LocationScoreHistory[]
+
+  @@map("locations")
+}
+
+model FindingCategory {
+  id          String          @id @default(cuid())
+  tenantId    String          @map("tenant_id")
+  title       String
+  description String?
+  icon        String?
+  color       String?
+  category    String?
+  severity    FindingSeverity @default(medium)
+  active      Boolean         @default(true)
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt      @map("updated_at")
+  createdBy   String?         @map("created_by")
+
+  tenant      Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  createdByUser User?         @relation(fields: [createdBy], references: [id])
+  auditResults AuditResult[]
+  auditFindings AuditFinding[]
 
   @@map("finding_categories")
 }
 
-// ── Hallazgos por auditoría ───────────────────────────────────
-model AuditFinding {
-  id         String   @id @default(cuid())
-  auditId    String
-  storeId    String
-  categoryId String
-  count      Int      @default(1)
-  notes      String?
-  createdAt  DateTime @default(now())
+model Audit {
+  id           String      @id @default(cuid())
+  tenantId     String      @map("tenant_id")
+  locationId   String      @map("location_id")
+  auditorId    String      @map("auditor_id")
+  reviewerId   String?     @map("reviewer_id")
+  status       AuditStatus @default(scheduled)
+  score        Int?
+  durationMin  Int?        @map("duration_min")
+  notes        String?
+  signatureUrl String?     @map("signature_url")
+  scheduledAt  DateTime?   @map("scheduled_at")
+  startedAt    DateTime?   @map("started_at")
+  completedAt  DateTime?   @map("completed_at")
+  createdAt    DateTime    @default(now()) @map("created_at")
+  updatedAt    DateTime    @updatedAt      @map("updated_at")
+  createdBy    String?     @map("created_by")
 
-  audit      Audit           @relation(fields: [auditId],    references: [id])
-  store      Store           @relation(fields: [storeId],    references: [id])
-  category   FindingCategory @relation(fields: [categoryId], references: [id])
+  tenant       Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  location     Location    @relation(fields: [locationId], references: [id])
+  auditor      User        @relation("AuditorAudits",  fields: [auditorId],  references: [id])
+  reviewer     User?       @relation("ReviewerAudits", fields: [reviewerId], references: [id])
+  results      AuditResult[]
+  findings     AuditFinding[]
+  scoreHistory LocationScoreHistory[]
+
+  @@map("audits")
+}
+
+model AuditResult {
+  id          String          @id @default(cuid())
+  auditId     String          @map("audit_id")
+  categoryId  String          @map("category_id")
+  count       Int             @default(0)
+  severity    FindingSeverity @default(medium)
+  evidenceUrl String?         @map("evidence_url")
+  notes       String?
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt      @map("updated_at")
+  createdBy   String?         @map("created_by")
+
+  audit       Audit           @relation(fields: [auditId],    references: [id], onDelete: Cascade)
+  category    FindingCategory @relation(fields: [categoryId], references: [id])
+  createdByUser User?         @relation(fields: [createdBy],  references: [id])
+
+  @@unique([auditId, categoryId])
+  @@map("audit_results")
+}
+
+model AuditFinding {
+  id               String          @id @default(cuid())
+  auditId          String          @map("audit_id")
+  locationId       String          @map("location_id")
+  categoryId       String          @map("category_id")
+  count            Int             @default(1)
+  severity         FindingSeverity @default(medium)
+  status           FindingStatus   @default(open)
+  resolutionNotes  String?         @map("resolution_notes")
+  dueDate          DateTime?       @map("due_date")
+  resolvedAt       DateTime?       @map("resolved_at")
+  createdAt        DateTime        @default(now()) @map("created_at")
+  updatedAt        DateTime        @updatedAt      @map("updated_at")
+  createdBy        String?         @map("created_by")
+
+  audit            Audit           @relation(fields: [auditId],    references: [id], onDelete: Cascade)
+  location         Location        @relation(fields: [locationId], references: [id])
+  category         FindingCategory @relation(fields: [categoryId], references: [id])
+  createdByUser    User?           @relation(fields: [createdBy],  references: [id])
 
   @@map("audit_findings")
+}
+
+model LocationScoreHistory {
+  id            String   @id @default(cuid())
+  locationId    String   @map("location_id")
+  auditId       String   @map("audit_id")
+  score         Int
+  previousScore Int?     @map("previous_score")
+  delta         Int?
+  recordedAt    DateTime @default(now()) @map("recorded_at")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt      @map("updated_at")
+  createdBy     String?  @map("created_by")
+
+  location      Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  audit         Audit    @relation(fields: [auditId],    references: [id])
+  createdByUser User?    @relation(fields: [createdBy],  references: [id])
+
+  @@map("location_score_history")
+}
+
+model SystemConfig {
+  id          String     @id @default(cuid())
+  tenantId    String     @map("tenant_id")
+  key         String
+  value       String?
+  type        ConfigType @default(string)
+  groupName   String     @default("general") @map("group_name")
+  label       String
+  description String?
+  isSecret    Boolean    @default(false) @map("is_secret")
+  active      Boolean    @default(true)
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt      @map("updated_at")
+  createdBy   String?    @map("created_by")
+  updatedBy   String?    @map("updated_by")
+
+  tenant      Tenant     @relation(fields: [tenantId],  references: [id], onDelete: Cascade)
+  createdByUser User?    @relation(fields: [createdBy], references: [id])
+  updatedByUser User?    @relation("UpdatedByUser", fields: [updatedBy], references: [id])
+
+  @@unique([tenantId, key])
+  @@map("system_config")
 }

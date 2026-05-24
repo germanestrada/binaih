@@ -11,9 +11,10 @@ export const SCORE_LABELS: Record<string, string> = {
 }
 
 export const NAV_ITEMS = [
-  { label: 'Dashboard', href: '/home' },
-  { label: 'Tiendas', href: '/tiendas' },
-  { label: 'Hallazgos', href: '/hallazgos' },
-  { label: 'Top Hallazgos', href: '/top-hallazgos' },
-  { label: 'Auditorías', href: '/auditorias' },
+  { label: 'Dashboard',    href: '/home'         },
+  { label: 'Locaciones',   href: '/tiendas'      },
+  { label: 'Hallazgos',    href: '/hallazgos'    },
+  { label: 'Top',          href: '/top-hallazgos'},
+  { label: 'Auditorías',   href: '/auditorias'   },
+  { label: 'Admin',        href: '/admin'        },
 ]
