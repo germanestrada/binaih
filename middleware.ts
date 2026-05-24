@@ -1,47 +1,49 @@
-
-import { auth } from '@/auth'
 import { NextResponse } from 'next/server'
-import type { Role } from '@/types/auth'
- 
-const PROTECTED: { pattern: RegExp; minRole: Role }[] = [
-  { pattern: /^\/home/,          minRole: 'viewer'  },
-  { pattern: /^\/tiendas/,       minRole: 'viewer'  },
-  { pattern: /^\/hallazgos/,     minRole: 'viewer'  },
-  { pattern: /^\/top-hallazgos/, minRole: 'viewer'  },
-  { pattern: /^\/auditorias/,    minRole: 'auditor' },
-]
- 
-const ROLE_LEVEL: Record<Role, number> = { viewer: 1, auditor: 2, admin: 3 }
- 
-function hasAccess(userRole: Role, minRole: Role): boolean {
-  return ROLE_LEVEL[userRole] >= ROLE_LEVEL[minRole]
+import type { NextRequest } from 'next/server'
+
+// Middleware liviano compatible con Edge Runtime
+// No importa NextAuth — solo verifica la cookie de sesión JWT
+
+const PUBLIC_PATHS = ['/login']
+
+const PROTECTED_ROLES: Record<string, string> = {
+  '/auditorias': 'auditor',
 }
- 
-export default auth((req) => {
-  const { pathname } = req.nextUrl
-  const session = req.auth
- 
-  if (pathname.startsWith('/login')) {
-    if (session) return NextResponse.redirect(new URL('/home', req.url))
+
+export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl
+
+  // Rutas estáticas y API — pasar siempre
+  if (
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/api') ||
+    pathname.includes('.')
+  ) {
     return NextResponse.next()
   }
- 
-  if (!session) {
-    const loginUrl = new URL('/login', req.url)
+
+  // Verificar sesión via cookie de NextAuth
+  const sessionToken =
+    request.cookies.get('next-auth.session-token')?.value ??
+    request.cookies.get('__Secure-next-auth.session-token')?.value
+
+  const isPublic = PUBLIC_PATHS.some(p => pathname.startsWith(p))
+
+  // Sin sesión → login
+  if (!sessionToken && !isPublic) {
+    const loginUrl = new URL('/login', request.url)
     loginUrl.searchParams.set('callbackUrl', pathname)
     return NextResponse.redirect(loginUrl)
   }
- 
-  const rule = PROTECTED.find(r => r.pattern.test(pathname))
-  if (rule && !hasAccess(session.user.role as Role, rule.minRole)) {
-    return NextResponse.redirect(new URL('/home?error=unauthorized', req.url))
+
+  // Con sesión en login → home
+  if (sessionToken && isPublic) {
+    return NextResponse.redirect(new URL('/home', request.url))
   }
- 
+
   return NextResponse.next()
-})
- 
+}
+
 export const config = {
   matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
-  // Forzar Node.js runtime — NextAuth no es compatible con Edge Runtime
-  runtime: 'nodejs',
 }
