@@ -1,5 +1,6 @@
 'use client'
 import type { KpiCard as KpiCardType } from '@/types/kpi'
+import Icon from '@/components/ui/Icon'
 
 interface KpiCardProps { kpi: KpiCardType; onClick?: () => void }
 
@@ -17,13 +18,23 @@ export default function KpiCard({ kpi, onClick }: KpiCardProps) {
         borderRadius: 'var(--r-lg)',
         padding: '20px',
         cursor: onClick ? 'pointer' : 'default',
-        transition: 'border-color .15s',
+        transition: 'border-color .15s, transform .1s',
+        position: 'relative',
       }}
-      onMouseEnter={e => { if (onClick) (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--ink3)' }}
-      onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--border)' }}
+      onMouseEnter={e => {
+        if (onClick) {
+          (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--ink3)'
+          ;(e.currentTarget as HTMLDivElement).style.transform = 'translateY(-1px)'
+        }
+      }}
+      onMouseLeave={e => {
+        ;(e.currentTarget as HTMLDivElement).style.borderColor = 'var(--border)'
+        ;(e.currentTarget as HTMLDivElement).style.transform = ''
+      }}
     >
-      <div style={{ fontSize: 11, color: 'var(--subtle)', textTransform: 'uppercase', letterSpacing: '.8px', marginBottom: 14, fontWeight: 500 }}>
-        {kpi.label}
+      <div style={{ fontSize: 11, color: 'var(--subtle)', textTransform: 'uppercase', letterSpacing: '.8px', marginBottom: 14, fontWeight: 500, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <span>{kpi.label}</span>
+        {onClick && <Icon name="arrow-right" size={11} color="var(--subtle)" />}
       </div>
       <div style={{ fontFamily: 'var(--font-serif)', fontSize: 38, color: 'var(--ink)', lineHeight: 1, letterSpacing: '-1px', marginBottom: 10 }}>
         {kpi.value}
