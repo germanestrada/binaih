@@ -1,14 +1,10 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-  serverExternalPackages: ['bcryptjs'],
+  serverExternalPackages: ['bcryptjs', 'nodemailer'],
   async redirects() {
     return [
-      {
-        source: '/',
-        destination: '/login',
-        permanent: false,
-      },
+      { source: '/', destination: '/login', permanent: false },
     ]
   },
 }
