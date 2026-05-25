@@ -11,7 +11,7 @@ export async function GET(req: Request) {
   const status    = searchParams.get('status')
   const locationId = searchParams.get('location_id')
 
-  let query = `/audits?tenant_id=eq.${session.user.companyId}&select=id,location_id,auditor_id,type_id,status,score,scheduled_at,started_at,completed_at,total_items,scored_items,source,locations(name,city),audit_types(name,icon),users(name)&order=scheduled_at.desc&limit=50`
+  let query = `/audits?tenant_id=eq.${session.user.companyId}&select=id,location_id,auditor_id,type_id,status,score,scheduled_at,started_at,completed_at,total_items,scored_items,source,locations(name,city),audit_types(name,icon),users!audits_auditor_id_fkey(name)&order=scheduled_at.desc&limit=50`
   if (status)     query += `&status=eq.${status}`
   if (locationId) query += `&location_id=eq.${locationId}`
 

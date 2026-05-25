@@ -9,7 +9,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   const { id } = await params
 
   const [auditRes, itemsRes] = await Promise.all([
-    sbFetch(`/audits?id=eq.${id}&select=*,locations(id,name,city,zone),audit_types(id,name,icon,description),users!auditor_id(name)&limit=1`),
+    sbFetch(`/audits?id=eq.${id}&select=*,locations(id,name,city,zone),audit_types(id,name,icon,description),users!audits_auditor_id_fkey(name)&limit=1`),
     sbFetch(`/audit_item_results?audit_id=eq.${id}&select=*,audit_type_items(id,title,description,section,order_index,response_type,max_score,weight,required,ai_enabled,scale_min_label,scale_max_label)&order=audit_type_items(order_index).asc`),
   ])
 
