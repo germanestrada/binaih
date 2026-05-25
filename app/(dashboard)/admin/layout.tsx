@@ -5,14 +5,18 @@ import { useEffect } from 'react'
 import Icon from '@/components/ui/Icon'
 
 const NAV = [
-  { href: '/admin',              label: 'Resumen',          icon: 'home'     as const },
-  { href: '/admin/usuarios',     label: 'Usuarios',         icon: 'user'     as const },
-  { href: '/admin/tipos-locacion',label: 'Tipos de locación',icon: 'building' as const },
-  { href: '/admin/locaciones',   label: 'Locaciones',       icon: 'store'    as const },
-  { href: '/admin/configuracion',label: 'Configuración',    icon: 'clipboard'as const },
-  { href: '/admin/exportar',     label: 'Exportar datos',   icon: 'export'   as const },
-  { href: '/admin/plan',         label: 'Plan activo',      icon: 'trophy'   as const },
+  { href: '/admin',                 label: 'Resumen',              icon: 'home'      as const, section: null },
+  { href: '/admin/usuarios',        label: 'Usuarios',             icon: 'user'      as const, section: 'Acceso' },
+  { href: '/admin/tipos-locacion',  label: 'Tipos de locación',    icon: 'building'  as const, section: 'Acceso' },
+  { href: '/admin/locaciones',      label: 'Locaciones',           icon: 'store'     as const, section: 'Acceso' },
+  { href: '/admin/tipos-auditoria', label: 'Tipos de auditoría',   icon: 'clipboard' as const, section: 'Auditorías' },
+  { href: '/admin/items-maestros',  label: 'Ítems maestros',       icon: 'search'    as const, section: 'Auditorías' },
+  { href: '/admin/configuracion',   label: 'Configuración',        icon: 'filter'    as const, section: 'Sistema' },
+  { href: '/admin/exportar',        label: 'Exportar datos',       icon: 'export'    as const, section: 'Sistema' },
+  { href: '/admin/plan',            label: 'Plan activo',          icon: 'trophy'    as const, section: 'Sistema' },
 ]
+
+const SECTIONS = ['Acceso', 'Auditorías', 'Sistema']
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession()
@@ -20,9 +24,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname()
 
   useEffect(() => {
-    if (status === 'authenticated' && session?.user?.role !== 'admin') {
-      router.push('/home')
-    }
+    if (status === 'authenticated' && session?.user?.role !== 'admin') router.push('/home')
   }, [session, status, router])
 
   if (status === 'loading') return null
@@ -30,41 +32,67 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div style={{ display: 'flex', height: 'calc(100vh - 92px)' }}>
-      {/* Sidebar */}
-      <aside style={{ width: 220, borderRight: '1px solid var(--border)', flexShrink: 0, display: 'flex', flexDirection: 'column' }}>
-        <div style={{ padding: '16px 16px 8px' }}>
+      <aside style={{ width: 220, borderRight: '1px solid var(--border)', flexShrink: 0, display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
+        <div style={{ padding: '16px 16px 4px' }}>
           <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--subtle)', textTransform: 'uppercase', letterSpacing: '1.2px' }}>
             Administración
           </div>
         </div>
+
         <nav style={{ flex: 1, padding: '4px 8px' }}>
-          {NAV.map(item => {
-            const active = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href))
+          {/* Resumen */}
+          {NAV.filter(n => !n.section).map(item => {
+            const active = pathname === item.href
             return (
               <button key={item.href} onClick={() => router.push(item.href)} style={{
                 width: '100%', display: 'flex', alignItems: 'center', gap: 10,
-                padding: '9px 10px', borderRadius: 'var(--r-sm)', marginBottom: 2,
+                padding: '8px 10px', borderRadius: 'var(--r-sm)', marginBottom: 2,
                 background: active ? 'var(--ink)' : 'none',
                 color: active ? 'white' : 'var(--mid)',
                 border: 'none', cursor: 'pointer', fontFamily: 'inherit',
                 fontSize: 13, fontWeight: active ? 500 : 400, textAlign: 'left',
-                transition: 'all .15s',
-              }}
-                onMouseEnter={e => { if (!active) (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface)' }}
-                onMouseLeave={e => { if (!active) (e.currentTarget as HTMLButtonElement).style.background = 'none' }}
-              >
+              }}>
                 <Icon name={item.icon} size={14} color="currentColor" />
                 {item.label}
               </button>
             )
           })}
+
+          {/* Secciones agrupadas */}
+          {SECTIONS.map(section => (
+            <div key={section}>
+              <div style={{ fontSize: 9, fontWeight: 600, color: 'var(--subtle)', textTransform: 'uppercase', letterSpacing: '1.2px', padding: '12px 10px 4px', opacity: .7 }}>
+                {section}
+              </div>
+              {NAV.filter(n => n.section === section).map(item => {
+                const active = pathname === item.href || pathname.startsWith(item.href + '/')
+                return (
+                  <button key={item.href} onClick={() => router.push(item.href)} style={{
+                    width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+                    padding: '8px 10px', borderRadius: 'var(--r-sm)', marginBottom: 2,
+                    background: active ? 'var(--ink)' : 'none',
+                    color: active ? 'white' : 'var(--mid)',
+                    border: 'none', cursor: 'pointer', fontFamily: 'inherit',
+                    fontSize: 13, fontWeight: active ? 500 : 400, textAlign: 'left',
+                    transition: 'all .15s',
+                  }}
+                    onMouseEnter={e => { if (!active) (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface)' }}
+                    onMouseLeave={e => { if (!active) (e.currentTarget as HTMLButtonElement).style.background = 'none' }}
+                  >
+                    <Icon name={item.icon} size={14} color="currentColor" />
+                    {item.label}
+                  </button>
+                )
+              })}
+            </div>
+          ))}
         </nav>
-        <div style={{ padding: '12px 16px', borderTop: '1px solid var(--border)', fontSize: 11, color: 'var(--subtle)' }}>
+
+        <div style={{ padding: '12px 16px', borderTop: '1px solid var(--border)', fontSize: 10, color: 'var(--subtle)' }}>
           Solo visible para administradores
         </div>
       </aside>
 
-      {/* Content */}
       <main style={{ flex: 1, overflowY: 'auto' }}>
         {children}
       </main>
