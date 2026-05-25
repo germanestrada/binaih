@@ -11,6 +11,7 @@ const NAV = [
   { href: '/admin/locaciones',      label: 'Locaciones',           icon: 'store'     as const, section: 'Acceso' },
   { href: '/admin/tipos-auditoria', label: 'Tipos de auditoría',   icon: 'clipboard' as const, section: 'Auditorías' },
   { href: '/admin/items-maestros',  label: 'Ítems maestros',       icon: 'search'    as const, section: 'Auditorías' },
+  { href: '/admin/items-tenant',    label: 'Ítems del tenant',     icon: 'check'     as const, section: 'Auditorías' },
   { href: '/admin/configuracion',   label: 'Configuración',        icon: 'filter'    as const, section: 'Sistema' },
   { href: '/admin/exportar',        label: 'Exportar datos',       icon: 'export'    as const, section: 'Sistema' },
   { href: '/admin/plan',            label: 'Plan activo',          icon: 'trophy'    as const, section: 'Sistema' },
