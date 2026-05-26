@@ -56,7 +56,7 @@ export async function GET(req: Request) {
     let html = `
 <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;">
   <div style="background:#0a0a0a;padding:24px 32px;border-radius:12px 12px 0 0;">
-    <div style="font-size:20px;color:white;">BINAIH</div>
+    <div style="font-size:20px;color:white;">TVEO</div>
     <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:4px;">Resumen diario · ${new Date().toLocaleDateString('es-CO',{weekday:'long',day:'numeric',month:'long'})}</div>
   </div>
   <div style="background:white;border:1px solid #e2e2e2;border-top:none;padding:32px;border-radius:0 0 12px 12px;">`
@@ -90,13 +90,13 @@ export async function GET(req: Request) {
     <a href="${APP_URL}/home" style="display:inline-block;background:#111;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:500;">
       Ir al dashboard →
     </a>
-    <p style="color:#aaa;font-size:11px;margin-top:32px;">BINAIH · Este es un resumen automático diario</p>
+    <p style="color:#aaa;font-size:11px;margin-top:32px;">TVEO · Este es un resumen automático diario</p>
   </div>
 </div>`
 
     const ok = await sendEmail(tenantId, {
       to:      admins,
-      subject: `📊 Resumen BINAIH — ${upcoming.length} auditorías próximas, ${overdue.length} hallazgos vencidos`,
+      subject: `📊 Resumen TVEO — ${upcoming.length} auditorías próximas, ${overdue.length} hallazgos vencidos`,
       html,
     })
 

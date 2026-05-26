@@ -57,7 +57,7 @@ export async function sendEmail(tenantId: string, payload: EmailPayload): Promis
 
     const transporter = createTransport(config)
     await transporter.sendMail({
-      from:    `"BINAIH" <${config.from}>`,
+      from:    `"TVEO" <${config.from}>`,
       to:      Array.isArray(payload.to) ? payload.to.join(',') : payload.to,
       subject: payload.subject,
       html:    payload.html,
@@ -95,7 +95,7 @@ export function templateAuditScheduled(data: {
     html: `
 <div style="${baseStyle}">
   <div style="background:#0a0a0a;padding:24px 32px;border-radius:12px 12px 0 0;">
-    <div style="font-size:20px;color:white;letter-spacing:0.5px;">BINAIH</div>
+    <div style="font-size:20px;color:white;letter-spacing:0.5px;">TVEO</div>
     <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:4px;">Portal de Auditorías</div>
   </div>
   <div style="background:white;border:1px solid #e2e2e2;border-top:none;padding:32px;border-radius:0 0 12px 12px;">
@@ -116,7 +116,7 @@ export function templateAuditScheduled(data: {
       Ver auditoría →
     </a>
 
-    <p style="color:#aaa;font-size:11px;margin-top:32px;">BINAIH · Solo personal autorizado</p>
+    <p style="color:#aaa;font-size:11px;margin-top:32px;">TVEO · Solo personal autorizado</p>
   </div>
 </div>`,
   }
@@ -140,7 +140,7 @@ export function templateAuditCompleted(data: {
     html: `
 <div style="${baseStyle}">
   <div style="background:#0a0a0a;padding:24px 32px;border-radius:12px 12px 0 0;">
-    <div style="font-size:20px;color:white;">BINAIH</div>
+    <div style="font-size:20px;color:white;">TVEO</div>
     <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:4px;">Portal de Auditorías</div>
   </div>
   <div style="background:white;border:1px solid #e2e2e2;border-top:none;padding:32px;border-radius:0 0 12px 12px;">
@@ -164,7 +164,7 @@ export function templateAuditCompleted(data: {
       Ver resultado completo →
     </a>
 
-    <p style="color:#aaa;font-size:11px;margin-top:32px;">BINAIH · Solo personal autorizado</p>
+    <p style="color:#aaa;font-size:11px;margin-top:32px;">TVEO · Solo personal autorizado</p>
   </div>
 </div>`,
   }
@@ -188,7 +188,7 @@ export function templateCriticalFinding(data: {
     html: `
 <div style="${baseStyle}">
   <div style="background:#0a0a0a;padding:24px 32px;border-radius:12px 12px 0 0;">
-    <div style="font-size:20px;color:white;">BINAIH</div>
+    <div style="font-size:20px;color:white;">TVEO</div>
     <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:4px;">Portal de Auditorías</div>
   </div>
   <div style="background:white;border:1px solid #e2e2e2;border-top:none;padding:32px;border-radius:0 0 12px 12px;">
@@ -208,7 +208,7 @@ export function templateCriticalFinding(data: {
       Ver auditoría y gestionar hallazgo →
     </a>
 
-    <p style="color:#aaa;font-size:11px;margin-top:32px;">BINAIH · Solo personal autorizado</p>
+    <p style="color:#aaa;font-size:11px;margin-top:32px;">TVEO · Solo personal autorizado</p>
   </div>
 </div>`,
   }
@@ -227,7 +227,7 @@ export function templateFindingOverdue(data: {
     html: `
 <div style="${baseStyle}">
   <div style="background:#0a0a0a;padding:24px 32px;border-radius:12px 12px 0 0;">
-    <div style="font-size:20px;color:white;">BINAIH</div>
+    <div style="font-size:20px;color:white;">TVEO</div>
   </div>
   <div style="background:white;border:1px solid #e2e2e2;border-top:none;padding:32px;border-radius:0 0 12px 12px;">
     <h2 style="font-size:22px;font-weight:400;margin:0 0 8px;color:#8b1a1a;">Hallazgo vencido</h2>
@@ -244,7 +244,7 @@ export function templateFindingOverdue(data: {
       Ver hallazgos pendientes →
     </a>
 
-    <p style="color:#aaa;font-size:11px;margin-top:32px;">BINAIH · Solo personal autorizado</p>
+    <p style="color:#aaa;font-size:11px;margin-top:32px;">TVEO · Solo personal autorizado</p>
   </div>
 </div>`,
   }

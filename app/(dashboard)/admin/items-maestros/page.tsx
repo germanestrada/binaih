@@ -50,7 +50,7 @@ export default function ItemsMaestrosPage() {
         </select>
         <span style={{fontSize:11,color:'var(--subtle)',fontFamily:'var(--font-mono)',marginLeft:'auto'}}>{filtered.length} ítems</span>
         <div style={{fontSize:11,padding:'6px 12px',background:'var(--warn-bg)',color:'var(--warn)',borderRadius:'var(--r-sm)',border:'1px solid var(--warn-bg)',fontWeight:500}}>
-          Solo lectura — administrado por BINAIH
+          Solo lectura — administrado por TVEO
         </div>
       </div>
 

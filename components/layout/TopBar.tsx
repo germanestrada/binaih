@@ -38,7 +38,7 @@ export default function TopBar() {
           <path d="M5 10 L10 5 L15 10" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
           <path d="M5 14 L10 9 L15 14" stroke="rgba(255,255,255,.4)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
-        <span style={{ fontFamily:'var(--font-serif)',fontSize:15,color:'var(--shell-text)',letterSpacing:'.5px' }}>BINAIH</span>
+        <span style={{ fontFamily:'var(--font-serif)',fontSize:15,color:'var(--shell-text)',letterSpacing:'.5px' }}>TVEO</span>
       </div>
       <nav style={{ display:'flex',gap:2 }}>
         {visibleNav.map(item => {

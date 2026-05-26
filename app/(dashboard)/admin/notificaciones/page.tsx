@@ -76,7 +76,7 @@ export default function NotificacionesPage() {
       <div style={{background:'var(--surface)',border:'1px solid var(--border)',borderRadius:'var(--r-lg)',padding:'20px'}}>
         <div style={{fontSize:13,fontWeight:500,color:'var(--ink)',marginBottom:12}}>Configurar Gmail como remitente</div>
         <ol style={{fontSize:12,color:'var(--mid)',lineHeight:2,margin:0,paddingLeft:20}}>
-          <li>Crea o usa una cuenta Gmail dedicada para BINAIH</li>
+          <li>Crea o usa una cuenta Gmail dedicada para TVEO</li>
           <li>Activa verificación en 2 pasos en <strong>myaccount.google.com/security</strong></li>
           <li>Ve a <strong>myaccount.google.com/apppasswords</strong> y crea una contraseña de app para "Correo"</li>
           <li>En Configuración del sistema, actualiza los campos del grupo <strong>"email"</strong>:
@@ -85,7 +85,7 @@ export default function NotificacionesPage() {
               <li><code>smtp_port</code> → <code>587</code></li>
               <li><code>smtp_user</code> → tu dirección Gmail</li>
               <li><code>smtp_password</code> → la contraseña de app de 16 caracteres</li>
-              <li><code>smtp_from</code> → <code>BINAIH &lt;tu@gmail.com&gt;</code></li>
+              <li><code>smtp_from</code> → <code>TVEO &lt;tu@gmail.com&gt;</code></li>
             </ul>
           </li>
           <li>Activa las notificaciones: <code>notif_email_enabled</code> → <code>true</code></li>

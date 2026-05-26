@@ -50,14 +50,14 @@ export default function StoreResultCard({ store }: { store: Store }) {
         </div>
 
         {/* Stats */}
-        <div style={{ display: 'flex', gap: 20, fontSize: 12, color: 'var(--subtle)', flexShrink: 0 }}>
-          <div style={{ textAlign: 'center' }}>
+        <div style={{ display: 'flex', gap: 14, fontSize: 12, color: 'var(--subtle)', flexShrink: 0, alignItems: 'center' }}>
+          <div style={{ textAlign: 'center', minWidth: 36 }}>
             <div style={{ fontFamily: 'var(--font-serif)', fontSize: 18, color: 'var(--ink)', lineHeight: 1 }}>{store.audits}</div>
-            <div style={{ fontSize: 10, marginTop: 2 }}>auditorías</div>
+            <div style={{ fontSize: 9, marginTop: 2, whiteSpace: 'nowrap' }}>audits</div>
           </div>
-          <div style={{ textAlign: 'center' }}>
+          <div style={{ textAlign: 'center', minWidth: 36 }}>
             <div style={{ fontFamily: 'var(--font-serif)', fontSize: 18, color: store.findings > 5 ? 'var(--err)' : 'var(--ink)', lineHeight: 1 }}>{store.findings}</div>
-            <div style={{ fontSize: 10, marginTop: 2 }}>hallazgos</div>
+            <div style={{ fontSize: 9, marginTop: 2, whiteSpace: 'nowrap' }}>hallazgos</div>
           </div>
         </div>
 

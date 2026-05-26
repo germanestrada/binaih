@@ -8,13 +8,13 @@ export async function POST() {
 
   const ok = await sendEmail(session.user.companyId, {
     to:      session.user.email!,
-    subject: '✅ BINAIH — Configuración de email verificada',
+    subject: '✅ TVEO — Configuración de email verificada',
     html: `
       <div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:32px;background:#f5f5f5;border-radius:12px;">
         <div style="font-size:24px;font-weight:300;margin-bottom:8px;">✅ Email configurado</div>
-        <p style="color:#555;font-size:14px;">La configuración SMTP de BINAIH funciona correctamente. Las notificaciones automáticas están activas.</p>
+        <p style="color:#555;font-size:14px;">La configuración SMTP de TVEO funciona correctamente. Las notificaciones automáticas están activas.</p>
         <hr style="border:none;border-top:1px solid #ddd;margin:20px 0;"/>
-        <p style="color:#aaa;font-size:11px;">BINAIH · ${new Date().toLocaleString('es-CO')}</p>
+        <p style="color:#aaa;font-size:11px;">TVEO · ${new Date().toLocaleString('es-CO')}</p>
       </div>`,
   })
 

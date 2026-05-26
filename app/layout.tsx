@@ -4,7 +4,7 @@ import SessionProvider from '@/components/layout/SessionProvider'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'BINAIH',
+  title: 'TVEO',
   description: 'Portal corporativo de auditoría de tiendas',
 }
 

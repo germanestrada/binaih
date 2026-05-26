@@ -9,6 +9,7 @@ const NAV = [
   { href: '/admin/usuarios',        label: 'Usuarios',             icon: 'user'      as const, section: 'Acceso' },
   { href: '/admin/tipos-locacion',  label: 'Tipos de locación',    icon: 'building'  as const, section: 'Acceso' },
   { href: '/admin/locaciones',      label: 'Locaciones',           icon: 'store'     as const, section: 'Acceso' },
+  { href: '/admin/locaciones-bulk', label: 'Cargue masivo',         icon: 'export'    as const, section: 'Acceso' },
   { href: '/admin/tipos-auditoria', label: 'Tipos de auditoría',   icon: 'clipboard' as const, section: 'Auditorías' },
   { href: '/admin/items-maestros',  label: 'Ítems maestros',       icon: 'search'    as const, section: 'Auditorías' },
   { href: '/admin/items-tenant',    label: 'Ítems del tenant',     icon: 'check'     as const, section: 'Auditorías' },
