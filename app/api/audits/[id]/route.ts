@@ -8,15 +8,17 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const { id } = await params
 
-  const [auditRes, itemsRes] = await Promise.all([
+  const [auditRes, itemsRes, aiLogsRes] = await Promise.all([
     sbFetch(`/audits?id=eq.${id}&select=*,locations(id,name,city,zone),audit_types(id,name,icon,description),users!audits_auditor_id_fkey(name)&limit=1`),
     sbFetch(`/audit_item_results?audit_id=eq.${id}&select=*,audit_type_items(id,title,description,section,order_index,response_type,max_score,weight,required,ai_enabled,scale_min_label,scale_max_label)&order=audit_type_items(order_index).asc`),
+    sbFetch(`/ai_analysis_logs?audit_id=eq.${id}&select=id,provider,model,proposed_status,proposed_score,confidence,success,duration_ms,created_at,error_message&order=created_at.asc`),
   ])
 
   const audits = await auditRes.json() as any[]
   if (!audits.length) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
-  const items = await itemsRes.json() as any[]
+  const items   = await itemsRes.json() as any[]
+  const aiLogs  = await aiLogsRes.json() as any[]
 
   // Agrupar ítems por sección
   const sections: Record<string, any[]> = {}
@@ -26,7 +28,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     sections[sec].push(r)
   })
 
-  return NextResponse.json({ ...audits[0], items, sections })
+  return NextResponse.json({ ...audits[0], items, sections, aiLogs })
 }
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {

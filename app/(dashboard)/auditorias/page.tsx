@@ -2,6 +2,7 @@
 import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Icon from '@/components/ui/Icon'
+import FilterBar from '@/components/ui/FilterBar'
 
 interface Audit {
   id: string
@@ -45,32 +46,25 @@ function AuditoriasContent() {
 
   useEffect(()=>{load(filter)},[filter])
 
-  const FILTERS = [
-    {value:'',           label:'Todas'},
-    {value:'scheduled',  label:'Programadas'},
-    {value:'in_progress',label:'En curso'},
-    {value:'completed',  label:'Completadas'},
-  ]
-
   return (
     <div style={{display:'flex',flexDirection:'column',height:'calc(100vh - 92px)'}}>
       {/* Toolbar */}
-      <div style={{display:'flex',alignItems:'center',gap:12,padding:'12px 24px',borderBottom:'1px solid var(--border)',background:'var(--white)',flexShrink:0}}>
-        <div style={{display:'flex',border:'1px solid var(--border)',borderRadius:'var(--r-sm)',overflow:'hidden'}}>
-          {FILTERS.map(f=>(
-            <button key={f.value} onClick={()=>setFilter(f.value)} style={{
-              padding:'6px 14px',fontSize:12,border:'none',cursor:'pointer',
-              fontFamily:'inherit',fontWeight:filter===f.value?500:400,
-              background:filter===f.value?'var(--ink)':'var(--white)',
-              color:filter===f.value?'white':'var(--subtle)',transition:'all .15s',
-            }}>{f.label}</button>
-          ))}
-        </div>
-        <span style={{fontSize:11,color:'var(--subtle)',fontFamily:'var(--font-mono)',flex:1}}>
-          {audits.length} auditoría{audits.length!==1?'s':''}
-        </span>
+      <div style={{display:'flex',alignItems:'center',gap:12,padding:'10px 24px',borderBottom:'1px solid var(--border)',background:'var(--white)',flexShrink:0}}>
+        <FilterBar
+          fields={[
+            {key:'status',label:'Estado',type:'select',options:[
+              {value:'scheduled',label:'Programada'},{value:'in_progress',label:'En curso'},
+              {value:'completed',label:'Completada'},{value:'cancelled',label:'Cancelada'},
+            ]},
+          ]}
+          values={{status:filter}}
+          onChange={(_k,v)=>setFilter(v)}
+          onClear={()=>setFilter('')}
+          count={audits.length}
+          label="Estado"
+        />
         <button onClick={()=>router.push('/auditorias/nueva')} style={{
-          display:'flex',alignItems:'center',gap:6,
+          display:'flex',alignItems:'center',gap:6,marginLeft:'auto',
           background:'var(--ink)',color:'white',border:'none',
           padding:'8px 16px',borderRadius:'var(--r-sm)',fontSize:13,
           fontWeight:500,cursor:'pointer',fontFamily:'inherit',

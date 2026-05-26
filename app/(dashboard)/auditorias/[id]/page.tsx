@@ -17,6 +17,12 @@ interface ItemResult {
   }
 }
 
+interface AILog {
+  id:string; provider:string; model:string; proposed_status?:string
+  proposed_score?:number; confidence?:number; success:boolean
+  duration_ms?:number; created_at:string; error_message?:string
+}
+
 interface AuditDetail {
   id: string; status: string; score?: number; source: string
   scheduled_at?: string; started_at?: string; completed_at?: string
@@ -26,6 +32,7 @@ interface AuditDetail {
   users?: { name:string }
   items: ItemResult[]
   sections: Record<string, ItemResult[]>
+  aiLogs: AILog[]
 }
 
 const STATUS_MAP: Record<string,{label:string;next?:string;nextLabel?:string;bg:string;color:string}> = {
@@ -312,6 +319,42 @@ export default function AuditoriaDetailPage() {
               <div style={{fontSize:12,color:'var(--ink)'}}>{s.value}</div>
             </div>
           ))}
+
+          {/* Trazabilidad IA */}
+          {audit.aiLogs?.length>0&&(
+            <div style={{borderTop:'1px solid var(--border2)',paddingTop:12,marginTop:4}}>
+              <div style={{fontSize:10,fontWeight:600,color:'var(--subtle)',textTransform:'uppercase',letterSpacing:'1px',marginBottom:10}}>
+                ✨ Trazabilidad IA
+              </div>
+              <div style={{display:'flex',justifyContent:'space-between',fontSize:11,marginBottom:6}}>
+                <span style={{color:'var(--subtle)'}}>Análisis</span>
+                <span style={{color:'var(--ink)',fontWeight:500}}>{audit.aiLogs.length}</span>
+              </div>
+              <div style={{display:'flex',justifyContent:'space-between',fontSize:11,marginBottom:6}}>
+                <span style={{color:'var(--subtle)'}}>Exitosos</span>
+                <span style={{color:'var(--ok)',fontWeight:500}}>{audit.aiLogs.filter((l:AILog)=>l.success).length}</span>
+              </div>
+              <div style={{display:'flex',justifyContent:'space-between',fontSize:11,marginBottom:10}}>
+                <span style={{color:'var(--subtle)'}}>Confianza prom.</span>
+                <span style={{color:'var(--ink)',fontWeight:500,fontFamily:'var(--font-mono)'}}>
+                  {Math.round(audit.aiLogs.filter((l:AILog)=>l.success&&l.confidence!=null).reduce((a:number,l:AILog)=>a+(l.confidence??0),0)/(audit.aiLogs.filter((l:AILog)=>l.success).length||1))}%
+                </span>
+              </div>
+              {/* Mini lista de logs */}
+              <div style={{display:'flex',flexDirection:'column',gap:6}}>
+                {audit.aiLogs.map((log:AILog)=>{
+                  const sc = log.proposed_status==='compliant'?'var(--ok)':log.proposed_status==='non_compliant'?'var(--err)':log.proposed_status==='partial'?'var(--warn)':'var(--subtle)'
+                  return (
+                    <div key={log.id} style={{display:'flex',alignItems:'center',gap:6,padding:'6px 8px',background:'var(--surface)',borderRadius:'var(--r-sm)',border:'1px solid var(--border2)'}}>
+                      <span style={{width:8,height:8,borderRadius:'50%',background:log.success?sc:'var(--err)',flexShrink:0,display:'inline-block'}}/>
+                      <span style={{fontSize:10,color:'var(--subtle)',fontFamily:'var(--font-mono)',flex:1}}>{new Date(log.created_at).toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'})}</span>
+                      {log.confidence!=null&&<span style={{fontSize:10,color:log.confidence>=85?'var(--ok)':log.confidence>=70?'var(--warn)':'var(--err)',fontFamily:'var(--font-mono)',fontWeight:600}}>{Math.round(log.confidence)}%</span>}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Acciones */}
           {canEdit&&status.next&&(
