@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import PageHeader from '@/components/layout/PageHeader'
 import Icon from '@/components/ui/Icon'
+import AIAnalyzeButton, { type AIResult } from '@/components/ui/AIAnalyzeButton'
 
 interface ItemResult {
   id: string; status: string; score?: number; scale_value?: number
@@ -180,6 +181,35 @@ function ItemRow({result, auditId, onUpdate}:{result:ItemResult;auditId:string;o
           {/* Notes */}
           <input value={val.notes} onChange={e=>setVal(p=>({...p,notes:e.target.value}))}
             placeholder="Notas adicionales (opcional)" style={{width:'100%',border:'1px solid var(--border)',borderRadius:'var(--r-sm)',padding:'7px 12px',fontSize:12,fontFamily:'inherit',outline:'none',marginBottom:12}}/>
+
+          {/* IA Analysis */}
+          {item.ai_enabled&&(
+            <div style={{marginBottom:12,padding:'10px 12px',background:'var(--surface)',borderRadius:'var(--r-sm)',border:'1px solid var(--border2)'}}>
+              <div style={{fontSize:10,fontWeight:600,color:'var(--subtle)',textTransform:'uppercase',letterSpacing:'1px',marginBottom:8}}>✨ Análisis con IA</div>
+              <AIAnalyzeButton
+                auditId={auditId}
+                itemResultId={result.id}
+                itemTitle={item.title}
+                itemDesc={item.description}
+                responseType={item.response_type}
+                aiPrompt={(item as any).ai_prompt}
+                aiCriteria={(item as any).ai_criteria}
+                maxScore={item.max_score}
+                scaleMinLabel={item.scale_min_label}
+                scaleMaxLabel={item.scale_max_label}
+                onResult={(aiResult:AIResult)=>{
+                  setVal(p=>({
+                    ...p,
+                    status:      aiResult.status,
+                    score:       String(aiResult.score),
+                    scale_value: String(aiResult.raw.scale_value??''),
+                    notes:       aiResult.reasoning,
+                  }))
+                  if(aiResult.autoApproved){ save() }
+                }}
+              />
+            </div>
+          )}
 
           <div style={{display:'flex',gap:8,justifyContent:'flex-end'}}>
             <button onClick={()=>setOpen(false)} style={{background:'none',border:'1px solid var(--border)',color:'var(--mid)',padding:'7px 14px',borderRadius:'var(--r-sm)',fontSize:12,cursor:'pointer',fontFamily:'inherit'}}>Cancelar</button>

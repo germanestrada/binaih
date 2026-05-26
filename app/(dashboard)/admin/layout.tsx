@@ -12,13 +12,14 @@ const NAV = [
   { href: '/admin/tipos-auditoria', label: 'Tipos de auditoría',   icon: 'clipboard' as const, section: 'Auditorías' },
   { href: '/admin/items-maestros',  label: 'Ítems maestros',       icon: 'search'    as const, section: 'Auditorías' },
   { href: '/admin/items-tenant',    label: 'Ítems del tenant',     icon: 'check'     as const, section: 'Auditorías' },
-  { href: '/admin/notificaciones',  label: 'Notificaciones',       icon: 'eye'       as const, section: 'Sistema' },
+  { href: '/admin/batch',           label: 'Análisis Batch IA',    icon: 'eye'       as const, section: 'IA' },
+  { href: '/admin/notificaciones',  label: 'Notificaciones',       icon: 'alert'     as const, section: 'Sistema' },
   { href: '/admin/configuracion',   label: 'Configuración',        icon: 'filter'    as const, section: 'Sistema' },
   { href: '/admin/exportar',        label: 'Exportar datos',       icon: 'export'    as const, section: 'Sistema' },
   { href: '/admin/plan',            label: 'Plan activo',          icon: 'trophy'    as const, section: 'Sistema' },
 ]
 
-const SECTIONS = ['Acceso', 'Auditorías', 'Sistema']
+const SECTIONS = ['Acceso', 'Auditorías', 'IA', 'Sistema']
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession()
