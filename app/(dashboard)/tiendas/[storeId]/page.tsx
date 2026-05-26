@@ -11,7 +11,7 @@ interface LocationDetail {
   status: string; current_score: number; last_audit_at?: string
   manager_name?: string; manager_phone?: string; area_sqm?: number
   location_types?: { name: string; icon: string }
-  audits: Audit[]; findings: Finding[]; scoreHistory: ScorePoint[]
+  audits: Audit[]; findings: Finding[]; scoreHistory: ScorePoint[]; aiLogs: AILog[]; lastAuditId?: string
 }
 interface Audit {
   id: string; score?: number; status: string
@@ -23,6 +23,11 @@ interface Finding {
   finding_categories?: { title: string; icon: string; color: string }
 }
 interface ScorePoint { score: number; previous_score?: number; delta?: number; recorded_at: string }
+interface AILog {
+  id: string; provider: string; model: string; proposed_status?: string
+  proposed_score?: number; confidence?: number; success: boolean
+  duration_ms?: number; created_at: string; error_message?: string
+}
 
 // ── Helpers ──────────────────────────────────────────────────
 function scoreColor(s: number) {
@@ -143,7 +148,7 @@ export default function StoreDetailPage() {
 
   const [data, setData]       = useState<LocationDetail | null>(null)
   const [loading, setLoading] = useState(true)
-  const [tab, setTab]         = useState<'findings'|'audits'|'trend'>('trend')
+  const [tab, setTab]         = useState<'findings'|'audits'|'trend'|'ai'>('trend')
 
   useEffect(() => {
     fetch(`/api/stores/${storeId}`)
@@ -228,6 +233,7 @@ export default function StoreDetailPage() {
               { key:'trend',    label:'Tendencia',  icon:'trending-up'  as const },
               { key:'findings', label:`Hallazgos (${openFindings.length})`, icon:'search' as const },
               { key:'audits',   label:'Auditorías', icon:'calendar' as const },
+              { key:'ai',       label:`IA (${data.aiLogs?.length??0})`, icon:'eye' as const },
             ] as const).map(t => (
               <button key={t.key} onClick={() => setTab(t.key as any)} style={{
                 display:'flex', alignItems:'center', gap:6,
@@ -347,6 +353,69 @@ export default function StoreDetailPage() {
                       </>
                     )}
                   </>
+                )}
+              </div>
+            )}
+
+            {/* ── Tab: IA logs ── */}
+            {tab === 'ai' && (
+              <div>
+                <div style={{ fontSize:10, fontWeight:600, color:'var(--subtle)', textTransform:'uppercase', letterSpacing:'1.2px', marginBottom:16 }}>
+                  Análisis IA — última auditoría
+                  {data.lastAuditId && (
+                    <a href={`/auditorias/${data.lastAuditId}`} style={{ marginLeft:12, fontSize:11, color:'var(--ink)', textDecoration:'underline' }}>Ver auditoría completa →</a>
+                  )}
+                </div>
+                {!data.aiLogs?.length ? (
+                  <div style={{ textAlign:'center', padding:'40px', color:'var(--subtle)', fontSize:13 }}>
+                    Sin análisis de IA en la última auditoría.
+                  </div>
+                ) : (
+                  <div style={{ background:'var(--white)', border:'1px solid var(--border)', borderRadius:'var(--r-lg)', overflow:'hidden' }}>
+                    {/* Stats resumen */}
+                    <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:0, borderBottom:'1px solid var(--border)' }}>
+                      {[
+                        { label:'Análisis', value: data.aiLogs.length },
+                        { label:'Exitosos', value: data.aiLogs.filter(l=>l.success).length, color:'var(--ok)' },
+                        { label:'Confianza prom.', value: `${Math.round(data.aiLogs.filter(l=>l.success&&l.confidence!=null).reduce((a,l)=>a+(l.confidence??0),0)/(data.aiLogs.filter(l=>l.success).length||1))}%` },
+                        { label:'Duración prom.', value: `${Math.round(data.aiLogs.filter(l=>l.duration_ms!=null).reduce((a,l)=>a+(l.duration_ms??0),0)/(data.aiLogs.length||1))}ms` },
+                      ].map((s,i)=>(
+                        <div key={s.label} style={{ padding:'12px 16px', borderRight:i<3?'1px solid var(--border2)':'none' }}>
+                          <div style={{ fontSize:10, color:'var(--subtle)', textTransform:'uppercase', letterSpacing:'1px', marginBottom:4, fontWeight:600 }}>{s.label}</div>
+                          <div style={{ fontFamily:'var(--font-serif)', fontSize:22, color:(s as any).color??'var(--ink)', lineHeight:1 }}>{s.value}</div>
+                        </div>
+                      ))}
+                    </div>
+                    {/* Lista de logs */}
+                    {data.aiLogs.map((log,i)=>{
+                      const statusColor = log.proposed_status==='compliant'?'var(--ok)':log.proposed_status==='non_compliant'?'var(--err)':log.proposed_status==='partial'?'var(--warn)':'var(--subtle)'
+                      const statusLabel = {compliant:'Cumple',non_compliant:'No cumple',partial:'Parcial',na:'N/A'}[log.proposed_status??'']??'—'
+                      return (
+                        <div key={log.id} style={{ display:'flex', alignItems:'center', gap:14, padding:'12px 16px', borderBottom:i<data.aiLogs.length-1?'1px solid var(--border2)':'none' }}>
+                          <div style={{ fontFamily:'var(--font-mono)', fontSize:10, color:'var(--subtle)', flexShrink:0 }}>
+                            {new Date(log.created_at).toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'})}
+                          </div>
+                          <div style={{ flex:1, minWidth:0 }}>
+                            <div style={{ fontSize:11, color:'var(--mid)' }}>{log.provider} / {log.model}</div>
+                            {log.error_message && <div style={{ fontSize:11, color:'var(--err)', marginTop:2 }}>{log.error_message.slice(0,60)}</div>}
+                          </div>
+                          {log.proposed_status && <span style={{ fontSize:11, fontWeight:500, color:statusColor }}>{statusLabel}</span>}
+                          {log.proposed_score!=null && <span style={{ fontFamily:'var(--font-serif)', fontSize:18, color:'var(--ink)' }}>{log.proposed_score}</span>}
+                          {log.confidence!=null && (
+                            <div style={{ display:'flex', alignItems:'center', gap:6, minWidth:100 }}>
+                              <div style={{ flex:1, height:3, background:'var(--border2)', borderRadius:2, overflow:'hidden' }}>
+                                <div style={{ height:'100%', width:`${log.confidence}%`, background:log.confidence>=85?'var(--ok)':log.confidence>=70?'var(--warn)':'var(--err)', borderRadius:2 }}/>
+                              </div>
+                              <span style={{ fontSize:10, fontFamily:'var(--font-mono)', color:'var(--subtle)' }}>{Math.round(log.confidence)}%</span>
+                            </div>
+                          )}
+                          <span style={{ fontSize:10, fontWeight:500, padding:'2px 7px', borderRadius:20, background:log.success?'var(--ok-bg)':'var(--err-bg)', color:log.success?'var(--ok)':'var(--err)', flexShrink:0 }}>
+                            {log.success?'✓':'✗'}
+                          </span>
+                        </div>
+                      )
+                    })}
+                  </div>
                 )}
               </div>
             )}
