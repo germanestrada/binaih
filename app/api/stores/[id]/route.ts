@@ -14,7 +14,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   const [locRes, auditsRes, findingsRes, historyRes] = await Promise.all([
     fetch(`${url}/rest/v1/locations?id=eq.${id}&select=*,location_types(name,icon)&limit=1`, { headers }),
     fetch(`${url}/rest/v1/audits?location_id=eq.${id}&select=id,score,status,completed_at,scheduled_at,notes&order=completed_at.desc&limit=10`, { headers }),
-    fetch(`${url}/rest/v1/audit_findings?location_id=eq.${id}&select=*,finding_categories(title,icon,color)&order=created_at.desc`, { headers }),
+    fetch(`${url}/rest/v1/audit_findings?location_id=eq.${id}&select=*,finding_categories(title,icon,color),audits(id,completed_at,scheduled_at)&order=created_at.desc`, { headers }),
     fetch(`${url}/rest/v1/location_score_history?location_id=eq.${id}&select=score,previous_score,delta,recorded_at&order=recorded_at.asc&limit=12`, { headers }),
   ])
 

@@ -41,6 +41,18 @@ export async function GET() {
       trialEndsAt:   tenant_.trial_ends_at ?? null,
       status:        tenant_.status ?? '—',
     },
+    tenant: {
+      name:           tenant_.name ?? '—',
+      nit:            tenant_.nit ?? tenant_.tax_id ?? null,
+      contactName:    tenant_.contact_name ?? null,
+      contactEmail:   tenant_.contact_email ?? null,
+      contactPhone:   tenant_.contact_phone ?? null,
+      billingAddress: tenant_.billing_address ?? null,
+      billingCity:    tenant_.billing_city ?? null,
+      billingState:   tenant_.billing_state ?? null,
+      billingCountry: tenant_.billing_country ?? 'Colombia',
+      billingZip:     tenant_.billing_zip ?? null,
+    },
     usage: {
       locations:      locs.length,
       activeLocations:locs.filter((l: any) => l.status === 'active').length,

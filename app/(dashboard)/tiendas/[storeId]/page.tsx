@@ -19,8 +19,9 @@ interface Audit {
 }
 interface Finding {
   id: string; count: number; severity: string; status: string
-  resolution_notes?: string; due_date?: string
+  resolution_notes?: string; due_date?: string; created_at?: string
   finding_categories?: { title: string; icon: string; color: string }
+  audits?: { id: string; completed_at?: string; scheduled_at?: string }
 }
 interface ScorePoint { score: number; previous_score?: number; delta?: number; recorded_at: string }
 interface AILog {
@@ -315,11 +316,23 @@ export default function StoreDetailPage() {
                                   {f.resolution_notes && (
                                     <div style={{ fontSize:11, color:'var(--subtle)', lineHeight:1.5 }}>{f.resolution_notes}</div>
                                   )}
-                                  {f.due_date && (
-                                    <div style={{ fontSize:10, color:'var(--warn)', marginTop:3, fontFamily:'var(--font-mono)' }}>
-                                      Fecha límite: {formatDate(f.due_date)}
-                                    </div>
-                                  )}
+                                  <div style={{ display:'flex', gap:12, marginTop:3, flexWrap:'wrap' }}>
+                                    {f.audits?.id && (
+                                      <div style={{ fontSize:10, color:'var(--subtle)', fontFamily:'var(--font-mono)' }}>
+                                        Auditoría: {f.audits.id.slice(-8).toUpperCase()}
+                                      </div>
+                                    )}
+                                    {f.created_at && (
+                                      <div style={{ fontSize:10, color:'var(--subtle)' }}>
+                                        {formatDate(f.created_at)}
+                                      </div>
+                                    )}
+                                    {f.due_date && (
+                                      <div style={{ fontSize:10, color:'var(--warn)', fontFamily:'var(--font-mono)' }}>
+                                        Límite: {formatDate(f.due_date)}
+                                      </div>
+                                    )}
+                                  </div>
                                 </div>
                                 <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:6, flexShrink:0 }}>
                                   <span style={{ fontFamily:'var(--font-serif)', fontSize:20, color:sc2, lineHeight:1 }}>{f.count}</span>
