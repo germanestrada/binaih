@@ -8,7 +8,11 @@ function LoginForm() {
   const router       = useRouter()
   const [email,    setEmail]    = useState('')
   const [password, setPassword] = useState('')
-  const [error,    setError]    = useState(searchParams.get('error') ? 'Credenciales incorrectas' : '')
+  const errorParam = searchParams.get('error')
+  const [error, setError] = useState(
+    errorParam === 'AccessDenied' ? 'Acceso no permitido en este horario o ubicación. Contacta a tu administrador.' :
+    errorParam ? 'Correo o contraseña incorrectos' : ''
+  )
   const [loading,  setLoading]  = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {

@@ -1,12 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from 'next/server'
+import { validateRouteId } from '@/lib/validate'
 import { guardSuperAdmin } from '@/lib/superadmin-guard'
 import { sbFetch } from '@/lib/admin-fetch'
 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { error } = await guardSuperAdmin()
   if (error) return error
-  const { id } = await params
+  const rawId = (await params).id
+  const id = validateRouteId(rawId)
+  if (!id) return NextResponse.json({ error: 'ID inválido' }, { status: 400 })
   const res  = await sbFetch(`/tenants?id=eq.${id}&select=*,plans(name,tier)&limit=1`)
   const data = await res.json() as any[]
   if (!data.length) return NextResponse.json({ error: 'Not found' }, { status: 404 })

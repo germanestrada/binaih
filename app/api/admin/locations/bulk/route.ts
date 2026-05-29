@@ -7,10 +7,28 @@ export async function POST(req: Request) {
   const session = await auth()
   if (!session || session.user.role !== 'admin') return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
+  const tenantId = session.user.companyId
   const { rows } = await req.json() as { rows: Record<string,string>[] }
   if (!rows?.length) return NextResponse.json({ error: 'Sin filas' }, { status: 400 })
 
-  const tenantId = session.user.companyId
+  // Límite de filas por request
+  const MAX_ROWS = 500
+  if (rows.length > MAX_ROWS) {
+    return NextResponse.json({ error: `Máximo ${MAX_ROWS} filas por cargue. El archivo tiene ${rows.length}.` }, { status: 400 })
+  }
+
+  // Verificar límite del plan
+  const planRes   = await sbFetch(`/tenants?id=eq.${tenantId}&select=plans(max_locations)&limit=1`)
+  const planData  = await planRes.json() as any[]
+  const maxLocs   = planData[0]?.plans?.max_locations ?? 999
+  const countRes  = await sbFetch(`/locations?tenant_id=eq.${tenantId}&select=id`)
+  const existing  = (await countRes.json() as any[]).length
+  if (existing + rows.length > maxLocs) {
+    return NextResponse.json({
+      error: `El plan permite máximo ${maxLocs} locaciones. Tienes ${existing} y estás intentando agregar ${rows.length}.`
+    }, { status: 400 })
+  }
+
 
   // Obtener tipos de locación del tenant para mapear por nombre
   const typesRes = await sbFetch(`/location_types?tenant_id=eq.${tenantId}&select=id,name`)

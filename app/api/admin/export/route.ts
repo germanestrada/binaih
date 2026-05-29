@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from 'next/server'
+import { sanitizeCsvCell } from '@/lib/validate'
 import { auth } from '@/auth'
 import { sbFetch } from '@/lib/admin-fetch'
 
@@ -25,7 +26,7 @@ export async function GET(req: Request) {
     headers = ['ID','Locación','Score','Estado','Completada','Programada','Duración min','Notas']
     rows    = rows.map((r: any) => [r.id,r.location_id,r.score,r.status,r.completed_at,r.scheduled_at,r.duration_min,r.notes])
   } else if (type === 'findings') {
-    const res = await sbFetch(`/audit_findings?select=id,location_id,category_id,count,severity,status,due_date,resolved_at&order=created_at.desc`)
+    const res = await sbFetch(`/audit_findings?tenant_id=eq.${tenant}&select=id,location_id,category_id,count,severity,status,due_date,resolved_at&order=created_at.desc`)
     rows    = await res.json()
     headers = ['ID','Locación','Categoría','Cantidad','Severidad','Estado','Fecha límite','Resuelto']
     rows    = rows.map((r: any) => [r.id,r.location_id,r.category_id,r.count,r.severity,r.status,r.due_date,r.resolved_at])
@@ -36,7 +37,7 @@ export async function GET(req: Request) {
     rows    = rows.map((r: any) => [r.id,r.name,r.email,r.role_name,r.zone,r.status,r.last_login,r.created_at])
   }
 
-  const csv = [headers, ...rows].map(r => r.map((v: any) => `"${v ?? ''}"`).join(',')).join('\n')
+  const csv = [headers, ...rows].map(r => r.map((v: any) => `"${sanitizeCsvCell(v)}"`).join(',')).join('\n')
   const filename = `binaih-${type}-${new Date().toISOString().slice(0,10)}.csv`
 
   return new NextResponse(csv, {

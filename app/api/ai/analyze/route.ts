@@ -32,10 +32,29 @@ export async function POST(req: Request) {
   const config   = await getAIConfig(tenantId)
   if (!config) return NextResponse.json({ error: 'IA no configurada. Ve a Admin → Configuración → grupo "ia".' }, { status: 400 })
 
-  // Si viene URL, descargar la imagen
+  // Si viene URL, validar dominio y descargar la imagen
   let base64 = imageBase64
   if (!base64 && imageUrl) {
-    const imgRes = await fetch(imageUrl)
+    // Validar que la URL sea de un origen permitido (SSRF protection)
+    let parsedUrl: URL
+    try {
+      parsedUrl = new URL(imageUrl)
+    } catch {
+      return NextResponse.json({ error: 'imageUrl inválida' }, { status: 400 })
+    }
+    const ALLOWED_HOSTS = [
+      process.env.NEXT_PUBLIC_SUPABASE_URL ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname : null,
+      'storage.googleapis.com',
+      'r2.cloudflarestorage.com',
+      's3.amazonaws.com',
+    ].filter(Boolean)
+
+    const isAllowed = ALLOWED_HOSTS.some(h => parsedUrl.hostname === h || parsedUrl.hostname.endsWith(`.${h}`))
+    const isPrivate = /^(localhost|127\.|10\.|172\.(1[6-9]|2[0-9]|3[01])\.|192\.168\.|169\.254\.)/.test(parsedUrl.hostname)
+    if (!isAllowed || isPrivate || !['https:', 'http:'].includes(parsedUrl.protocol)) {
+      return NextResponse.json({ error: 'imageUrl no pertenece a un origen permitido' }, { status: 400 })
+    }
+    const imgRes = await fetch(imageUrl, { signal: AbortSignal.timeout(10000) })
     const buffer = await imgRes.arrayBuffer()
     base64       = Buffer.from(buffer).toString('base64')
   }

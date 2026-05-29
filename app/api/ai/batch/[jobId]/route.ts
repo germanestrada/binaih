@@ -9,7 +9,9 @@ export async function GET(_req: Request, { params }: { params: Promise<{ jobId: 
   const session = await auth()
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const { jobId } = await params
-  const res  = await sbFetch(`/batch_jobs?id=eq.${jobId}&select=*,locations(name,city),audit_types(name,icon),batch_image_results(*)&limit=1`)
+  const session2 = await auth()
+  if (!session2) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const res  = await sbFetch(`/batch_jobs?id=eq.${jobId}&tenant_id=eq.${session2.user.companyId}&select=*,locations(name,city),audit_types(name,icon),batch_image_results(*)&limit=1`)
   const data = await res.json() as any[]
   if (!data.length) return NextResponse.json({ error: 'Not found' }, { status: 404 })
   return NextResponse.json(data[0])
@@ -39,7 +41,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ jobId: 
   })
 
   // Obtener info del job
-  const jobRes  = await sbFetch(`/batch_jobs?id=eq.${jobId}&select=*&limit=1`)
+  const jobRes  = await sbFetch(`/batch_jobs?id=eq.${jobId}&tenant_id=eq.${tenantId}&select=*&limit=1`)
   const jobs    = await jobRes.json() as any[]
   const job     = jobs[0]
 

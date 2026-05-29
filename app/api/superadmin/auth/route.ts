@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from 'next/server'
 import { verifySuperAdminCredentials, signSuperAdminToken, getSuperAdminSession, COOKIE_NAME, MAX_AGE } from '@/lib/superadmin-auth'
+import { checkRateLimit, resetRateLimit } from '@/lib/rate-limit'
 import { verifyTotp, generateTotpSecret, getTotpUri } from "@/lib/totp";
 import { sbFetch } from '@/lib/admin-fetch'
 
@@ -9,8 +10,22 @@ export async function POST(req: Request) {
   const { email, password, totpCode } = await req.json()
   if (!email || !password) return NextResponse.json({ error: 'Credenciales requeridas' }, { status: 400 })
 
+  // Rate limiting por email + IP
+  const ip      = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const rlKey   = `sa-login:${email}:${ip}`
+  const rl      = checkRateLimit(rlKey)
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: `Demasiados intentos. Intenta de nuevo en ${Math.ceil((rl.retryAfter ?? 900) / 60)} minutos.` },
+      { status: 429, headers: { 'Retry-After': String(rl.retryAfter ?? 900) } }
+    )
+  }
+
   const admin = await verifySuperAdminCredentials(email, password)
   if (!admin) return NextResponse.json({ error: 'Credenciales incorrectas' }, { status: 401 })
+  
+  // Limpiar contador en login exitoso
+  resetRateLimit(rlKey)
 
   // Si tiene 2FA activado, verificar código TOTP
   if (admin.totp_enabled) {

@@ -3,9 +3,12 @@ import { cookies } from 'next/headers'
 import { sbFetch } from '@/lib/admin-fetch'
 import bcrypt from 'bcryptjs'
 
-const SECRET = new TextEncoder().encode(
-  process.env.SUPERADMIN_SECRET ?? 'tveo-superadmin-secret-change-in-production'
-)
+function getSecret(): Uint8Array {
+  if (!process.env.SUPERADMIN_SECRET) {
+    throw new Error('[TVEO] SUPERADMIN_SECRET env var is required but not set.')
+  }
+  return new TextEncoder().encode(process.env.SUPERADMIN_SECRET)
+}
 const COOKIE_NAME = 'tveo-sa-token'
 const MAX_AGE    = 60 * 60 * 4 // 4 horas
 
@@ -23,13 +26,13 @@ export async function signSuperAdminToken(payload: SuperAdminSession): Promise<s
     .setProtectedHeader({ alg: 'HS256' })
     .setExpirationTime(`${MAX_AGE}s`)
     .setIssuedAt()
-    .sign(SECRET)
+    .sign(getSecret())
 }
 
 // Verificar JWT
 export async function verifySuperAdminToken(token: string): Promise<SuperAdminSession | null> {
   try {
-    const { payload } = await jwtVerify(token, SECRET)
+    const { payload } = await jwtVerify(token, getSecret())
     return payload as unknown as SuperAdminSession
   } catch {
     return null

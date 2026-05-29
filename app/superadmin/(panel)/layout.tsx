@@ -30,6 +30,9 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
     router.push('/superadmin/login')
   }
 
+  // Banner 2FA si no está activado
+  const [dismissed2FA, setDismissed2FA] = useState(false)
+
   if (loading) return (
     <div style={{ minHeight: '100vh', background: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#555', fontSize: 13 }}>
       Verificando acceso…
@@ -104,8 +107,17 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
         </div>
       </aside>
 
+      {/* Banner 2FA */}
+      {admin&&!admin.totpEnabled&&!dismissed2FA&&(
+        <div style={{position:'fixed',top:0,left:0,right:0,zIndex:200,background:'#92400e',color:'white',padding:'12px 24px',display:'flex',alignItems:'center',gap:12,fontSize:13}}>
+          <span style={{fontSize:16}}>⚠️</span>
+          <span style={{flex:1,fontWeight:500}}>Tu cuenta no tiene 2FA activado. El acceso super-admin sin 2FA es un riesgo de seguridad crítico. <a href="/superadmin/admins" style={{color:'#fcd34d',textDecoration:'underline'}}>Activar ahora →</a></span>
+          <button onClick={()=>setDismissed2FA(true)} style={{background:'none',border:'none',color:'rgba(255,255,255,.6)',cursor:'pointer',fontSize:18,padding:0}}>✕</button>
+        </div>
+      )}
+
       {/* Content */}
-      <main style={{ flex: 1, overflow: 'auto', color: 'white' }}>
+      <main style={{paddingTop:admin&&!admin.totpEnabled&&!dismissed2FA?44:0, flex:1, overflow:'auto', color:'white'}}>
         {children}
       </main>
     </div>

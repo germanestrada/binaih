@@ -478,7 +478,6 @@ export default function LandingPage() {
             <span style={{fontSize:12}}>{t.footer.copy}</span>
             <div style={{display:'flex',gap:16}}>
               <Link href="/login" style={{fontSize:12,color:'rgba(255,255,255,.4)',textDecoration:'none'}}>{t.nav.login}</Link>
-              <Link href="/superadmin/login" style={{fontSize:12,color:'rgba(255,255,255,.2)',textDecoration:'none'}}>Admin</Link>
             </div>
           </div>
         </div>

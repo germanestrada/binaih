@@ -2,6 +2,7 @@ import NextAuth from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
 import { getUserByEmail, validatePassword } from '@/lib/users'
 import { checkAccessRestrictions } from '@/lib/access-control'
+import { checkRateLimit, resetRateLimit } from '@/lib/rate-limit'
 import type { Role } from '@/types/auth'
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -21,17 +22,32 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const password = credentials?.password as string | undefined
         if (!email || !password) return null
 
+        // Rate limiting por email
+        const rlKey = `tenant-login:${email}`
+        const rl    = checkRateLimit(rlKey)
+        if (!rl.allowed) {
+          console.warn(`[RateLimit] Login bloqueado para ${email} — demasiados intentos`)
+          return null
+        }
+
         const user = await getUserByEmail(email)
         if (!user) return null
 
         const valid = await validatePassword(password, user.passwordHash)
         if (!valid) return null
 
+        // Limpiar contador en login exitoso
+        resetRateLimit(rlKey)
+
         // Verificar restricciones de acceso (IP y horario)
+        // NextAuth v5 pasa el request en credentials authorize
+        const reqObj = credentials as any
+        const clientIp = reqObj?.__ip ?? undefined
         const access = await checkAccessRestrictions({
           userId:   user.id,
           tenantId: user.tenantId,
           roleName: user.roleName,
+          ip:       clientIp,
         })
         if (!access.allowed) {
           // Registrar intento bloqueado
