@@ -65,12 +65,15 @@ export default function AccesosPage() {
           {filtered.length===0&&<div style={{padding:'40px',textAlign:'center',color:'var(--subtle)',fontSize:13}}>Sin registros de acceso.</div>}
           {filtered.map((log,i)=>(
             <div key={log.id} style={{display:'flex',alignItems:'center',gap:14,padding:'11px 16px',borderBottom:i<filtered.length-1?'1px solid var(--border2)':'none'}}>
-              <div style={{fontFamily:'var(--font-mono)',fontSize:10,color:'var(--subtle)',whiteSpace:'nowrap',flexShrink:0,width:130}}>
-                {new Date(log.created_at).toLocaleDateString('es-CO',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})}
-              </div>
+              {/* Usuario */}
               <div style={{flex:1,minWidth:0}}>
                 <div style={{fontSize:12,fontWeight:500,color:'var(--ink)'}}>{log.users?.name??'—'}</div>
                 <div style={{fontSize:11,color:'var(--subtle)',fontFamily:'var(--font-mono)'}}>{log.users?.email} · {log.users?.role_name}</div>
+              </div>
+              {/* Fecha separada del nombre */}
+              <div style={{fontFamily:'var(--font-mono)',fontSize:10,color:'var(--subtle)',whiteSpace:'nowrap',flexShrink:0,textAlign:'right'}}>
+                <div>{new Date(log.created_at).toLocaleDateString('es-CO',{day:'2-digit',month:'short',year:'numeric'})}</div>
+                <div>{new Date(log.created_at).toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'})}</div>
               </div>
               {log.ip_address&&<span style={{fontSize:10,color:'var(--subtle)',fontFamily:'var(--font-mono)',flexShrink:0}}>{log.ip_address}</span>}
               <span style={{fontSize:11,fontWeight:500,padding:'2px 9px',borderRadius:20,background:(ACTION_COLOR[log.action]??'var(--subtle)')+'22',color:ACTION_COLOR[log.action]??'var(--subtle)',flexShrink:0,whiteSpace:'nowrap'}}>

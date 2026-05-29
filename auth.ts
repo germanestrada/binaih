@@ -1,6 +1,7 @@
 import NextAuth from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
 import { getUserByEmail, validatePassword } from '@/lib/users'
+import { checkAccessRestrictions } from '@/lib/access-control'
 import type { Role } from '@/types/auth'
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -25,6 +26,37 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         const valid = await validatePassword(password, user.passwordHash)
         if (!valid) return null
+
+        // Verificar restricciones de acceso (IP y horario)
+        const access = await checkAccessRestrictions({
+          userId:   user.id,
+          tenantId: user.tenantId,
+          roleName: user.roleName,
+        })
+        if (!access.allowed) {
+          // Registrar intento bloqueado
+          try {
+            const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+            const key = process.env.SUPABASE_SERVICE_ROLE_KEY
+            if (url && key) {
+              // Notificar al admin via API route
+              fetch(`${process.env.NEXTAUTH_URL}/api/notifications`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  type: 'access_blocked',
+                  data: {
+                    userName:  user.name,
+                    userEmail: user.email,
+                    reason:    access.reason,
+                    appUrl:    process.env.NEXTAUTH_URL,
+                  }
+                }),
+              }).catch(() => {})
+            }
+          } catch {}
+          return null
+        }
 
         return {
           id:          user.id,
