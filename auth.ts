@@ -46,6 +46,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token['zone']        = user.zone ?? null
         token['companyId']   = user.companyId
         token['companyName'] = user.companyName
+        // Registrar acceso (fire and forget)
+        try {
+          const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+          const key = process.env.SUPABASE_SERVICE_ROLE_KEY
+          if (url && key) {
+            fetch(`${url}/rest/v1/user_access_logs`, {
+              method: 'POST',
+              headers: { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+              body: JSON.stringify({ tenant_id: user.companyId, user_id: user.id, action: 'login' }),
+            }).catch(() => {})
+          }
+        } catch {}
       }
       return token
     },

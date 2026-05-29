@@ -15,6 +15,7 @@ const NAV = [
   { href: '/admin/items-tenant',    label: 'Ítems del tenant',     icon: 'check'     as const, section: 'Auditorías' },
   { href: '/admin/batch',           label: 'Análisis Batch',       icon: 'eye'       as const, section: 'IA' },
   { href: '/admin/ia-logs',         label: 'Trazabilidad IA',      icon: 'search'    as const, section: 'IA' },
+  { href: '/admin/accesos',         label: 'Historial de accesos', icon: 'eye'       as const, section: 'Sistema' },
   { href: '/admin/notificaciones',  label: 'Notificaciones',       icon: 'alert'     as const, section: 'Sistema' },
   { href: '/admin/configuracion',   label: 'Configuración',        icon: 'filter'    as const, section: 'Sistema' },
   { href: '/admin/exportar',        label: 'Exportar datos',       icon: 'export'    as const, section: 'Sistema' },
