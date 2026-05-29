@@ -14,30 +14,42 @@ export default function SuperAdminLoginPage() {
   const submitCredentials = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(''); setLoading(true)
-    const res  = await fetch('/api/superadmin/auth', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    })
-    const data = await res.json()
-    setLoading(false)
-    if (!res.ok) { setError(data.error ?? 'Error'); return }
-    if (data.requireTotp) { setStep('totp'); return }
-    router.push('/superadmin')
+    try {
+      const res  = await fetch('/api/superadmin/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email, password }),
+      })
+      const data = await res.json()
+      setLoading(false)
+      if (!res.ok) { setError(data.error ?? 'Credenciales incorrectas'); return }
+      if (data.requireTotp) { setStep('totp'); return }
+      window.location.href = '/superadmin'
+    } catch (err: unknown) {
+      setLoading(false)
+      setError('Error de conexión — ' + (err instanceof Error ? err.message : String(err)))
+    }
   }
 
   const submitTotp = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(''); setLoading(true)
-    const res  = await fetch('/api/superadmin/auth', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password, totpCode: totp }),
-    })
-    const data = await res.json()
-    setLoading(false)
-    if (!res.ok) { setError(data.error ?? 'Error'); return }
-    router.push('/superadmin')
+    try {
+      const res  = await fetch('/api/superadmin/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email, password, totpCode: totp }),
+      })
+      const data = await res.json()
+      setLoading(false)
+      if (!res.ok) { setError(data.error ?? 'Código incorrecto'); return }
+      window.location.href = '/superadmin'
+    } catch (err: unknown) {
+      setLoading(false)
+      setError('Error de conexión')
+    }
   }
 
   const INP: React.CSSProperties = {

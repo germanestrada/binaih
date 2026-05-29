@@ -49,7 +49,7 @@ export async function POST(req: Request) {
     secure:   process.env.NODE_ENV === 'production',
     sameSite: 'strict',
     maxAge:   MAX_AGE,
-    path:     '/superadmin',
+    path:     '/',
   })
   return res
 }
