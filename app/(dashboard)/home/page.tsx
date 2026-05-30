@@ -25,16 +25,17 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Verificar si el tour fue completado
+    // Esperar a que la sesion este cargada
+    if (!session?.user?.email) return
+    if (session.user.role !== 'admin') return
+    if (session.user.email === 'demo@tveo.co') return
+
     fetch('/api/onboarding').then(r => r.json()).then(d => {
       const steps = d.data ?? []
       const tourDone = steps.some((s: any) => s.step === 'tour_completed' || s.step === 'tour_skipped')
-      // Solo mostrar para admins, no para el demo
-      if (!tourDone && session?.user?.role === 'admin' && session?.user?.email !== 'demo@tveo.co') {
-        setShowTour(true)
-      }
+      if (!tourDone) setShowTour(true)
     })
-  }, [session])
+  }, [session?.user?.email])
 
   useEffect(()=>{
     Promise.all([
