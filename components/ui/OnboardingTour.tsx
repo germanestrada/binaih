@@ -1,6 +1,5 @@
 'use client'
-import { useEffect, useState, useCallback } from 'react'
-import { usePathname, useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
 // ── Definición de los pasos del tour ─────────────────────────
 interface TourStep {
@@ -16,10 +15,9 @@ const TOUR_STEPS: TourStep[] = [
   {
     id:       'welcome',
     title:    '¡Bienvenido a TVEO! 👋',
-    body:     'Esto es tu portal de auditorías inteligentes. En 2 minutos te mostramos todo lo que puedes hacer. ¿Comenzamos?',
+    body:     'Este es tu portal de auditorías inteligentes. En 2 minutos te mostramos todo lo que puedes hacer. ¿Comenzamos?',
     target:   'body',
     position: 'center',
-    path:     '/home',
   },
   {
     id:       'dashboard_kpis',
@@ -27,63 +25,48 @@ const TOUR_STEPS: TourStep[] = [
     body:     'Aquí ves el estado global de tu operación: score promedio, auditorías completadas, hallazgos críticos y cobertura. El color indica si estás en zona verde, amarilla o roja.',
     target:   '#kpi-grid',
     position: 'bottom',
-    path:     '/home',
   },
   {
     id:       'dashboard_chart',
     title:    'Actividad semanal',
-    body:     'El gráfico muestra las auditorías completadas cada día. Te ayuda a identificar si tu equipo está cumpliendo el ritmo de cobertura.',
+    body:     'El gráfico muestra cuántas auditorías se completaron cada día. Te ayuda a verificar si tu equipo mantiene el ritmo de cobertura planeado.',
     target:   '#weekly-chart',
     position: 'top',
-    path:     '/home',
   },
   {
-    id:       'locaciones',
-    title:    'Tus locaciones',
-    body:     'Aquí están todas tus tiendas, bodegas o puntos de venta. Cada tarjeta muestra el score actual, auditorías recientes y hallazgos. Haz clic en cualquiera para ver el detalle.',
-    target:   '#stores-list',
+    id:       'recent_locations',
+    title:    'Locaciones recientes',
+    body:     'Ve el estado de tus tiendas y puntos de venta más recientes. En el menú lateral "Locaciones" puedes ver todas con mapa interactivo, filtros y vista split.',
+    target:   '#stores-recent',
+    position: 'top',
+  },
+  {
+    id:       'recent_audits',
+    title:    'Auditorías recientes',
+    body:     'Las últimas auditorías completadas con su score y estado. Desde "Auditorías" puedes crear nuevas, ver el checklist completo y los análisis de IA.',
+    target:   '#audits-recent',
+    position: 'top',
+  },
+  {
+    id:       'sidebar_nav',
+    title:    'Navegación principal',
+    body:     'Desde el menú lateral accedes a: Locaciones, Hallazgos, Top Hallazgos, Auditorías y el Panel de Administración para configurar tu operación.',
+    target:   'nav',
     position: 'right',
-    path:     '/tiendas',
   },
   {
-    id:       'mapa',
-    title:    'Vista de mapa',
-    body:     'Cambia a la vista de mapa para ver la distribución geográfica de tus locaciones y su estado de cumplimiento de un vistazo.',
-    target:   '#view-toggle',
-    position: 'bottom',
-    path:     '/tiendas',
-  },
-  {
-    id:       'auditorias',
-    title:    'Gestión de auditorías',
-    body:     'Crea, programa y monitorea todas tus auditorías. Cada auditoría tiene un checklist de ítems, fotos de evidencia y análisis de IA si está habilitado.',
-    target:   '#audits-list',
-    position: 'right',
-    path:     '/auditorias',
-  },
-  {
-    id:       'hallazgos',
-    title:    'Hallazgos y seguimiento',
-    body:     'Los hallazgos se generan automáticamente al completar auditorías. Puedes filtrarlos por severidad, categoría y estado de resolución.',
-    target:   'body',
-    position: 'center',
-    path:     '/hallazgos',
-  },
-  {
-    id:       'admin',
+    id:       'admin_hint',
     title:    'Panel de administración',
-    body:     'Configura tu operación: usuarios, tipos de locación, tipos de auditoría, reglas de IA, control de acceso y más. Todo sin necesidad de soporte técnico.',
+    body:     'En "Admin" configuras usuarios, tipos de locación, tipos de auditoría, reglas de IA, control de acceso por IP y horario, y mucho más. Sin soporte técnico.',
     target:   'body',
     position: 'center',
-    path:     '/admin',
   },
   {
     id:       'finish',
     title:    '¡Listo para empezar! 🚀',
-    body:     'Ya conoces las funciones principales. Te recomendamos comenzar agregando tu primera locación desde el panel de administración.',
+    body:     'Ya conoces las funciones principales. El checklist debajo te guía paso a paso para configurar tu primera locación y auditoría.',
     target:   'body',
     position: 'center',
-    path:     '/home',
   },
 ]
 
@@ -92,8 +75,6 @@ interface OnboardingTourProps {
 }
 
 export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
-  const router   = useRouter()
-  const pathname = usePathname()
   const [step,    setStep]    = useState(0)
   const [visible, setVisible] = useState(true)
   const [pos,     setPos]     = useState({ top:0, left:0, width:0, height:0 })
@@ -102,12 +83,7 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
   const isLast  = step === TOUR_STEPS.length - 1
   const isFirst = step === 0
 
-  // Navegar a la ruta del paso si es diferente a la actual
-  useEffect(() => {
-    if (current.path && pathname !== current.path) {
-      router.push(current.path)
-    }
-  }, [step])
+  // No hay navegación automática — el tour permanece en la página actual
 
   // Calcular posición del elemento objetivo
   useEffect(() => {
@@ -126,7 +102,7 @@ export default function OnboardingTour({ onComplete }: OnboardingTourProps) {
       }
     }, 500)
     return () => clearTimeout(timer)
-  }, [step, pathname])
+  }, [step])
 
   const next = async () => {
     if (isLast) {
