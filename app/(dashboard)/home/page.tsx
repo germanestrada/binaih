@@ -1,7 +1,9 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
-import OnboardingTour from '@/components/ui/OnboardingTour'
+import dynamic from 'next/dynamic'
+const OnboardingTour = dynamic(() => import('@/components/ui/OnboardingTour'), { ssr: false }) as React.ComponentType<{ onComplete: () => void }>
+import React from 'react'
 import OnboardingChecklist from '@/components/ui/OnboardingChecklist'
 import { useRouter } from 'next/navigation'
 import KpiGrid from '@/components/dashboard/KpiGrid'
