@@ -15,7 +15,7 @@ const PUBLIC_PATHS = [
   '/_next', '/favicon', '/robots',
 ]
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Permitir rutas públicas y assets

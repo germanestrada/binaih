@@ -280,11 +280,12 @@ export default function LandingPage() {
             {t.hero.sub}
           </p>
           <div style={{display:'flex',gap:12,justifyContent:'center',flexWrap:'wrap',marginBottom:18}}>
-            <a href="#contact" className="btn-primary" style={{textDecoration:'none',padding:'15px 32px',fontSize:16,borderRadius:12}}>
-              {t.hero.cta1}
+            <a href="/demo" className="btn-primary" style={{textDecoration:'none',padding:'15px 32px',fontSize:16,borderRadius:12,display:'inline-flex',alignItems:'center',gap:8}}>
+              <span style={{width:8,height:8,borderRadius:'50%',background:'#60a5fa',display:'inline-block'}}/>
+              {lang==='es'?'Explorar demo en vivo':'Try live demo'}
             </a>
-            <a href="#product" className="btn-secondary" style={{textDecoration:'none',padding:'15px 32px',fontSize:16,borderRadius:12}}>
-              {t.hero.cta2} →
+            <a href="#contact" className="btn-secondary" style={{textDecoration:'none',padding:'15px 32px',fontSize:16,borderRadius:12}}>
+              {t.hero.cta1}
             </a>
           </div>
           <p style={{fontSize:13,color:'#aaa'}}>{t.hero.trust}</p>
@@ -361,8 +362,8 @@ export default function LandingPage() {
                     </li>
                   ))}
                 </ul>
-                <a href={i===2?'#contact':'#contact'} className={p.popular?'btn-primary':'btn-secondary'} style={{display:'block',textAlign:'center',textDecoration:'none',padding:'12px',borderRadius:10,fontSize:14,fontWeight:500,width:'100%',border:p.popular?'none':'1.5px solid #ddd',background:p.popular?'#111':'transparent',color:p.popular?'#fff':'#111'}}>
-                  {i===2?t.plans.contact:t.plans.cta}
+                <a href={i===2?'#contact':'/demo'} className={p.popular?'btn-primary':'btn-secondary'} style={{display:'block',textAlign:'center',textDecoration:'none',padding:'12px',borderRadius:10,fontSize:14,fontWeight:500,width:'100%',border:p.popular?'none':'1.5px solid #ddd',background:p.popular?'#111':'transparent',color:p.popular?'#fff':'#111'}}>
+                  {i===2?t.plans.contact:i===0?lang==='es'?'Ver demo':'Try demo':t.plans.cta}
                 </a>
               </div>
             ))}
