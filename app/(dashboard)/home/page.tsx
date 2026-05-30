@@ -1,5 +1,8 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { useSession } from 'next-auth/react'
+import OnboardingTour from '@/components/ui/OnboardingTour'
+import OnboardingChecklist from '@/components/ui/OnboardingChecklist'
 import { useRouter } from 'next/navigation'
 import KpiGrid from '@/components/dashboard/KpiGrid'
 import GaugeCard from '@/components/dashboard/GaugeCard'
@@ -12,10 +15,24 @@ interface Audit    { id:string; status:string; completed_at?:string; locations?:
 
 export default function HomePage() {
   const router = useRouter()
+  const { data: session } = useSession()
+  const [showTour, setShowTour] = useState(false)
   const [kpis,    setKpis]    = useState<KpiData|null>(null)
   const [stores,  setStores]  = useState<Store[]>([])
   const [audits,  setAudits]  = useState<Audit[]>([])
   const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    // Verificar si el tour fue completado
+    fetch('/api/onboarding').then(r => r.json()).then(d => {
+      const steps = d.data ?? []
+      const tourDone = steps.some((s: any) => s.step === 'tour_completed' || s.step === 'tour_skipped')
+      // Solo mostrar para admins, no para el demo
+      if (!tourDone && session?.user?.role === 'admin' && session?.user?.email !== 'demo@tveo.co') {
+        setShowTour(true)
+      }
+    })
+  }, [session])
 
   useEffect(()=>{
     Promise.all([
@@ -39,16 +56,22 @@ export default function HomePage() {
   const { cards=[], gauges=[], weeklyChart=[] } = kpis ?? {}
 
   return (
+    <>
+    {showTour && <OnboardingTour onComplete={() => setShowTour(false)} />}
     <div style={{ padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {/* Checklist de onboarding para admins nuevos */}
+      {session?.user?.role === 'admin' && session?.user?.email !== 'demo@tveo.co' && (
+        <OnboardingChecklist />
+      )}
       <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--subtle)', textTransform: 'uppercase', letterSpacing: '1.2px' }}>
         Resumen general
       </div>
 
-      <KpiGrid cards={cards} />
+      <div id="kpi-grid"><KpiGrid cards={cards} /></div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 2fr', gap: 12 }}>
         {gauges.map((g: any) => <GaugeCard key={g.label} gauge={g} />)}
-        <BarChart data={weeklyChart} />
+        <div id="weekly-chart"><BarChart data={weeklyChart} /></div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
@@ -105,5 +128,6 @@ export default function HomePage() {
         </div>
       </div>
     </div>
+    </>
   )
 }
