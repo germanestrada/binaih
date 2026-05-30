@@ -2,9 +2,9 @@
 import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import dynamic from 'next/dynamic'
-const OnboardingTour = dynamic(() => import('@/components/ui/OnboardingTour'), { ssr: false }) as React.ComponentType<{ onComplete: () => void }>
 import React from 'react'
-import OnboardingChecklist from '@/components/ui/OnboardingChecklist'
+const OnboardingTour     = dynamic(() => import('@/components/ui/OnboardingTour'),     { ssr: false }) as React.ComponentType<{ onComplete: () => void }>
+const OnboardingChecklist = dynamic(() => import('@/components/ui/OnboardingChecklist'), { ssr: false })
 import { useRouter } from 'next/navigation'
 import KpiGrid from '@/components/dashboard/KpiGrid'
 import GaugeCard from '@/components/dashboard/GaugeCard'
