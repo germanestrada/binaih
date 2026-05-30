@@ -1,10 +1,5 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { useSession } from 'next-auth/react'
-import dynamic from 'next/dynamic'
-import React from 'react'
-const OnboardingTour     = dynamic(() => import('@/components/ui/OnboardingTour'),     { ssr: false }) as React.ComponentType<{ onComplete: () => void }>
-const OnboardingChecklist = dynamic(() => import('@/components/ui/OnboardingChecklist'), { ssr: false })
 import { useRouter } from 'next/navigation'
 import KpiGrid from '@/components/dashboard/KpiGrid'
 import GaugeCard from '@/components/dashboard/GaugeCard'
@@ -17,25 +12,10 @@ interface Audit    { id:string; status:string; completed_at?:string; locations?:
 
 export default function HomePage() {
   const router = useRouter()
-  const { data: session } = useSession()
-  const [showTour, setShowTour] = useState(false)
   const [kpis,    setKpis]    = useState<KpiData|null>(null)
   const [stores,  setStores]  = useState<Store[]>([])
   const [audits,  setAudits]  = useState<Audit[]>([])
   const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    // Esperar a que la sesion este cargada
-    if (!session?.user?.email) return
-    if (session.user.role !== 'admin') return
-    if (session.user.email === 'demo@tveo.co') return
-
-    fetch('/api/onboarding').then(r => r.json()).then(d => {
-      const steps = d.data ?? []
-      const tourDone = steps.some((s: any) => s.step === 'tour_completed' || s.step === 'tour_skipped')
-      if (!tourDone) setShowTour(true)
-    })
-  }, [session?.user?.email])
 
   useEffect(()=>{
     Promise.all([
@@ -59,13 +39,7 @@ export default function HomePage() {
   const { cards=[], gauges=[], weeklyChart=[] } = kpis ?? {}
 
   return (
-    <>
-    {showTour && <OnboardingTour onComplete={() => setShowTour(false)} />}
     <div style={{ padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: 16 }}>
-      {/* Checklist de onboarding para admins nuevos */}
-      {session?.user?.role === 'admin' && session?.user?.email !== 'demo@tveo.co' && (
-        <OnboardingChecklist />
-      )}
       <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--subtle)', textTransform: 'uppercase', letterSpacing: '1.2px' }}>
         Resumen general
       </div>
@@ -131,6 +105,5 @@ export default function HomePage() {
         </div>
       </div>
     </div>
-    </>
   )
 }
