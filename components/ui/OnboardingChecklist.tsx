@@ -24,12 +24,19 @@ export default function OnboardingChecklist() {
   const [loading,   setLoading]   = useState(true)
   const [collapsed, setCollapsed] = useState(false)
 
-  useEffect(() => {
+  const loadProgress = () => {
     fetch('/api/onboarding').then(r => r.json()).then(d => {
       const completed = new Set((d.data ?? []).filter((x: any) => x.completed).map((x: any) => x.step))
       setItems(ITEMS.map(it => ({ ...it, done: completed.has(it.id) })))
       setLoading(false)
     })
+  }
+
+  useEffect(() => {
+    loadProgress()
+    // Escuchar evento del tour para refrescar
+    window.addEventListener('onboarding:refresh', loadProgress)
+    return () => window.removeEventListener('onboarding:refresh', loadProgress)
   }, [])
 
   if (loading) return null
