@@ -14,11 +14,13 @@ export default async function DashboardLayout({ children }: { children: React.Re
     <>
     <SessionGuard/>
     <DemoBanner/>
-    <OnboardingWrapper/>
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <TopBar />
       <UserStrip />
-      <main style={{ flex: 1, overflow: 'auto' }}>{children}</main>
+      <main style={{ flex: 1, overflow: 'auto' }}>
+        <OnboardingWrapper/>
+        {children}
+      </main>
     </div>
   </>
   )
