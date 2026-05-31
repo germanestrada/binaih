@@ -1,5 +1,4 @@
 'use client'
-
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
@@ -49,8 +48,11 @@ export default function OnboardingChecklist() {
   // Ocultar si todo completado
   if (done === total) return null
 
+  // Cada instancia genera un ID único para debugging
+  const instanceId = typeof window !== 'undefined' ? Math.random().toString(36).slice(2,6) : 'ssr'
+
   return (
-    <div style={{
+    <div data-onboarding-instance={instanceId} style={{
       background: 'var(--white)', border: '1px solid var(--border)',
       borderRadius: 'var(--r-lg)', overflow: 'hidden', marginBottom: 16,
     }}>
