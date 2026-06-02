@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 
 interface ChecklistItem {
   id:    string
@@ -19,13 +20,13 @@ const ITEMS: Omit<ChecklistItem,'done'>[] = [
 ]
 
 export default function OnboardingChecklist() {
-  const router = useRouter()
-  const [mounted,   setMounted]   = useState(false)
-  const [items,     setItems]     = useState<ChecklistItem[]>([])
-  const [loading,   setLoading]   = useState(true)
+  const router               = useRouter()
+  const { data: session }    = useSession()
+  const [mounted, setMounted]= useState(false)
+  const [items,   setItems]  = useState<ChecklistItem[]>([])
+  const [loading, setLoading]= useState(true)
   const [collapsed, setCollapsed] = useState(false)
 
-  // Solo renderizar en el cliente para evitar hydration mismatch
   useEffect(() => { setMounted(true) }, [])
 
   const loadProgress = () => {
@@ -37,30 +38,30 @@ export default function OnboardingChecklist() {
   }
 
   useEffect(() => {
+    if (!mounted) return
     loadProgress()
-    // Escuchar evento del tour para refrescar
     window.addEventListener('onboarding:refresh', loadProgress)
     return () => window.removeEventListener('onboarding:refresh', loadProgress)
-  }, [])
+  }, [mounted])
 
-  if (!mounted || loading) return null
+  // No renderizar hasta que el cliente esté listo
+  if (!mounted) return null
+  if (loading) return null
+
+  // No mostrar para usuario demo
+  if (session?.user?.email === 'demo@tveo.co') return null
 
   const done  = items.filter(i => i.done).length
   const total = items.length
   const pct   = Math.round(done / total * 100)
 
-  // Ocultar si todo completado
   if (done === total) return null
 
-  // Cada instancia genera un ID único para debugging
-  const instanceId = typeof window !== 'undefined' ? Math.random().toString(36).slice(2,6) : 'ssr'
-
   return (
-    <div data-onboarding-instance={instanceId} style={{
+    <div style={{
       background: 'var(--white)', border: '1px solid var(--border)',
       borderRadius: 'var(--r-lg)', overflow: 'hidden', marginBottom: 16,
     }}>
-      {/* Header */}
       <button
         onClick={() => setCollapsed(c => !c)}
         style={{
@@ -69,7 +70,6 @@ export default function OnboardingChecklist() {
           cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left',
         }}
       >
-        {/* Progress ring */}
         <div style={{ position:'relative', width:36, height:36, flexShrink:0 }}>
           <svg width="36" height="36" viewBox="0 0 36 36">
             <circle cx="18" cy="18" r="14" fill="none" stroke="var(--border2)" strokeWidth="3"/>
@@ -96,15 +96,10 @@ export default function OnboardingChecklist() {
         <div style={{ fontSize:14, color:'var(--subtle)', transition:'transform .2s', transform: collapsed ? 'rotate(-90deg)' : 'rotate(0)' }}>▾</div>
       </button>
 
-      {/* Progress bar */}
       <div style={{ height:2, background:'var(--border2)', margin:'0 16px' }}>
-        <div style={{
-          height:'100%', width:`${pct}%`, background:'#1558b0',
-          borderRadius:1, transition:'width .5s ease',
-        }}/>
+        <div style={{ height:'100%', width:`${pct}%`, background:'#1558b0', borderRadius:1, transition:'width .5s ease' }}/>
       </div>
 
-      {/* Items */}
       {!collapsed && (
         <div style={{ padding:'8px 16px 14px' }}>
           {items.map((item, i) => (
@@ -119,7 +114,6 @@ export default function OnboardingChecklist() {
                 opacity: item.done ? .6 : 1,
               }}
             >
-              {/* Checkbox */}
               <div style={{
                 width:22, height:22, borderRadius:'50%', flexShrink:0,
                 background: item.done ? '#1558b0' : 'var(--surface)',
@@ -137,9 +131,7 @@ export default function OnboardingChecklist() {
                 <div style={{ fontSize:11, color:'var(--subtle)', marginTop:1 }}>{item.desc}</div>
               </div>
               {!item.done && (
-                <div style={{ fontSize:11, color:'#1558b0', fontWeight:500, flexShrink:0 }}>
-                  Ir →
-                </div>
+                <div style={{ fontSize:11, color:'#1558b0', fontWeight:500, flexShrink:0 }}>Ir →</div>
               )}
             </div>
           ))}

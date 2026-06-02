@@ -3,19 +3,18 @@ import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import dynamic from 'next/dynamic'
 
-const OnboardingTour      = dynamic(() => import('./OnboardingTour'),      { ssr: false }) as React.ComponentType<{ onComplete: () => void }>
-const OnboardingChecklist = dynamic(() => import('./OnboardingChecklist'), { ssr: false })
+const OnboardingTour = dynamic(() => import('./OnboardingTour'), { ssr: false }) as React.ComponentType<{ onComplete: () => void }>
 
 export default function OnboardingWrapper() {
   const { data: session, status } = useSession()
-  const [mounted,  setMounted]    = useState(false)
-  const [showTour, setShowTour]   = useState(false)
-  const [checked,  setChecked]    = useState(false)
+  const [mounted,  setMounted]  = useState(false)
+  const [showTour, setShowTour] = useState(false)
+  const [checked,  setChecked]  = useState(false)
 
   useEffect(() => { setMounted(true) }, [])
 
   useEffect(() => {
-    // Solo ejecutar una vez cuando la sesión esté lista
+    if (!mounted) return
     if (status !== 'authenticated') return
     if (checked) return
     if (session?.user?.role !== 'admin') { setChecked(true); return }
@@ -23,23 +22,16 @@ export default function OnboardingWrapper() {
 
     setChecked(true)
     fetch('/api/onboarding').then(r => r.json()).then(d => {
-      const steps   = d.data ?? []
+      const steps    = d.data ?? []
       const tourDone = steps.some((s: any) =>
         s.step === 'tour_completed' || s.step === 'tour_skipped'
       )
       if (!tourDone) setShowTour(true)
     })
-  }, [status, session?.user?.email])
+  }, [mounted, status, session?.user?.email])
 
   if (!mounted) return null
-  if (status !== 'authenticated') return null
-  if (session?.user?.role !== 'admin') return null
-  if (session?.user?.email === 'demo@tveo.co') return null
+  if (!showTour) return null
 
-  return (
-    <>
-      {showTour && <OnboardingTour onComplete={() => setShowTour(false)} />}
-      <OnboardingChecklist />
-    </>
-  )
+  return <OnboardingTour onComplete={() => setShowTour(false)} />
 }
