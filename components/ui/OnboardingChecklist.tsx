@@ -20,9 +20,13 @@ const ITEMS: Omit<ChecklistItem,'done'>[] = [
 
 export default function OnboardingChecklist() {
   const router = useRouter()
+  const [mounted,   setMounted]   = useState(false)
   const [items,     setItems]     = useState<ChecklistItem[]>([])
   const [loading,   setLoading]   = useState(true)
   const [collapsed, setCollapsed] = useState(false)
+
+  // Solo renderizar en el cliente para evitar hydration mismatch
+  useEffect(() => { setMounted(true) }, [])
 
   const loadProgress = () => {
     fetch('/api/onboarding').then(r => r.json()).then(d => {
@@ -39,7 +43,7 @@ export default function OnboardingChecklist() {
     return () => window.removeEventListener('onboarding:refresh', loadProgress)
   }, [])
 
-  if (loading) return null
+  if (!mounted || loading) return null
 
   const done  = items.filter(i => i.done).length
   const total = items.length

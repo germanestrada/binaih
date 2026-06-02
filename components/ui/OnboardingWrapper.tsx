@@ -8,8 +8,11 @@ const OnboardingChecklist = dynamic(() => import('./OnboardingChecklist'), { ssr
 
 export default function OnboardingWrapper() {
   const { data: session, status } = useSession()
+  const [mounted,  setMounted]    = useState(false)
   const [showTour, setShowTour]   = useState(false)
   const [checked,  setChecked]    = useState(false)
+
+  useEffect(() => { setMounted(true) }, [])
 
   useEffect(() => {
     // Solo ejecutar una vez cuando la sesión esté lista
@@ -28,6 +31,7 @@ export default function OnboardingWrapper() {
     })
   }, [status, session?.user?.email])
 
+  if (!mounted) return null
   if (status !== 'authenticated') return null
   if (session?.user?.role !== 'admin') return null
   if (session?.user?.email === 'demo@tveo.co') return null
