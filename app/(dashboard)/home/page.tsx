@@ -1,4 +1,5 @@
 'use client'
+import OnboardingChecklist from '@/components/ui/OnboardingChecklist'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import KpiGrid from '@/components/dashboard/KpiGrid'
