@@ -12,6 +12,7 @@ const NAV = [
   { label: 'Top',        href: '/top-hallazgos',  icon: 'trophy'   as const, minRole: 'viewer'  as Role },
   { label: 'Auditorías', href: '/auditorias',     icon: 'calendar' as const, minRole: 'auditor' as Role },
   { label: 'Admin',      href: '/admin',           icon: 'building' as const, minRole: 'admin'   as Role },
+  { label: 'Programación', href: '/programacion', icon: 'calendar' as const, minRole: 'auditor' as Role },
 ]
 
 const ROLE_LEVEL: Record<Role, number> = { viewer: 1, auditor: 2, admin: 3 }
