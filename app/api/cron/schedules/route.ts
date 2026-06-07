@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/**/
 import { NextResponse } from 'next/server'
 import { sbFetch } from '@/lib/admin-fetch'
 
