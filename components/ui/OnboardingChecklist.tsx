@@ -140,7 +140,7 @@ export default function OnboardingChecklist() {
 
     // Carga inicial
     fetch('/api/onboarding').then(r => r.json()).then(d => {
-      const completed = new Set((d.data ?? []).filter((x: any) => x.completed).map((x: any) => x.step))
+      const completed = new Set<string>((d.data ?? []).filter((x: any) => x.completed).map((x: any) => x.step as string))
       render(completed)
     })
 
