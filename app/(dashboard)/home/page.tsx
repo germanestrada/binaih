@@ -1,11 +1,17 @@
 'use client'
-import OnboardingChecklist from '@/components/ui/OnboardingChecklist'
+import dynamic from 'next/dynamic'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import KpiGrid from '@/components/dashboard/KpiGrid'
 import GaugeCard from '@/components/dashboard/GaugeCard'
 import BarChart from '@/components/dashboard/BarChart'
 import StoreResultCard from '@/components/stores/StoreResultCard'
+
+// Import dinámico para evitar SSR del checklist
+const OnboardingChecklist = dynamic(
+  () => import('@/components/ui/OnboardingChecklist'),
+  { ssr: false }
+)
 
 interface KpiData { cards: any[]; gauges: any[]; weeklyChart: any[] }
 interface Store    { id:string; name:string; city:string; zone?:string; score:number; audits:number; findings:number; status:string }
