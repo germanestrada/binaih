@@ -1,127 +1,156 @@
 'use client'
-import { useEffect, useRef, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useEffect, useRef } from 'react'
 import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 
-interface ChecklistItem {
-  id:      string
-  label:   string
-  desc:    string
-  href?:   string
-  isTour?: boolean
-  done:    boolean
-}
-
-const ITEMS: Omit<ChecklistItem,'done'>[] = [
-  { id:'tour_completed',    label:'Completar el tour inicial',     desc:'Explora las funciones principales',    isTour: true },
-  { id:'first_location',   label:'Agregar tu primera locación',   desc:'Crea una tienda, bodega o sucursal',    href:'/admin/locaciones' },
-  { id:'first_audit_type', label:'Crear un tipo de auditoría',    desc:'Define el checklist de tu operación',   href:'/admin/tipos-auditoria' },
-  { id:'first_user',       label:'Invitar a tu equipo',           desc:'Agrega un auditor o viewer',            href:'/admin/usuarios' },
-  { id:'first_audit',      label:'Realizar tu primera auditoría', desc:'Completa un checklist en una locación', href:'/programacion' },
+const ITEMS = [
+  { id:'tour_completed',    label:'Completar el tour inicial',     desc:'Explora las funciones principales',    isTour: true,  href: null },
+  { id:'first_location',   label:'Agregar tu primera locación',   desc:'Crea una tienda, bodega o sucursal',    isTour: false, href:'/admin/locaciones' },
+  { id:'first_audit_type', label:'Crear un tipo de auditoría',    desc:'Define el checklist de tu operación',   isTour: false, href:'/admin/tipos-auditoria' },
+  { id:'first_user',       label:'Invitar a tu equipo',           desc:'Agrega un auditor o viewer',            isTour: false, href:'/admin/usuarios' },
+  { id:'first_audit',      label:'Realizar tu primera auditoría', desc:'Completa un checklist en una locación', isTour: false, href:'/programacion' },
 ]
 
-export default function OnboardingChecklist() {
-  const router            = useRouter()
-  const { data: session } = useSession()
-  const [items,     setItems]     = useState<ChecklistItem[]>(ITEMS.map(it => ({ ...it, done: false })))
-  const [loaded,    setLoaded]    = useState(false)
-  const [collapsed, setCollapsed] = useState(true)
-  const initRef = useRef(false)
+// ID único para el contenedor — garantiza una sola instancia
+const ROOT_ID = 'tveo-onboarding-v1'
 
-  const loadProgress = () => {
-    fetch('/api/onboarding').then(r => r.json()).then(d => {
-      const completed = new Set((d.data ?? []).filter((x: any) => x.completed).map((x: any) => x.step))
-      setItems(ITEMS.map(it => ({ ...it, done: completed.has(it.id) })))
-      setLoaded(true)
-    })
-  }
+export default function OnboardingChecklist() {
+  const { data: session } = useSession()
+  const router = useRouter()
+  const renderedRef = useRef(false)
 
   useEffect(() => {
-    if (initRef.current) return
-    initRef.current = true
-    loadProgress()
-    window.addEventListener('onboarding:refresh', loadProgress)
-    return () => window.removeEventListener('onboarding:refresh', loadProgress)
-  }, [])
+    // Verificar sesión
+    if (!session?.user) return
+    if (session.user.role !== 'admin') return
+    if (session.user.email === 'demo@tveo.co') return
 
-  if (!loaded) return null
-  if (typeof window === 'undefined') return null
-  if (session?.user?.email === 'demo@tveo.co') return null
-  if (session?.user?.role !== 'admin') return null
+    // Eliminar cualquier instancia previa
+    const existing = document.getElementById(ROOT_ID)
+    if (existing) existing.remove()
 
-  const done  = items.filter(i => i.done).length
-  const total = items.length
-  const pct   = Math.round(done / total * 100)
+    // Solo renderizar una vez
+    if (renderedRef.current) return
+    renderedRef.current = true
 
-  if (done === total && total > 0) return null
+    const render = (completedSteps: Set<string>) => {
+      const old = document.getElementById(ROOT_ID)
+      if (old) old.remove()
 
-  const handleItem = (item: ChecklistItem) => {
-    if (item.done) return
-    if (item.isTour) {
-      // Disparar evento global para activar el tour sin causar re-render del checklist
-      window.dispatchEvent(new CustomEvent('onboarding:start-tour'))
-      return
-    }
-    if (item.href) router.push(item.href)
-  }
+      const done  = ITEMS.filter(i => completedSteps.has(i.id)).length
+      const total = ITEMS.length
+      const pct   = Math.round(done / total * 100)
 
-  return (
-    <div style={{
-      background: 'var(--white)', border: '1px solid var(--border)',
-      borderRadius: 'var(--r-lg)', overflow: 'hidden', marginBottom: 16,
-    }}>
-      <button onClick={() => setCollapsed(c => !c)} style={{
-        width: '100%', display: 'flex', alignItems: 'center', gap: 12,
-        padding: '14px 16px', background: 'none', border: 'none',
-        cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left',
-      }}>
-        <div style={{ position:'relative', width:36, height:36, flexShrink:0 }}>
-          <svg width="36" height="36" viewBox="0 0 36 36">
-            <circle cx="18" cy="18" r="14" fill="none" stroke="var(--border2)" strokeWidth="3"/>
-            <circle cx="18" cy="18" r="14" fill="none" stroke="#1558b0" strokeWidth="3"
-              strokeDasharray={`${pct * 0.88} 88`} strokeLinecap="round"
-              transform="rotate(-90 18 18)" style={{ transition:'stroke-dasharray .5s ease' }}/>
-          </svg>
-          <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center', fontSize:10, fontWeight:600, color:'#1558b0' }}>{pct}%</div>
-        </div>
-        <div style={{ flex:1 }}>
-          <div style={{ fontSize:13, fontWeight:500, color:'var(--ink)' }}>Configura tu cuenta — {done}/{total} completado</div>
-          <div style={{ fontSize:11, color:'var(--subtle)', marginTop:2 }}>
-            {done === 0 ? 'Comienza aquí para sacarle el máximo a TVEO' : done < 3 ? 'Vas bien, continúa con el siguiente paso' : 'Casi listo, un par de pasos más'}
+      if (done === total) return
+
+      // Crear contenedor
+      const root = document.createElement('div')
+      root.id    = ROOT_ID
+
+      // Insertar antes del "Resumen general"
+      const main = document.querySelector('main')
+      if (!main) return
+      const firstChild = main.firstChild
+      main.insertBefore(root, firstChild)
+
+      // Estado de colapso
+      let collapsed = true
+
+      const redraw = () => {
+        root.innerHTML = ''
+
+        const wrapper = document.createElement('div')
+        wrapper.style.cssText = 'background:var(--white);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;margin-bottom:16px;'
+
+        // Header
+        const header = document.createElement('button')
+        header.style.cssText = 'width:100%;display:flex;align-items:center;gap:12px;padding:14px 16px;background:none;border:none;cursor:pointer;font-family:inherit;text-align:left;'
+        header.innerHTML = `
+          <div style="position:relative;width:36px;height:36px;flex-shrink:0">
+            <svg width="36" height="36" viewBox="0 0 36 36">
+              <circle cx="18" cy="18" r="14" fill="none" stroke="var(--border2)" stroke-width="3"/>
+              <circle cx="18" cy="18" r="14" fill="none" stroke="#1558b0" stroke-width="3"
+                stroke-dasharray="${pct * 0.88} 88" stroke-linecap="round"
+                transform="rotate(-90 18 18)"/>
+            </svg>
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#1558b0">${pct}%</div>
           </div>
-        </div>
-        <div style={{ fontSize:14, color:'var(--subtle)', transition:'transform .2s', transform: collapsed ? 'rotate(-90deg)' : 'rotate(0)' }}>▾</div>
-      </button>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:500;color:var(--ink)">Configura tu cuenta — ${done}/${total} completado</div>
+            <div style="font-size:11px;color:var(--subtle);margin-top:2px">${done === 0 ? 'Comienza aquí para sacarle el máximo a TVEO' : done < 3 ? 'Vas bien, continúa con el siguiente paso' : 'Casi listo, un par de pasos más'}</div>
+          </div>
+          <div style="font-size:14px;color:var(--subtle);transition:transform .2s;transform:${collapsed ? 'rotate(-90deg)' : 'rotate(0)'}"">▾</div>
+        `
+        header.onclick = () => { collapsed = !collapsed; redraw() }
+        wrapper.appendChild(header)
 
-      <div style={{ height:2, background:'var(--border2)', margin:'0 16px' }}>
-        <div style={{ height:'100%', width:`${pct}%`, background:'#1558b0', borderRadius:1, transition:'width .5s ease' }}/>
-      </div>
+        // Progress bar
+        const bar = document.createElement('div')
+        bar.style.cssText = 'height:2px;background:var(--border2);margin:0 16px'
+        bar.innerHTML = `<div style="height:100%;width:${pct}%;background:#1558b0;border-radius:1px;transition:width .5s ease"></div>`
+        wrapper.appendChild(bar)
 
-      {!collapsed && (
-        <div style={{ padding:'8px 16px 14px' }}>
-          {items.map((item, i) => (
-            <div key={item.id} onClick={() => handleItem(item)} style={{
-              display:'flex', alignItems:'center', gap:12, padding:'10px 0',
-              borderBottom: i < items.length-1 ? '1px solid var(--border2)' : 'none',
-              cursor: item.done ? 'default' : 'pointer', opacity: item.done ? .6 : 1,
-            }}>
-              <div style={{
-                width:22, height:22, borderRadius:'50%', flexShrink:0,
-                background: item.done ? '#1558b0' : 'var(--surface)',
-                border: `2px solid ${item.done ? '#1558b0' : 'var(--border)'}`,
-                display:'flex', alignItems:'center', justifyContent:'center', transition:'all .2s',
-              }}>
-                {item.done && <span style={{ fontSize:11, color:'white', fontWeight:700 }}>✓</span>}
+        // Items
+        if (!collapsed) {
+          const list = document.createElement('div')
+          list.style.cssText = 'padding:8px 16px 14px'
+          ITEMS.forEach((item, i) => {
+            const isDone = completedSteps.has(item.id)
+            const row    = document.createElement('div')
+            row.style.cssText = `display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:${i < ITEMS.length-1 ? '1px solid var(--border2)' : 'none'};cursor:${isDone ? 'default' : 'pointer'};opacity:${isDone ? 0.6 : 1}`
+            row.innerHTML = `
+              <div style="width:22px;height:22px;border-radius:50%;flex-shrink:0;background:${isDone ? '#1558b0' : 'var(--surface)'};border:2px solid ${isDone ? '#1558b0' : 'var(--border)'};display:flex;align-items:center;justify-content:center">
+                ${isDone ? '<span style="font-size:11px;color:white;font-weight:700">✓</span>' : ''}
               </div>
-              <div style={{ flex:1, minWidth:0 }}>
-                <div style={{ fontSize:13, color:'var(--ink)', fontWeight:500, textDecoration: item.done ? 'line-through' : 'none' }}>{item.label}</div>
-                <div style={{ fontSize:11, color:'var(--subtle)', marginTop:1 }}>{item.desc}</div>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:13px;color:var(--ink);font-weight:500;text-decoration:${isDone ? 'line-through' : 'none'}">${item.label}</div>
+                <div style="font-size:11px;color:var(--subtle);margin-top:1px">${item.desc}</div>
               </div>
-              {!item.done && <div style={{ fontSize:11, color:'#1558b0', fontWeight:500, flexShrink:0 }}>{item.isTour ? 'Iniciar →' : 'Ir →'}</div>}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  )
+              ${!isDone ? `<div style="font-size:11px;color:#1558b0;font-weight:500;flex-shrink:0">${item.isTour ? 'Iniciar →' : 'Ir →'}</div>` : ''}
+            `
+            if (!isDone) {
+              row.onclick = () => {
+                if (item.isTour) {
+                  window.dispatchEvent(new CustomEvent('onboarding:start-tour'))
+                } else if (item.href) {
+                  router.push(item.href)
+                }
+              }
+            }
+            list.appendChild(row)
+          })
+          wrapper.appendChild(list)
+        }
+
+        root.appendChild(wrapper)
+      }
+
+      redraw()
+
+      // Escuchar refresh
+      const onRefresh = () => {
+        fetch('/api/onboarding').then(r => r.json()).then(d => {
+          const c = new Set((d.data ?? []).filter((x: any) => x.completed).map((x: any) => x.step))
+          render(c)
+        })
+      }
+      window.removeEventListener('onboarding:refresh', onRefresh)
+      window.addEventListener('onboarding:refresh', onRefresh)
+    }
+
+    // Carga inicial
+    fetch('/api/onboarding').then(r => r.json()).then(d => {
+      const completed = new Set((d.data ?? []).filter((x: any) => x.completed).map((x: any) => x.step))
+      render(completed)
+    })
+
+    return () => {
+      const el = document.getElementById(ROOT_ID)
+      if (el) el.remove()
+      renderedRef.current = false
+    }
+  }, [session?.user?.email])
+
+  // No renderiza nada en el árbol de React
+  return null
 }
