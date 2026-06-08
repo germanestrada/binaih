@@ -1,2 +1,2 @@
-// Tour ahora se activa desde OnboardingChecklist al hacer clic en el primer paso
+// Tour se maneja desde OnboardingChecklist al hacer clic en "Iniciar"
 export default function OnboardingWrapper() { return null }

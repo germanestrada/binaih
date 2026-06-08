@@ -16,11 +16,11 @@ interface ChecklistItem {
 }
 
 const ITEMS: Omit<ChecklistItem,'done'>[] = [
-  { id:'tour_completed',    label:'Completar el tour inicial',     desc:'Explora las funciones principales',   isTour: true },
-  { id:'first_location',   label:'Agregar tu primera locación',   desc:'Crea una tienda, bodega o sucursal',   href:'/admin/locaciones' },
-  { id:'first_audit_type', label:'Crear un tipo de auditoría',    desc:'Define el checklist de tu operación',  href:'/admin/tipos-auditoria' },
-  { id:'first_user',       label:'Invitar a tu equipo',           desc:'Agrega un auditor o viewer',           href:'/admin/usuarios' },
-  { id:'first_audit',      label:'Realizar tu primera auditoría', desc:'Completa un checklist en una locación',href:'/auditorias/nueva' },
+  { id:'tour_completed',    label:'Completar el tour inicial',     desc:'Explora las funciones principales',    isTour: true },
+  { id:'first_location',   label:'Agregar tu primera locación',   desc:'Crea una tienda, bodega o sucursal',    href:'/admin/locaciones' },
+  { id:'first_audit_type', label:'Crear un tipo de auditoría',    desc:'Define el checklist de tu operación',   href:'/admin/tipos-auditoria' },
+  { id:'first_user',       label:'Invitar a tu equipo',           desc:'Agrega un auditor o viewer',            href:'/admin/usuarios' },
+  { id:'first_audit',      label:'Realizar tu primera auditoría', desc:'Completa un checklist en una locación', href:'/programacion' },
 ]
 
 export default function OnboardingChecklist() {
@@ -29,7 +29,7 @@ export default function OnboardingChecklist() {
   const [mounted,   setMounted]   = useState(false)
   const [items,     setItems]     = useState<ChecklistItem[]>(ITEMS.map(it => ({ ...it, done: false })))
   const [loaded,    setLoaded]    = useState(false)
-  const [collapsed, setCollapsed] = useState(false)
+  const [collapsed, setCollapsed] = useState(true)  // ← colapsado por defecto
   const [showTour,  setShowTour]  = useState(false)
 
   useEffect(() => { setMounted(true) }, [])
@@ -49,7 +49,6 @@ export default function OnboardingChecklist() {
     return () => window.removeEventListener('onboarding:refresh', loadProgress)
   }, [mounted])
 
-  // No renderizar hasta que el cliente esté listo y los datos cargados
   if (!mounted || !loaded) return null
   if (session?.user?.email === 'demo@tveo.co') return null
   if (session?.user?.role !== 'admin') return null
@@ -58,7 +57,6 @@ export default function OnboardingChecklist() {
   const total = items.length
   const pct   = Math.round(done / total * 100)
 
-  // Solo ocultar si TODOS están completados
   if (done === total && total > 0) return null
 
   const handleItem = (item: ChecklistItem) => {
@@ -74,6 +72,7 @@ export default function OnboardingChecklist() {
 
   return (
     <>
+      {/* Tour solo se monta aquí, OnboardingWrapper en layout está vacío */}
       {showTour && <OnboardingTour onComplete={handleTourComplete} />}
 
       <div style={{
