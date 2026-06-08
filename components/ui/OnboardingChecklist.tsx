@@ -1,11 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
-import { createPortal } from 'react-dom'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
-import dynamic from 'next/dynamic'
-
-const OnboardingTour = dynamic(() => import('./OnboardingTour'), { ssr: false }) as React.ComponentType<{ onComplete: () => void }>
 
 interface ChecklistItem {
   id:      string
@@ -24,103 +20,13 @@ const ITEMS: Omit<ChecklistItem,'done'>[] = [
   { id:'first_audit',      label:'Realizar tu primera auditoría', desc:'Completa un checklist en una locación', href:'/programacion' },
 ]
 
-function ChecklistUI({ items, collapsed, setCollapsed, showTour, setShowTour, handleItem, handleTourComplete }: any) {
-  const done  = items.filter((i: any) => i.done).length
-  const total = items.length
-  const pct   = Math.round(done / total * 100)
-
-  if (done === total && total > 0) return null
-
-  return (
-    <>
-      {showTour && <OnboardingTour onComplete={handleTourComplete} />}
-      <div style={{
-        background: 'var(--white)', border: '1px solid var(--border)',
-        borderRadius: 'var(--r-lg)', overflow: 'hidden', marginBottom: 16,
-      }}>
-        <button onClick={() => setCollapsed((c: boolean) => !c)} style={{
-          width: '100%', display: 'flex', alignItems: 'center', gap: 12,
-          padding: '14px 16px', background: 'none', border: 'none',
-          cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left',
-        }}>
-          <div style={{ position:'relative', width:36, height:36, flexShrink:0 }}>
-            <svg width="36" height="36" viewBox="0 0 36 36">
-              <circle cx="18" cy="18" r="14" fill="none" stroke="var(--border2)" strokeWidth="3"/>
-              <circle cx="18" cy="18" r="14" fill="none" stroke="#1558b0" strokeWidth="3"
-                strokeDasharray={`${pct * 0.88} 88`} strokeLinecap="round"
-                transform="rotate(-90 18 18)" style={{ transition:'stroke-dasharray .5s ease' }}/>
-            </svg>
-            <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center', fontSize:10, fontWeight:600, color:'#1558b0' }}>{pct}%</div>
-          </div>
-          <div style={{ flex:1 }}>
-            <div style={{ fontSize:13, fontWeight:500, color:'var(--ink)' }}>Configura tu cuenta — {done}/{total} completado</div>
-            <div style={{ fontSize:11, color:'var(--subtle)', marginTop:2 }}>
-              {done === 0 ? 'Comienza aquí para sacarle el máximo a TVEO' : done < 3 ? 'Vas bien, continúa con el siguiente paso' : 'Casi listo, un par de pasos más'}
-            </div>
-          </div>
-          <div style={{ fontSize:14, color:'var(--subtle)', transition:'transform .2s', transform: collapsed ? 'rotate(-90deg)' : 'rotate(0)' }}>▾</div>
-        </button>
-        <div style={{ height:2, background:'var(--border2)', margin:'0 16px' }}>
-          <div style={{ height:'100%', width:`${pct}%`, background:'#1558b0', borderRadius:1, transition:'width .5s ease' }}/>
-        </div>
-        {!collapsed && (
-          <div style={{ padding:'8px 16px 14px' }}>
-            {items.map((item: any, i: number) => (
-              <div key={item.id} onClick={() => handleItem(item)} style={{
-                display:'flex', alignItems:'center', gap:12, padding:'10px 0',
-                borderBottom: i < items.length-1 ? '1px solid var(--border2)' : 'none',
-                cursor: item.done ? 'default' : 'pointer', opacity: item.done ? .6 : 1,
-              }}>
-                <div style={{
-                  width:22, height:22, borderRadius:'50%', flexShrink:0,
-                  background: item.done ? '#1558b0' : 'var(--surface)',
-                  border: `2px solid ${item.done ? '#1558b0' : 'var(--border)'}`,
-                  display:'flex', alignItems:'center', justifyContent:'center', transition:'all .2s',
-                }}>
-                  {item.done && <span style={{ fontSize:11, color:'white', fontWeight:700 }}>✓</span>}
-                </div>
-                <div style={{ flex:1, minWidth:0 }}>
-                  <div style={{ fontSize:13, color:'var(--ink)', fontWeight:500, textDecoration: item.done ? 'line-through' : 'none' }}>{item.label}</div>
-                  <div style={{ fontSize:11, color:'var(--subtle)', marginTop:1 }}>{item.desc}</div>
-                </div>
-                {!item.done && <div style={{ fontSize:11, color:'#1558b0', fontWeight:500, flexShrink:0 }}>{item.isTour ? 'Iniciar →' : 'Ir →'}</div>}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </>
-  )
-}
-
 export default function OnboardingChecklist() {
   const router            = useRouter()
   const { data: session } = useSession()
   const [items,     setItems]     = useState<ChecklistItem[]>(ITEMS.map(it => ({ ...it, done: false })))
   const [loaded,    setLoaded]    = useState(false)
   const [collapsed, setCollapsed] = useState(true)
-  const [showTour,  setShowTour]  = useState(false)
-  const [container, setContainer] = useState<HTMLElement|null>(null)
-  const mountedRef = useRef(false)
-
-  // Crear un contenedor dedicado en el DOM — solo una vez
-  useEffect(() => {
-    if (mountedRef.current) return
-    mountedRef.current = true
-
-    const el = document.createElement('div')
-    el.id    = 'onboarding-checklist-root'
-    // Insertar antes del primer hijo del main
-    const main = document.querySelector('main')
-    if (main) {
-      main.insertBefore(el, main.firstChild)
-      setContainer(el)
-    }
-
-    return () => {
-      if (el.parentNode) el.parentNode.removeChild(el)
-    }
-  }, [])
+  const initRef = useRef(false)
 
   const loadProgress = () => {
     fetch('/api/onboarding').then(r => r.json()).then(d => {
@@ -131,37 +37,91 @@ export default function OnboardingChecklist() {
   }
 
   useEffect(() => {
-    if (!container) return
+    if (initRef.current) return
+    initRef.current = true
     loadProgress()
     window.addEventListener('onboarding:refresh', loadProgress)
     return () => window.removeEventListener('onboarding:refresh', loadProgress)
-  }, [container])
+  }, [])
 
-  const handleItem = (item: ChecklistItem) => {
-    if (item.done) return
-    if (item.isTour) { setShowTour(true); return }
-    if (item.href) router.push(item.href)
-  }
-
-  const handleTourComplete = () => {
-    setShowTour(false)
-    window.dispatchEvent(new CustomEvent('onboarding:refresh'))
-  }
-
-  if (!container || !loaded) return null
+  if (!loaded) return null
+  if (typeof window === 'undefined') return null
   if (session?.user?.email === 'demo@tveo.co') return null
   if (session?.user?.role !== 'admin') return null
 
-  return createPortal(
-    <ChecklistUI
-      items={items}
-      collapsed={collapsed}
-      setCollapsed={setCollapsed}
-      showTour={showTour}
-      setShowTour={setShowTour}
-      handleItem={handleItem}
-      handleTourComplete={handleTourComplete}
-    />,
-    container
+  const done  = items.filter(i => i.done).length
+  const total = items.length
+  const pct   = Math.round(done / total * 100)
+
+  if (done === total && total > 0) return null
+
+  const handleItem = (item: ChecklistItem) => {
+    if (item.done) return
+    if (item.isTour) {
+      // Disparar evento global para activar el tour sin causar re-render del checklist
+      window.dispatchEvent(new CustomEvent('onboarding:start-tour'))
+      return
+    }
+    if (item.href) router.push(item.href)
+  }
+
+  return (
+    <div style={{
+      background: 'var(--white)', border: '1px solid var(--border)',
+      borderRadius: 'var(--r-lg)', overflow: 'hidden', marginBottom: 16,
+    }}>
+      <button onClick={() => setCollapsed(c => !c)} style={{
+        width: '100%', display: 'flex', alignItems: 'center', gap: 12,
+        padding: '14px 16px', background: 'none', border: 'none',
+        cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left',
+      }}>
+        <div style={{ position:'relative', width:36, height:36, flexShrink:0 }}>
+          <svg width="36" height="36" viewBox="0 0 36 36">
+            <circle cx="18" cy="18" r="14" fill="none" stroke="var(--border2)" strokeWidth="3"/>
+            <circle cx="18" cy="18" r="14" fill="none" stroke="#1558b0" strokeWidth="3"
+              strokeDasharray={`${pct * 0.88} 88`} strokeLinecap="round"
+              transform="rotate(-90 18 18)" style={{ transition:'stroke-dasharray .5s ease' }}/>
+          </svg>
+          <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center', fontSize:10, fontWeight:600, color:'#1558b0' }}>{pct}%</div>
+        </div>
+        <div style={{ flex:1 }}>
+          <div style={{ fontSize:13, fontWeight:500, color:'var(--ink)' }}>Configura tu cuenta — {done}/{total} completado</div>
+          <div style={{ fontSize:11, color:'var(--subtle)', marginTop:2 }}>
+            {done === 0 ? 'Comienza aquí para sacarle el máximo a TVEO' : done < 3 ? 'Vas bien, continúa con el siguiente paso' : 'Casi listo, un par de pasos más'}
+          </div>
+        </div>
+        <div style={{ fontSize:14, color:'var(--subtle)', transition:'transform .2s', transform: collapsed ? 'rotate(-90deg)' : 'rotate(0)' }}>▾</div>
+      </button>
+
+      <div style={{ height:2, background:'var(--border2)', margin:'0 16px' }}>
+        <div style={{ height:'100%', width:`${pct}%`, background:'#1558b0', borderRadius:1, transition:'width .5s ease' }}/>
+      </div>
+
+      {!collapsed && (
+        <div style={{ padding:'8px 16px 14px' }}>
+          {items.map((item, i) => (
+            <div key={item.id} onClick={() => handleItem(item)} style={{
+              display:'flex', alignItems:'center', gap:12, padding:'10px 0',
+              borderBottom: i < items.length-1 ? '1px solid var(--border2)' : 'none',
+              cursor: item.done ? 'default' : 'pointer', opacity: item.done ? .6 : 1,
+            }}>
+              <div style={{
+                width:22, height:22, borderRadius:'50%', flexShrink:0,
+                background: item.done ? '#1558b0' : 'var(--surface)',
+                border: `2px solid ${item.done ? '#1558b0' : 'var(--border)'}`,
+                display:'flex', alignItems:'center', justifyContent:'center', transition:'all .2s',
+              }}>
+                {item.done && <span style={{ fontSize:11, color:'white', fontWeight:700 }}>✓</span>}
+              </div>
+              <div style={{ flex:1, minWidth:0 }}>
+                <div style={{ fontSize:13, color:'var(--ink)', fontWeight:500, textDecoration: item.done ? 'line-through' : 'none' }}>{item.label}</div>
+                <div style={{ fontSize:11, color:'var(--subtle)', marginTop:1 }}>{item.desc}</div>
+              </div>
+              {!item.done && <div style={{ fontSize:11, color:'#1558b0', fontWeight:500, flexShrink:0 }}>{item.isTour ? 'Iniciar →' : 'Ir →'}</div>}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   )
 }
