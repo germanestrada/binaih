@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 interface ActionLog {
   id:string; action:string; entity_type:string; entity_id?:string
   entity_name?:string; records_affected:number; description?:string
-  status:string; created_at:string
+  metadata?:Record<string,unknown>; status:string; created_at:string
   users?:{id:string;name:string;email:string;role_name:string}
 }
 

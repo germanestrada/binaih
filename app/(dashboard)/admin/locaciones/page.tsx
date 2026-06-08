@@ -186,7 +186,7 @@ export default function LocacionesAdminPage() {
                   <select value={l.status} onChange={e=>changeStatus(l,e.target.value)} style={{border:'1px solid var(--border)',padding:'5px 8px',borderRadius:'var(--r-sm)',cursor:'pointer',fontSize:11,color:'var(--mid)',fontFamily:'inherit',background:'none'}}>
                     {STATUS_OPTS.map(s=><option key={s} value={s}>{s}</option>)}
                   </select>
-                  <button onClick={()=>openBulkDelete(l)} style={{background:'none',border:'1px solid var(--warn-bg)',padding:'5px 10px',borderRadius:'var(--r-sm)',cursor:'pointer',fontSize:11,color:'var(--warn)',fontFamily:'inherit'}}>Auditorías</button>
+                  <button onClick={()=>openBulkDelete(l)} style={{background:'none',border:'1px solid var(--warn-bg)',padding:'5px 10px',borderRadius:'var(--r-sm)',cursor:'pointer',fontSize:11,color:'var(--warn)',fontFamily:'inherit'}}>Eliminar Auditorías</button>
                   <button onClick={()=>openDelete(l)} style={{background:'none',border:'1px solid var(--err-bg)',padding:'5px 10px',borderRadius:'var(--r-sm)',cursor:'pointer',fontSize:11,color:'var(--err)',fontFamily:'inherit'}}>Eliminar</button>
                 </div>
               </div>

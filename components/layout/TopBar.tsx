@@ -6,13 +6,12 @@ import Icon from '@/components/ui/Icon'
 import type { Role } from '@/types/auth'
 
 const NAV = [
-  { label: 'Dashboard',  href: '/home',          icon: 'home'     as const, minRole: 'viewer'  as Role },
-  { label: 'Locaciones', href: '/tiendas',        icon: 'store'    as const, minRole: 'viewer'  as Role },
-  { label: 'Hallazgos',  href: '/hallazgos',      icon: 'search'   as const, minRole: 'viewer'  as Role },
-  { label: 'Top',        href: '/top-hallazgos',  icon: 'trophy'   as const, minRole: 'viewer'  as Role },
-  { label: 'Auditorías', href: '/auditorias',     icon: 'calendar' as const, minRole: 'auditor' as Role },
-  { label: 'Admin',      href: '/admin',           icon: 'building' as const, minRole: 'admin'   as Role },
-  { label: 'Programación', href: '/programacion', icon: 'calendar' as const, minRole: 'auditor' as Role },
+  { label: 'Dashboard',    href: '/home',          icon: 'home'     as const, minRole: 'viewer'  as Role },
+  { label: 'Locaciones',   href: '/tiendas',        icon: 'store'    as const, minRole: 'viewer'  as Role },
+  { label: 'Programación', href: '/programacion',   icon: 'calendar' as const, minRole: 'auditor' as Role },
+  { label: 'Auditorías',   href: '/auditorias',     icon: 'calendar' as const, minRole: 'auditor' as Role },
+  { label: 'Top',          href: '/top-hallazgos',  icon: 'trophy'   as const, minRole: 'viewer'  as Role },
+  { label: 'Hallazgos',    href: '/hallazgos',      icon: 'search'   as const, minRole: 'viewer'  as Role },
 ]
 
 const ROLE_LEVEL: Record<Role, number> = { viewer: 1, auditor: 2, admin: 3 }
@@ -33,6 +32,7 @@ export default function TopBar() {
 
   return (
     <header style={{ background:'var(--shell)',display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 24px',height:52,borderBottom:'1px solid var(--shell-sep)',flexShrink:0 }}>
+      {/* Logo */}
       <div style={{ display:'flex',alignItems:'center',gap:10,minWidth:120 }}>
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
           <rect x="1" y="1" width="18" height="18" rx="4" stroke="white" strokeWidth="1.5"/>
@@ -41,6 +41,8 @@ export default function TopBar() {
         </svg>
         <span style={{ fontFamily:'var(--font-serif)',fontSize:15,color:'var(--shell-text)',letterSpacing:'.5px' }}>TVEO</span>
       </div>
+
+      {/* Nav central */}
       <nav style={{ display:'flex',gap:2 }}>
         {visibleNav.map(item => {
           const active = path === item.href || path.startsWith(item.href + '/')
@@ -52,14 +54,36 @@ export default function TopBar() {
           )
         })}
       </nav>
+
+      {/* Derecha: Admin + usuario + signout */}
       <div style={{ display:'flex',alignItems:'center',gap:10,minWidth:120,justifyContent:'flex-end' }}>
+        {/* Link Admin — solo para rol admin */}
+        {userRole === 'admin' && (
+          <Link href="/admin" style={{
+            fontSize: 12, fontWeight: 500,
+            color: path.startsWith('/admin') ? 'white' : 'var(--shell-dim)',
+            textDecoration: 'none',
+            padding: '5px 10px',
+            borderRadius: 'var(--r-sm)',
+            background: path.startsWith('/admin') ? 'rgba(255,255,255,.07)' : 'transparent',
+            transition: 'all .15s',
+          }}>
+            Admin
+          </Link>
+        )}
+
+        {/* Info usuario */}
         <div style={{ textAlign:'right' }}>
           <div style={{ fontSize:12,color:'var(--shell-text)',lineHeight:1.2 }}>{userName}</div>
           <div style={{ fontSize:10,color:roleBadge.color,fontFamily:'var(--font-mono)' }}>{roleBadge.label}</div>
         </div>
+
+        {/* Avatar */}
         <div style={{ width:30,height:30,borderRadius:'50%',border:'1px solid rgba(255,255,255,.2)',color:'var(--shell-text)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:600,letterSpacing:'.5px' }}>
           {initials}
         </div>
+
+        {/* Logout */}
         <button onClick={()=>signOut({callbackUrl:'/login'})} title="Cerrar sesión"
           style={{ background:'none',border:'none',color:'var(--shell-dim)',cursor:'pointer',display:'flex',alignItems:'center',padding:4,borderRadius:4,transition:'color .15s' }}
           onMouseEnter={e=>(e.currentTarget as HTMLButtonElement).style.color='white'}
