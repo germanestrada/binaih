@@ -130,7 +130,7 @@ export default function OnboardingChecklist() {
       // Escuchar refresh
       const onRefresh = () => {
         fetch('/api/onboarding').then(r => r.json()).then(d => {
-          const c = new Set((d.data ?? []).filter((x: any) => x.completed).map((x: any) => x.step))
+          const c = new Set<string>((d.data ?? []).filter((x: any) => x.completed).map((x: any) => x.step as string))
           render(c)
         })
       }
