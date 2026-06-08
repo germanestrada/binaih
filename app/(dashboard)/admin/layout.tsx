@@ -21,6 +21,7 @@ const NAV = [
   { href: '/admin/configuracion',   label: 'Configuración',        icon: 'filter'    as const, section: 'Sistema' },
   { href: '/admin/exportar',        label: 'Exportar datos',       icon: 'export'    as const, section: 'Sistema' },
   { href: '/admin/plan',            label: 'Plan activo',          icon: 'trophy'    as const, section: 'Sistema' },
+  { href: '/admin/logs-acciones',   label: 'Log de acciones',      icon: 'eye'       as const, section: 'Sistema' },
 ]
 
 const SECTIONS = ['Acceso', 'Auditorías', 'IA', 'Sistema']
