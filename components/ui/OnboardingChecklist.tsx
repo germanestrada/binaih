@@ -4,7 +4,6 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 
 const ITEMS = [
-  { id:'tour_completed',    label:'Completar el tour inicial',     desc:'Explora las funciones principales',    isTour: true,  href: null },
   { id:'first_location',   label:'Agregar tu primera locación',   desc:'Crea una tienda, bodega o sucursal',    isTour: false, href:'/admin/locaciones' },
   { id:'first_audit_type', label:'Crear un tipo de auditoría',    desc:'Define el checklist de tu operación',   isTour: false, href:'/admin/tipos-auditoria' },
   { id:'first_user',       label:'Invitar a tu equipo',           desc:'Agrega un auditor o viewer',            isTour: false, href:'/admin/usuarios' },
