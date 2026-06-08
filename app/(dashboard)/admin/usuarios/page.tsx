@@ -7,9 +7,9 @@ interface User { id:string; name:string; email:string; role_name:string; zone?:s
 const ROLES = ['admin','auditor','viewer']
 const ZONES = ['Norte','Sur','Oriente','Occidente','Centro']
 const BADGE: Record<string,{label:string;bg:string;color:string}> = {
-  active:   {label:'Activo',  bg:'var(--ok-bg)',  color:'var(--ok)'},
-  inactive: {label:'Inactivo',bg:'var(--surface)',color:'var(--subtle)'},
-  pending:  {label:'Pendiente',bg:'var(--warn-bg)',color:'var(--warn)'},
+  active:   {label:'Activo',   bg:'var(--ok-bg)',   color:'var(--ok)'},
+  inactive: {label:'Inactivo', bg:'var(--surface)',  color:'var(--subtle)'},
+  pending:  {label:'Pendiente',bg:'var(--warn-bg)',  color:'var(--warn)'},
 }
 const INP: React.CSSProperties = {width:'100%',border:'1px solid var(--border)',borderRadius:'var(--r-md)',padding:'9px 12px',fontSize:13,fontFamily:'inherit',color:'var(--ink)',outline:'none',marginBottom:12,background:'white'}
 const BTN = (p=false): React.CSSProperties => ({background:p?'var(--ink)':'var(--surface)',color:p?'white':'var(--mid)',border:`1px solid ${p?'var(--ink)':'var(--border)'}`,padding:'9px 18px',borderRadius:'var(--r-sm)',fontSize:13,fontWeight:500,cursor:'pointer',fontFamily:'inherit'})
@@ -29,23 +29,23 @@ function Modal({title,onClose,children}:{title:string;onClose:()=>void;children:
 }
 
 export default function UsuariosPage() {
-  const [users,setUsers]       = useState<User[]>([])
-  const [loading,setLoading]   = useState(true)
-  const [modal,setModal]       = useState<'create'|'edit'|null>(null)
-  const [selected,setSelected] = useState<User|null>(null)
-  const [error,setError]       = useState('')
-  const [form,setForm]         = useState({name:'',email:'',password:'',role_name:'viewer',zone:'',status:'active'})
+  const [users,    setUsers]    = useState<User[]>([])
+  const [loading,  setLoading]  = useState(true)
+  const [modal,    setModal]    = useState<'create'|'edit'|null>(null)
+  const [selected, setSelected] = useState<User|null>(null)
+  const [error,    setError]    = useState('')
+  const [form,     setForm]     = useState({name:'',email:'',password:'',role_name:'viewer',zone:'',status:'active'})
 
   const load = () => { setLoading(true); fetch('/api/admin/users').then(r=>r.json()).then(d=>{setUsers(d.data??[]);setLoading(false)}) }
   useEffect(()=>{load()},[])
 
   const openCreate = () => { setForm({name:'',email:'',password:'',role_name:'viewer',zone:'',status:'active'}); setError(''); setModal('create') }
-  const openEdit   = (u:User) => { setSelected(u); setForm({name:u.name,email:u.email,password:'',role_name:u.role_name,zone:u.zone??''  ,status:u.status}); setError(''); setModal('edit') }
+  const openEdit   = (u:User) => { setSelected(u); setForm({name:u.name,email:u.email,password:'',role_name:u.role_name,zone:u.zone??'',status:u.status}); setError(''); setModal('edit') }
 
   const save = async () => {
     setError('')
     const isCreate = modal==='create'
-    const url = isCreate?'/api/admin/users':`/api/admin/users/${selected?.id}`
+    const url  = isCreate?'/api/admin/users':`/api/admin/users/${selected?.id}`
     const body: Record<string,string|null> = {name:form.name,role_name:form.role_name,zone:form.zone||null,status:form.status}
     if (isCreate){body.email=form.email;body.password=form.password}
     else if(form.password)body.password=form.password
@@ -55,15 +55,10 @@ export default function UsuariosPage() {
     setModal(null);load()
   }
 
-  const toggle = async (u:User) => {
-    await fetch(`/api/admin/users/${u.id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:u.status==='active'?'inactive':'active'})})
-    load()
-  }
-
-  const del = async (u:User) => {
-    if(!confirm(`¿Eliminar a ${u.name}? Esta acción no se puede deshacer.`))return
-    const res=await fetch(`/api/admin/users/${u.id}`,{method:'DELETE'})
-    if(!res.ok){const d=await res.json();alert(d.error);return}
+  // Solo inactivar — nunca eliminar
+  const suspend = async (u:User) => {
+    const newStatus = u.status==='active' ? 'inactive' : 'active'
+    await fetch(`/api/admin/users/${u.id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:newStatus})})
     load()
   }
 
@@ -77,7 +72,7 @@ export default function UsuariosPage() {
         <div style={{background:'var(--white)',border:'1px solid var(--border)',borderRadius:'var(--r-lg)',overflow:'hidden'}}>
           {users.length===0&&<div style={{padding:'40px',textAlign:'center',color:'var(--subtle)',fontSize:13}}>Sin usuarios</div>}
           {users.map((u,i)=>{
-            const b=BADGE[u.status]??BADGE.inactive
+            const b = BADGE[u.status]??BADGE.inactive
             return(
               <div key={u.id} style={{display:'flex',alignItems:'center',gap:14,padding:'13px 16px',borderBottom:i<users.length-1?'1px solid var(--border2)':'none'}}>
                 <div style={{width:36,height:36,borderRadius:'50%',background:'var(--surface)',border:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,fontWeight:600,color:'var(--ink)',flexShrink:0}}>
@@ -93,8 +88,10 @@ export default function UsuariosPage() {
                 <span style={{fontSize:11,fontWeight:500,padding:'2px 9px',borderRadius:20,background:b.bg,color:b.color}}>{b.label}</span>
                 <div style={{display:'flex',gap:6}}>
                   <button onClick={()=>openEdit(u)} style={{background:'none',border:'1px solid var(--border)',padding:'5px 10px',borderRadius:'var(--r-sm)',cursor:'pointer',fontSize:11,color:'var(--mid)',fontFamily:'inherit'}}>Editar</button>
-                  <button onClick={()=>toggle(u)} style={{background:'none',border:'1px solid var(--border)',padding:'5px 10px',borderRadius:'var(--r-sm)',cursor:'pointer',fontSize:11,color:'var(--mid)',fontFamily:'inherit'}}>{u.status==='active'?'Suspender':'Activar'}</button>
-                  <button onClick={()=>del(u)} style={{background:'none',border:'1px solid var(--err-bg)',padding:'5px 10px',borderRadius:'var(--r-sm)',cursor:'pointer',fontSize:11,color:'var(--err)',fontFamily:'inherit'}}>Eliminar</button>
+                  {/* Solo inactivar — no eliminar */}
+                  <button onClick={()=>suspend(u)} style={{background:'none',border:'1px solid var(--border)',padding:'5px 10px',borderRadius:'var(--r-sm)',cursor:'pointer',fontSize:11,color:'var(--mid)',fontFamily:'inherit'}}>
+                    {u.status==='active'?'Inactivar':'Activar'}
+                  </button>
                 </div>
               </div>
             )

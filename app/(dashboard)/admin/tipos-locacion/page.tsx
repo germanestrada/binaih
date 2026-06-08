@@ -22,12 +22,13 @@ function Modal({title,onClose,children}:{title:string;onClose:()=>void;children:
 }
 
 export default function TiposLocacionPage() {
-  const [items,setItems]       = useState<LocType[]>([])
-  const [loading,setLoading]   = useState(true)
-  const [modal,setModal]       = useState<'create'|'edit'|null>(null)
-  const [selected,setSelected] = useState<LocType|null>(null)
-  const [error,setError]       = useState('')
-  const [form,setForm]         = useState({name:'',icon:'🏪',description:''})
+  const [items,    setItems]    = useState<LocType[]>([])
+  const [loading,  setLoading]  = useState(true)
+  const [modal,    setModal]    = useState<'create'|'edit'|'blocked'|null>(null)
+  const [selected, setSelected] = useState<LocType|null>(null)
+  const [error,    setError]    = useState('')
+  const [form,     setForm]     = useState({name:'',icon:'🏪',description:''})
+  const [blockedCount, setBlockedCount] = useState(0)
 
   const load = () => { setLoading(true); fetch('/api/admin/location-types').then(r=>r.json()).then(d=>{setItems(d.data??[]);setLoading(false)}) }
   useEffect(()=>{load()},[])
@@ -51,9 +52,18 @@ export default function TiposLocacionPage() {
   }
 
   const del = async (t:LocType) => {
-    if(!confirm(`¿Eliminar "${t.name}"?`))return
-    const res = await fetch(`/api/admin/location-types/${t.id}`,{method:'DELETE'})
-    if(!res.ok){const d=await res.json();alert(d.error);return}
+    // Verificar si tiene locaciones asociadas
+    const res  = await fetch(`/api/admin/location-types/${t.id}/check`)
+    const data = await res.json()
+    if (data.count > 0) {
+      setSelected(t)
+      setBlockedCount(data.count)
+      setModal('blocked')
+      return
+    }
+    if (!confirm(`¿Eliminar "${t.name}"?`)) return
+    const delRes = await fetch(`/api/admin/location-types/${t.id}`,{method:'DELETE'})
+    if (!delRes.ok){const d=await delRes.json();alert(d.error??'Error');return}
     load()
   }
 
@@ -83,7 +93,9 @@ export default function TiposLocacionPage() {
           ))}
         </div>
       )}
-      {modal&&(
+
+      {/* Modal crear/editar */}
+      {(modal==='create'||modal==='edit')&&(
         <Modal title={modal==='create'?'Nuevo tipo':'Editar tipo'} onClose={()=>setModal(null)}>
           <input style={INP} placeholder="Nombre del tipo" value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))}/>
           <div style={{marginBottom:12}}>
@@ -99,6 +111,21 @@ export default function TiposLocacionPage() {
           <div style={{display:'flex',gap:8,justifyContent:'flex-end'}}>
             <button onClick={()=>setModal(null)} style={BTN()}>Cancelar</button>
             <button onClick={save} style={BTN(true)}>Guardar</button>
+          </div>
+        </Modal>
+      )}
+
+      {/* Modal bloqueado */}
+      {modal==='blocked'&&selected&&(
+        <Modal title="No se puede eliminar" onClose={()=>setModal(null)}>
+          <div style={{background:'var(--err-bg)',border:'1px solid var(--err)',borderRadius:'var(--r-md)',padding:'14px 16px',marginBottom:16}}>
+            <div style={{fontSize:14,fontWeight:600,color:'var(--err)',marginBottom:6}}>⚠️ Tipo en uso</div>
+            <div style={{fontSize:13,color:'var(--err)',lineHeight:1.6}}>
+              El tipo <strong>{selected.name}</strong> está asignado a <strong>{blockedCount} locación{blockedCount!==1?'es':''}</strong>. Reasigna o elimina esas locaciones antes de eliminar este tipo.
+            </div>
+          </div>
+          <div style={{display:'flex',justifyContent:'flex-end'}}>
+            <button onClick={()=>setModal(null)} style={BTN(true)}>Entendido</button>
           </div>
         </Modal>
       )}

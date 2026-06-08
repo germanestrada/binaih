@@ -10,17 +10,13 @@ interface Schedule {
   audit_types:{id:string;name:string;icon:string;color:string}
   users:{id:string;name:string;email:string}
 }
-interface Location    { id:string; name:string; city:string }
-interface AuditType   { id:string; name:string; icon:string }
-interface User        { id:string; name:string; role_name:string }
+interface Location  { id:string; name:string; city:string; status:string }
+interface AuditType { id:string; name:string; icon:string }
+interface User      { id:string; name:string; role_name:string }
 
-const FREQ_LABEL: Record<string,string> = {
-  once:'Una vez', daily:'Diaria', weekly:'Semanal', monthly:'Mensual'
-}
-const FREQ_COLOR: Record<string,string> = {
-  once:'#64748b', daily:'#1558b0', weekly:'#7c3aed', monthly:'#059669'
-}
-const DAYS = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb']
+const FREQ_LABEL: Record<string,string> = { once:'Una vez', daily:'Diaria', weekly:'Semanal', monthly:'Mensual' }
+const FREQ_COLOR: Record<string,string> = { once:'#64748b', daily:'#1558b0', weekly:'#7c3aed', monthly:'#059669' }
+const DAYS   = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb']
 const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic']
 
 const EMPTY_FORM = {
@@ -67,7 +63,8 @@ export default function ProgramacionPage() {
       fetch('/api/admin/users').then(r=>r.json()),
     ]).then(([s,loc,at,u])=>{
       setSchedules(s.data??[])
-      setLocations(loc.data??[])
+      // Solo locaciones activas
+      setLocations((loc.data??[]).filter((l:Location)=>l.status==='active'))
       setAuditTypes(at.data??[])
       setUsers((u.data??[]).filter((u:User)=>['admin','auditor'].includes(u.role_name)))
       setLoading(false)
@@ -121,13 +118,11 @@ export default function ProgramacionPage() {
     setError(''); setModal('edit')
   }
 
-  // ── Calendario ────────────────────────────────────────────
   const year  = currentMonth.getFullYear()
   const month = currentMonth.getMonth()
-  const firstDay = new Date(year, month, 1).getDay()
+  const firstDay    = new Date(year, month, 1).getDay()
   const daysInMonth = new Date(year, month+1, 0).getDate()
 
-  // Mapear schedules a días del mes actual
   const calendarEvents: Record<number, Schedule[]> = {}
   schedules.filter(s=>s.active).forEach(s => {
     if (!s.next_run_at) return
@@ -144,23 +139,18 @@ export default function ProgramacionPage() {
 
   return (
     <div style={{display:'flex',flexDirection:'column',height:'calc(100vh - 92px)'}}>
-      {/* Header */}
       <div style={{display:'flex',alignItems:'center',gap:12,padding:'12px 24px',borderBottom:'1px solid var(--border)',background:'var(--white)',flexShrink:0}}>
         <div style={{display:'flex',border:'1px solid var(--border)',borderRadius:'var(--r-sm)',overflow:'hidden'}}>
           {(['calendar','list'] as const).map(v=>(
-            <button key={v} onClick={()=>setView(v)} style={{
-              padding:'7px 14px',fontSize:12,border:'none',cursor:'pointer',fontFamily:'inherit',
-              background:view===v?'var(--ink)':'var(--white)',
-              color:view===v?'white':'var(--subtle)',
-            }}>{v==='calendar'?'📅 Calendario':'📋 Lista'}</button>
+            <button key={v} onClick={()=>setView(v)} style={{padding:'7px 14px',fontSize:12,border:'none',cursor:'pointer',fontFamily:'inherit',background:view===v?'var(--ink)':'var(--white)',color:view===v?'white':'var(--subtle)'}}>
+              {v==='calendar'?'📅 Calendario':'📋 Lista'}
+            </button>
           ))}
         </div>
         {view==='calendar'&&(
           <div style={{display:'flex',alignItems:'center',gap:8}}>
             <button onClick={prevMonth} style={{...BTN(),padding:'7px 10px'}}>‹</button>
-            <span style={{fontSize:14,fontWeight:500,color:'var(--ink)',minWidth:120,textAlign:'center'}}>
-              {MONTHS[month]} {year}
-            </span>
+            <span style={{fontSize:14,fontWeight:500,color:'var(--ink)',minWidth:120,textAlign:'center'}}>{MONTHS[month]} {year}</span>
             <button onClick={nextMonth} style={{...BTN(),padding:'7px 10px'}}>›</button>
           </div>
         )}
@@ -172,43 +162,24 @@ export default function ProgramacionPage() {
         </button>
       </div>
 
-      {/* Content */}
       <div style={{flex:1,overflowY:'auto',padding:'20px 24px'}}>
         {loading?<div style={{color:'var(--subtle)',fontSize:13}}>Cargando…</div>:(
-
           view==='calendar' ? (
-            /* ── Vista Calendario ── */
             <div>
-              {/* Cabecera días */}
               <div style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:1,marginBottom:1}}>
-                {DAYS.map(d=>(
-                  <div key={d} style={{textAlign:'center',fontSize:11,fontWeight:600,color:'var(--subtle)',textTransform:'uppercase',letterSpacing:'1px',padding:'8px 0'}}>{d}</div>
-                ))}
+                {DAYS.map(d=><div key={d} style={{textAlign:'center',fontSize:11,fontWeight:600,color:'var(--subtle)',textTransform:'uppercase',letterSpacing:'1px',padding:'8px 0'}}>{d}</div>)}
               </div>
-              {/* Grid de días */}
               <div style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:1}}>
-                {Array.from({length:firstDay}).map((_,i)=>(
-                  <div key={`e${i}`} style={{minHeight:100,background:'var(--surface)',borderRadius:'var(--r-sm)'}}/>
-                ))}
+                {Array.from({length:firstDay}).map((_,i)=><div key={`e${i}`} style={{minHeight:100,background:'var(--surface)',borderRadius:'var(--r-sm)'}}/>)}
                 {Array.from({length:daysInMonth}).map((_,i)=>{
                   const day    = i+1
                   const events = calendarEvents[day] ?? []
                   const isToday = new Date().getDate()===day && new Date().getMonth()===month && new Date().getFullYear()===year
                   return (
-                    <div key={day} style={{
-                      minHeight:100,background:'var(--white)',borderRadius:'var(--r-sm)',
-                      border:`1px solid ${isToday?'var(--ink)':'var(--border2)'}`,
-                      padding:'6px',
-                    }}>
+                    <div key={day} style={{minHeight:100,background:'var(--white)',borderRadius:'var(--r-sm)',border:`1px solid ${isToday?'var(--ink)':'var(--border2)'}`,padding:'6px'}}>
                       <div style={{fontSize:12,fontWeight:isToday?600:400,color:isToday?'var(--ink)':'var(--subtle)',marginBottom:4}}>{day}</div>
                       {events.map(ev=>(
-                        <div key={ev.id} onClick={()=>openEdit(ev)} style={{
-                          fontSize:10,padding:'2px 5px',borderRadius:4,marginBottom:2,
-                          background:(ev.audit_types.color||'#1558b0')+'22',
-                          color:ev.audit_types.color||'#1558b0',
-                          cursor:'pointer',lineHeight:1.4,
-                          border:`1px solid ${ev.audit_types.color||'#1558b0'}44`,
-                        }}>
+                        <div key={ev.id} onClick={()=>openEdit(ev)} style={{fontSize:10,padding:'2px 5px',borderRadius:4,marginBottom:2,background:(ev.audit_types.color||'#1558b0')+'22',color:ev.audit_types.color||'#1558b0',cursor:'pointer',lineHeight:1.4,border:`1px solid ${ev.audit_types.color||'#1558b0'}44`}}>
                           {ev.audit_types.icon} {ev.locations.name.slice(0,14)}
                           <span style={{float:'right',opacity:.6}}>{ev.scheduled_time}</span>
                         </div>
@@ -219,29 +190,19 @@ export default function ProgramacionPage() {
               </div>
             </div>
           ) : (
-            /* ── Vista Lista ── */
             schedules.length===0?(
-              <div style={{textAlign:'center',padding:'48px',color:'var(--subtle)',fontSize:13}}>
-                Sin programaciones. Crea la primera con el botón de arriba.
-              </div>
+              <div style={{textAlign:'center',padding:'48px',color:'var(--subtle)',fontSize:13}}>Sin programaciones. Crea la primera con el botón de arriba.</div>
             ):(
               <div style={{background:'var(--white)',border:'1px solid var(--border)',borderRadius:'var(--r-lg)',overflow:'hidden'}}>
                 {schedules.map((s,i)=>(
                   <div key={s.id} style={{display:'flex',alignItems:'center',gap:14,padding:'14px 16px',borderBottom:i<schedules.length-1?'1px solid var(--border2)':'none',opacity:s.active?1:.5}}>
-                    {/* Tipo auditoría */}
-                    <div style={{width:40,height:40,borderRadius:'var(--r-md)',background:(s.audit_types.color||'#111')+'22',display:'flex',alignItems:'center',justifyContent:'center',fontSize:20,flexShrink:0}}>
-                      {s.audit_types.icon}
-                    </div>
+                    <div style={{width:40,height:40,borderRadius:'var(--r-md)',background:(s.audit_types.color||'#111')+'22',display:'flex',alignItems:'center',justifyContent:'center',fontSize:20,flexShrink:0}}>{s.audit_types.icon}</div>
                     <div style={{flex:1,minWidth:0}}>
                       <div style={{display:'flex',gap:8,alignItems:'center',marginBottom:3,flexWrap:'wrap'}}>
                         <span style={{fontSize:13,fontWeight:500,color:'var(--ink)'}}>{s.locations.name}</span>
                         <span style={{fontSize:10,color:'var(--subtle)'}}>{s.locations.city}</span>
-                        <span style={{fontSize:11,fontWeight:500,padding:'2px 8px',borderRadius:20,background:(FREQ_COLOR[s.frequency]||'#111')+'22',color:FREQ_COLOR[s.frequency]||'#111'}}>
-                          {FREQ_LABEL[s.frequency]}
-                        </span>
-                        {s.frequency==='weekly'&&s.week_days&&(
-                          <span style={{fontSize:10,color:'var(--subtle)'}}>{s.week_days.map(d=>DAYS[d]).join(', ')}</span>
-                        )}
+                        <span style={{fontSize:11,fontWeight:500,padding:'2px 8px',borderRadius:20,background:(FREQ_COLOR[s.frequency]||'#111')+'22',color:FREQ_COLOR[s.frequency]||'#111'}}>{FREQ_LABEL[s.frequency]}</span>
+                        {s.frequency==='weekly'&&s.week_days&&<span style={{fontSize:10,color:'var(--subtle)'}}>{s.week_days.map(d=>DAYS[d]).join(', ')}</span>}
                       </div>
                       <div style={{display:'flex',gap:12,fontSize:11,color:'var(--subtle)',flexWrap:'wrap'}}>
                         <span>🕐 {s.scheduled_time}</span>
@@ -264,12 +225,11 @@ export default function ProgramacionPage() {
         )}
       </div>
 
-      {/* Modal crear/editar */}
       {modal&&(
         <Modal title={modal==='create'?'Nueva programación':'Editar programación'} onClose={()=>setModal(null)}>
           <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginBottom:2}}>
             <div>
-              <div style={{fontSize:10,color:'var(--subtle)',fontWeight:600,textTransform:'uppercase',letterSpacing:'1px',marginBottom:4}}>Locación *</div>
+              <div style={{fontSize:10,color:'var(--subtle)',fontWeight:600,textTransform:'uppercase',letterSpacing:'1px',marginBottom:4}}>Locación * (solo activas)</div>
               <select style={{...INP}} value={form.location_id} onChange={f('location_id')}>
                 <option value="">Selecciona…</option>
                 {locations.map(l=><option key={l.id} value={l.id}>{l.name} — {l.city}</option>)}
@@ -288,7 +248,6 @@ export default function ProgramacionPage() {
             <option value="">Selecciona…</option>
             {users.map(u=><option key={u.id} value={u.id}>{u.name} ({u.role_name})</option>)}
           </select>
-
           <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
             <div>
               <div style={{fontSize:10,color:'var(--subtle)',fontWeight:600,textTransform:'uppercase',letterSpacing:'1px',marginBottom:4}}>Frecuencia *</div>
@@ -304,33 +263,23 @@ export default function ProgramacionPage() {
               <input type="time" style={{...INP}} value={form.scheduled_time} onChange={f('scheduled_time')}/>
             </div>
           </div>
-
-          {/* Días de la semana para weekly */}
           {form.frequency==='weekly'&&(
             <div style={{marginBottom:10}}>
               <div style={{fontSize:10,color:'var(--subtle)',fontWeight:600,textTransform:'uppercase',letterSpacing:'1px',marginBottom:6}}>Días de la semana</div>
               <div style={{display:'flex',gap:6,flexWrap:'wrap'}}>
                 {DAYS.map((d,i)=>{
                   const sel = (form.week_days??[]).includes(i)
-                  return (
-                    <button key={i} type="button" onClick={()=>setForm((p:any)=>({...p,week_days:sel?p.week_days.filter((x:number)=>x!==i):[...(p.week_days??[]),i].sort()}))}
-                      style={{padding:'5px 10px',borderRadius:'var(--r-sm)',border:'1px solid var(--border)',cursor:'pointer',fontSize:12,fontFamily:'inherit',background:sel?'var(--ink)':'var(--surface)',color:sel?'white':'var(--mid)',transition:'all .15s'}}>
-                      {d}
-                    </button>
-                  )
+                  return <button key={i} type="button" onClick={()=>setForm((p:any)=>({...p,week_days:sel?p.week_days.filter((x:number)=>x!==i):[...(p.week_days??[]),i].sort()}))} style={{padding:'5px 10px',borderRadius:'var(--r-sm)',border:'1px solid var(--border)',cursor:'pointer',fontSize:12,fontFamily:'inherit',background:sel?'var(--ink)':'var(--surface)',color:sel?'white':'var(--mid)',transition:'all .15s'}}>{d}</button>
                 })}
               </div>
             </div>
           )}
-
-          {/* Día del mes para monthly */}
           {form.frequency==='monthly'&&(
             <div style={{marginBottom:10}}>
               <div style={{fontSize:10,color:'var(--subtle)',fontWeight:600,textTransform:'uppercase',letterSpacing:'1px',marginBottom:4}}>Día del mes (1-31)</div>
               <input type="number" min="1" max="31" style={{...INP}} value={form.month_day} onChange={f('month_day')}/>
             </div>
           )}
-
           <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
             <div>
               <div style={{fontSize:10,color:'var(--subtle)',fontWeight:600,textTransform:'uppercase',letterSpacing:'1px',marginBottom:4}}>Fecha inicio *</div>
@@ -341,10 +290,8 @@ export default function ProgramacionPage() {
               <input type="date" style={{...INP}} value={form.ends_at} onChange={f('ends_at')}/>
             </div>
           </div>
-
           <div style={{fontSize:10,color:'var(--subtle)',fontWeight:600,textTransform:'uppercase',letterSpacing:'1px',marginBottom:4}}>Notas</div>
           <textarea style={{...INP,minHeight:56,resize:'vertical'}} value={form.notes} onChange={f('notes')} placeholder="Instrucciones para el auditor…"/>
-
           {error&&<div style={{fontSize:12,color:'var(--err)',marginBottom:10,padding:'8px 12px',background:'var(--err-bg)',borderRadius:'var(--r-sm)'}}>{error}</div>}
           <div style={{display:'flex',gap:8,justifyContent:'flex-end',marginTop:4}}>
             <button onClick={()=>setModal(null)} style={BTN()}>Cancelar</button>
