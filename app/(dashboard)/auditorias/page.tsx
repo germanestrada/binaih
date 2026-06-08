@@ -48,7 +48,7 @@ function AuditoriasContent() {
 
   return (
     <div style={{display:'flex',flexDirection:'column',height:'calc(100vh - 92px)'}}>
-      {/* Toolbar */}
+      {/* Toolbar — sin botón Nueva auditoría */}
       <div style={{display:'flex',alignItems:'center',gap:12,padding:'10px 24px',borderBottom:'1px solid var(--border)',background:'var(--white)',flexShrink:0}}>
         <FilterBar
           fields={[
@@ -63,14 +63,15 @@ function AuditoriasContent() {
           count={audits.length}
           label="Estado"
         />
-        <button onClick={()=>router.push('/auditorias/nueva')} style={{
+        {/* Botón para ir a Programación */}
+        <button onClick={()=>router.push('/programacion')} style={{
           display:'flex',alignItems:'center',gap:6,marginLeft:'auto',
-          background:'var(--ink)',color:'white',border:'none',
+          background:'none',color:'var(--mid)',border:'1px solid var(--border)',
           padding:'8px 16px',borderRadius:'var(--r-sm)',fontSize:13,
           fontWeight:500,cursor:'pointer',fontFamily:'inherit',
         }}>
-          <Icon name="calendar" size={13} color="white"/>
-          Nueva auditoría
+          <Icon name="calendar" size={13} color="currentColor"/>
+          Programar auditoría
         </button>
       </div>
 
@@ -82,19 +83,18 @@ function AuditoriasContent() {
           <div style={{textAlign:'center',padding:'60px',color:'var(--subtle)'}}>
             <Icon name="calendar" size={28} color="var(--border)" style={{display:'block',margin:'0 auto 12px'}}/>
             <div style={{fontSize:13}}>Sin auditorías{filter?` con estado "${filter}"`:''}</div>
-            <button onClick={()=>router.push('/auditorias/nueva')} style={{marginTop:16,fontSize:12,color:'var(--ink)',background:'none',border:'1px solid var(--border)',padding:'7px 16px',borderRadius:'var(--r-sm)',cursor:'pointer',fontFamily:'inherit'}}>
-              Programar primera auditoría
+            <button onClick={()=>router.push('/programacion')} style={{marginTop:16,fontSize:12,color:'var(--ink)',background:'none',border:'1px solid var(--border)',padding:'7px 16px',borderRadius:'var(--r-sm)',cursor:'pointer',fontFamily:'inherit'}}>
+              Ir a Programación
             </button>
           </div>
         ) : (
           <div style={{background:'var(--white)',border:'1px solid var(--border)',borderRadius:'var(--r-lg)',overflow:'hidden'}}>
             {audits.map((a,i)=>{
-              const b = STATUS_BADGE[a.status] ?? STATUS_BADGE.scheduled
+              const b        = STATUS_BADGE[a.status] ?? STATUS_BADGE.scheduled
               const progress = a.total_items ? Math.round((a.scored_items??0)/a.total_items*100) : 0
               return (
                 <div key={a.id}
-                  onClick={()=>router.push(`/auditorias/${a.id}`)}
-                  style={{display:'flex',alignItems:'center',gap:14,padding:'14px 16px',borderBottom:i<audits.length-1?'1px solid var(--border2)':'none',cursor:'pointer',transition:'background .1s'}}
+                  style={{display:'flex',alignItems:'center',gap:14,padding:'14px 16px',borderBottom:i<audits.length-1?'1px solid var(--border2)':'none',transition:'background .1s'}}
                   onMouseEnter={e=>(e.currentTarget as HTMLDivElement).style.background='var(--surface)'}
                   onMouseLeave={e=>(e.currentTarget as HTMLDivElement).style.background=''}
                 >
@@ -104,7 +104,7 @@ function AuditoriasContent() {
                   </div>
 
                   {/* Info */}
-                  <div style={{flex:1,minWidth:0}}>
+                  <div style={{flex:1,minWidth:0,cursor:'pointer'}} onClick={()=>router.push(`/auditorias/${a.id}`)}>
                     <div style={{fontSize:13,fontWeight:500,color:'var(--ink)',marginBottom:2}}>
                       {a.audit_types?.name ?? 'Auditoría'} — {a.locations?.name ?? '—'}
                     </div>
@@ -112,6 +112,7 @@ function AuditoriasContent() {
                       <span>📍 {a.locations?.city}</span>
                       <span>👤 {a.users?.name}</span>
                       <span>🗓 {formatDate(a.scheduled_at)}</span>
+                      {a.source==='scheduled'&&<span style={{color:'var(--ink)',fontWeight:500}}>🔁 Programada</span>}
                       {a.source==='ai'&&<span style={{color:'var(--ink)',fontWeight:500}}>✨ IA</span>}
                     </div>
                     {/* Barra de progreso para in_progress */}
@@ -130,6 +131,22 @@ function AuditoriasContent() {
                   {/* Score */}
                   {a.score!=null&&(
                     <div style={{fontFamily:'var(--font-serif)',fontSize:28,color:'var(--ink)',lineHeight:1,flexShrink:0}}>{a.score}</div>
+                  )}
+
+                  {/* Botón Ejecutar para auditorías programadas */}
+                  {a.status==='scheduled'&&(
+                    <button
+                      onClick={e=>{e.stopPropagation();router.push(`/auditorias/${a.id}`)}}
+                      style={{
+                        display:'flex',alignItems:'center',gap:6,
+                        background:'var(--ink)',color:'white',border:'none',
+                        padding:'7px 14px',borderRadius:'var(--r-sm)',fontSize:12,
+                        fontWeight:500,cursor:'pointer',fontFamily:'inherit',flexShrink:0,
+                      }}
+                    >
+                      <Icon name="check" size={12} color="white"/>
+                      Ejecutar
+                    </button>
                   )}
 
                   {/* Estado */}
