@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Icon from '@/components/ui/Icon'
+import { useRouter } from 'next/navigation'
 
 interface User { id:string; name:string; email:string; role_name:string; zone?:string; status:string; last_login?:string }
 
@@ -29,6 +30,7 @@ function Modal({title,onClose,children}:{title:string;onClose:()=>void;children:
 }
 
 export default function UsuariosPage() {
+  const router = useRouter()
   const [users,    setUsers]    = useState<User[]>([])
   const [loading,  setLoading]  = useState(true)
   const [modal,    setModal]    = useState<'create'|'edit'|null>(null)
@@ -87,6 +89,7 @@ export default function UsuariosPage() {
                 {u.last_login&&<span style={{fontSize:10,color:'var(--subtle)',fontFamily:'var(--font-mono)'}}>Último: {new Date(u.last_login).toLocaleDateString('es-CO')}</span>}
                 <span style={{fontSize:11,fontWeight:500,padding:'2px 9px',borderRadius:20,background:b.bg,color:b.color}}>{b.label}</span>
                 <div style={{display:'flex',gap:6}}>
+                  <button onClick={()=>router.push(`/admin/usuarios/${u.id}`)} style={{background:'none',border:'1px solid var(--border)',padding:'5px 10px',borderRadius:'var(--r-sm)',cursor:'pointer',fontSize:11,color:'var(--mid)',fontFamily:'inherit'}}>Ver ficha</button>
                   <button onClick={()=>openEdit(u)} style={{background:'none',border:'1px solid var(--border)',padding:'5px 10px',borderRadius:'var(--r-sm)',cursor:'pointer',fontSize:11,color:'var(--mid)',fontFamily:'inherit'}}>Editar</button>
                   {/* Solo inactivar — no eliminar */}
                   <button onClick={()=>suspend(u)} style={{background:'none',border:'1px solid var(--border)',padding:'5px 10px',borderRadius:'var(--r-sm)',cursor:'pointer',fontSize:11,color:'var(--mid)',fontFamily:'inherit'}}>
