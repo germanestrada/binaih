@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useSession, signOut } from 'next-auth/react'
 import Icon from '@/components/ui/Icon'
+import NotificationBell from '@/components/ui/NotificationBell'
 import type { Role } from '@/types/auth'
 
 const NAV = [
@@ -57,6 +58,9 @@ export default function TopBar() {
 
       {/* Derecha: Admin + usuario + signout */}
       <div style={{ display:'flex',alignItems:'center',gap:10,minWidth:120,justifyContent:'flex-end' }}>
+        {/* Campana de notificaciones */}
+        <NotificationBell />
+
         {/* Link Admin — solo para rol admin */}
         {userRole === 'admin' && (
           <Link href="/admin" style={{
