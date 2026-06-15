@@ -107,6 +107,8 @@ export async function POST(req: Request) {
       ai_criteria:             item.ai_criteria?.trim() || null,
       plan_tier_required:      ['starter','professional','enterprise'].includes(item.plan_tier_required) ? item.plan_tier_required : 'starter',
       active:                  item.active !== 'false' && item.active !== false,
+      sector:                  item.sector?.trim() || null,
+      subsector:               item.subsector?.trim() || null,
     }
 
     try {

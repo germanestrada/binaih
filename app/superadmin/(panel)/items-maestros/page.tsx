@@ -1,16 +1,33 @@
 'use client'
 import { useEffect, useState, useRef } from 'react'
 
-interface MasterItem { id:string; code:string; title:string; description?:string; icon:string; category:string; response_type:string; weight_default:number; max_score_default:number; required_default:boolean; ai_enabled:boolean; ai_visual_category?:string; ai_confidence_threshold:number; plan_tier_required:string; active:boolean; ai_prompt?:string; ai_criteria?:string }
+interface MasterItem { id:string; code:string; title:string; description?:string; icon:string; category:string; sector?:string; subsector?:string; response_type:string; weight_default:number; max_score_default:number; required_default:boolean; ai_enabled:boolean; ai_visual_category?:string; ai_confidence_threshold:number; plan_tier_required:string; active:boolean; ai_prompt?:string; ai_criteria?:string }
 
 const RESPONSE_TYPES = ['binary','scale_5','scale_10','numeric','text','photo']
+
+const SECTORS: Record<string, string[]> = {
+  'retail':   ['alimentos','moda_textil','electrodomesticos','general'],
+  'salud':    ['clinicas_hospitales','farmacias_droguerias','consultorios_medicos','laboratorios_clinicos','comun'],
+  'logistica':['bodegas','centros_distribucion','transporte'],
+  'general':  ['comun'],
+}
+const SECTOR_LABELS: Record<string,string> = {
+  retail:'Retail', salud:'Salud', logistica:'Logística', general:'General',
+}
+const SUBSECTOR_LABELS: Record<string,string> = {
+  alimentos:'Alimentos', moda_textil:'Moda y textil', electrodomesticos:'Electrodomésticos',
+  clinicas_hospitales:'Clínicas y hospitales', farmacias_droguerias:'Farmacias y droguerías',
+  consultorios_medicos:'Consultorios médicos', laboratorios_clinicos:'Laboratorios clínicos',
+  bodegas:'Bodegas', centros_distribucion:'Centros de distribución', transporte:'Transporte',
+  comun:'Común (todos)', general:'General',
+}
 const AI_CATEGORIES  = ['pricing','ppe','cleanliness','order','signage','inventory','infrastructure','customer','general']
 const PLAN_TIERS     = ['starter','professional','enterprise']
 
 const INP: React.CSSProperties = {width:'100%',border:'1px solid #2a2a2a',borderRadius:8,padding:'8px 12px',fontSize:12,fontFamily:'inherit',color:'white',outline:'none',marginBottom:8,background:'rgba(255,255,255,.04)'}
 const BTN = (p=false): React.CSSProperties => ({background:p?'white':'rgba(255,255,255,.06)',color:p?'#0a0a0a':'#888',border:`1px solid ${p?'white':'#2a2a2a'}`,padding:'7px 16px',borderRadius:8,fontSize:12,fontWeight:500,cursor:'pointer',fontFamily:'inherit'})
 
-const EMPTY = {code:'',title:'',description:'',icon:'📋',category:'exhibicion',response_type:'binary',weight_default:'1.0',max_score_default:'10',required_default:true,ai_enabled:false,ai_visual_category:'general',ai_confidence_threshold:'80',plan_tier_required:'starter',active:true,ai_prompt:'',ai_criteria:''}
+const EMPTY = {code:'',title:'',description:'',icon:'📋',category:'exhibicion',sector:'retail',subsector:'alimentos',response_type:'binary',weight_default:'1.0',max_score_default:'10',required_default:true,ai_enabled:false,ai_visual_category:'general',ai_confidence_threshold:'80',plan_tier_required:'starter',active:true,ai_prompt:'',ai_criteria:''}
 
 const CSV_TEMPLATE = `code,title,description,icon,category,response_type,weight_default,max_score_default,required_default,ai_enabled,ai_visual_category,ai_confidence_threshold,plan_tier_required,active,ai_prompt,ai_criteria
 EXH-001,Exhibición de productos,Verificar exhibición correcta en góndola,📦,exhibicion,binary,1,10,true,false,general,80,starter,true,,
@@ -24,7 +41,9 @@ export default function ItemsMaestrosAdminPage() {
   const [selected, setSelected] = useState<MasterItem|null>(null)
   const [form,     setForm]     = useState<any>(EMPTY)
   const [error,    setError]    = useState('')
-  const [filter,   setFilter]   = useState('')
+  const [filter,      setFilter]      = useState('')
+  const [filterSector,    setFilterSector]    = useState('')
+  const [filterSubsector, setFilterSubsector] = useState('')
   // Bulk import state
   const [bulkFile,    setBulkFile]    = useState<File|null>(null)
   const [bulkPreview, setBulkPreview] = useState<any[]>([])
@@ -41,7 +60,7 @@ export default function ItemsMaestrosAdminPage() {
 
   const openEdit = (item:MasterItem) => {
     setSelected(item)
-    setForm({...item,weight_default:String(item.weight_default),max_score_default:String(item.max_score_default),ai_confidence_threshold:String(item.ai_confidence_threshold)})
+    setForm({...item,sector:item.sector??'retail',subsector:item.subsector??'alimentos',weight_default:String(item.weight_default),max_score_default:String(item.max_score_default),ai_confidence_threshold:String(item.ai_confidence_threshold)})
     setError(''); setModal('edit')
   }
 
@@ -149,14 +168,31 @@ export default function ItemsMaestrosAdminPage() {
     load()
   }
 
-  const filtered = items.filter(i=>!filter||i.title.toLowerCase().includes(filter.toLowerCase())||i.code.toLowerCase().includes(filter.toLowerCase()))
+  const filtered = items.filter(i => {
+    if (filter && !i.title.toLowerCase().includes(filter.toLowerCase()) && !i.code.toLowerCase().includes(filter.toLowerCase())) return false
+    if (filterSector && i.sector !== filterSector) return false
+    if (filterSubsector && i.subsector !== filterSubsector) return false
+    return true
+  })
   const groups   = [...new Set(filtered.map(i=>i.category))]
 
   return (
     <div style={{padding:'28px 32px'}}>
-      <div style={{display:'flex',gap:12,alignItems:'center',marginBottom:20}}>
+      <div style={{display:'flex',gap:10,alignItems:'center',marginBottom:20,flexWrap:'wrap'}}>
         <input value={filter} onChange={e=>setFilter(e.target.value)} placeholder="Buscar ítem…"
-          style={{border:'1px solid #2a2a2a',borderRadius:8,padding:'8px 12px',fontSize:12,fontFamily:'inherit',color:'white',outline:'none',background:'rgba(255,255,255,.04)',width:240}}/>
+          style={{border:'1px solid #2a2a2a',borderRadius:8,padding:'8px 12px',fontSize:12,fontFamily:'inherit',color:'white',outline:'none',background:'rgba(255,255,255,.04)',width:200}}/>
+        <select value={filterSector} onChange={e=>{setFilterSector(e.target.value);setFilterSubsector('')}}
+          style={{border:'1px solid #2a2a2a',borderRadius:8,padding:'8px 10px',fontSize:12,fontFamily:'inherit',color:filterSector?'white':'#555',outline:'none',background:'#111',cursor:'pointer'}}>
+          <option value="">Todos los sectores</option>
+          {Object.keys(SECTORS).map(s=><option key={s} value={s}>{SECTOR_LABELS[s]??s}</option>)}
+        </select>
+        {filterSector&&(
+          <select value={filterSubsector} onChange={e=>setFilterSubsector(e.target.value)}
+            style={{border:'1px solid #2a2a2a',borderRadius:8,padding:'8px 10px',fontSize:12,fontFamily:'inherit',color:filterSubsector?'white':'#555',outline:'none',background:'#111',cursor:'pointer'}}>
+            <option value="">Todos los subsectores</option>
+            {SECTORS[filterSector]?.map(s=><option key={s} value={s}>{SUBSECTOR_LABELS[s]??s}</option>)}
+          </select>
+        )}
         <span style={{fontSize:11,color:'#444',fontFamily:'monospace',marginRight:'auto'}}>{filtered.length} ítems</span>
         <button onClick={()=>{setBulkFile(null);setBulkPreview([]);setBulkResult(null);setBulkError('');setFileKey(k=>k+1);setModal('bulk')}} style={{...BTN(),color:'#a78bfa',borderColor:'rgba(167,139,250,.3)'}}>⬆ Cargue masivo</button>
         <button onClick={()=>{setForm(EMPTY);setError('');setModal('create')}} style={BTN(true)}>+ Nuevo ítem</button>
@@ -180,6 +216,7 @@ export default function ItemsMaestrosAdminPage() {
                     </div>
                     <div style={{fontSize:11,color:'#444'}}>{item.response_type} · max {item.max_score_default} · peso {item.weight_default}</div>
                   </div>
+                  {item.sector&&<span style={{fontSize:10,padding:'2px 8px',borderRadius:20,background:'rgba(99,102,241,.1)',color:'#818cf8',flexShrink:0}}>{SECTOR_LABELS[item.sector]??item.sector}{item.subsector?` · ${SUBSECTOR_LABELS[item.subsector]??item.subsector}`:''}</span>}
                   <span style={{fontSize:10,padding:'2px 8px',borderRadius:20,background:item.plan_tier_required==='starter'?'rgba(74,222,128,.1)':item.plan_tier_required==='professional'?'rgba(250,204,21,.1)':'rgba(255,255,255,.05)',color:item.plan_tier_required==='starter'?'#4ade80':item.plan_tier_required==='professional'?'#facc15':'#888',flexShrink:0}}>{item.plan_tier_required}</span>
                   <div style={{display:'flex',gap:6,flexShrink:0}}>
                     <button onClick={()=>openEdit(item)} style={{...BTN(),padding:'4px 10px'}}>Editar</button>
@@ -208,6 +245,18 @@ export default function ItemsMaestrosAdminPage() {
             <input style={INP} placeholder="Nombre del ítem" value={form.title} onChange={f('title')}/>
             <div style={{fontSize:10,color:'#555',marginBottom:3}}>Descripción</div>
             <textarea style={{...INP,minHeight:56,resize:'vertical'}} placeholder="Descripción detallada" value={form.description??''} onChange={f('description')}/>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
+              <div><div style={{fontSize:10,color:'#555',marginBottom:3}}>Sector</div>
+                <select style={{...INP,cursor:'pointer'}} value={form.sector??'retail'} onChange={e=>{setForm((p:any)=>({...p,sector:e.target.value,subsector:SECTORS[e.target.value]?.[0]??''}))}}>
+                  {Object.keys(SECTORS).map(s=><option key={s} value={s}>{SECTOR_LABELS[s]??s}</option>)}
+                </select>
+              </div>
+              <div><div style={{fontSize:10,color:'#555',marginBottom:3}}>Subsector</div>
+                <select style={{...INP,cursor:'pointer'}} value={form.subsector??''} onChange={f('subsector')}>
+                  {(SECTORS[form.sector??'retail']??[]).map(s=><option key={s} value={s}>{SUBSECTOR_LABELS[s]??s}</option>)}
+                </select>
+              </div>
+            </div>
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
               <div><div style={{fontSize:10,color:'#555',marginBottom:3}}>Categoría</div><input style={INP} value={form.category} onChange={f('category')}/></div>
               <div><div style={{fontSize:10,color:'#555',marginBottom:3}}>Tipo respuesta</div>
