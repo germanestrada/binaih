@@ -98,6 +98,7 @@ export default function ItemsMaestrosAdminPage() {
     setBulkFile(file)
     setBulkError('')
     setBulkResult(null)
+    setBulkPreview([])
     const reader = new FileReader()
     reader.onload = ev => {
       try {
@@ -132,7 +133,7 @@ export default function ItemsMaestrosAdminPage() {
         <input value={filter} onChange={e=>setFilter(e.target.value)} placeholder="Buscar ítem…"
           style={{border:'1px solid #2a2a2a',borderRadius:8,padding:'8px 12px',fontSize:12,fontFamily:'inherit',color:'white',outline:'none',background:'rgba(255,255,255,.04)',width:240}}/>
         <span style={{fontSize:11,color:'#444',fontFamily:'monospace',marginRight:'auto'}}>{filtered.length} ítems</span>
-        <button onClick={()=>{setBulkFile(null);setBulkPreview([]);setBulkResult(null);setBulkError('');setModal('bulk')}} style={{...BTN(),color:'#a78bfa',borderColor:'rgba(167,139,250,.3)'}}>⬆ Cargue masivo</button>
+        <button onClick={()=>{setBulkFile(null);setBulkPreview([]);setBulkResult(null);setBulkError('');if(fileRef.current)fileRef.current.value='';setModal('bulk')}} style={{...BTN(),color:'#a78bfa',borderColor:'rgba(167,139,250,.3)'}}>⬆ Cargue masivo</button>
         <button onClick={()=>{setForm(EMPTY);setError('');setModal('create')}} style={BTN(true)}>+ Nuevo ítem</button>
       </div>
 
@@ -306,7 +307,7 @@ export default function ItemsMaestrosAdminPage() {
             {bulkError&&<div style={{fontSize:12,color:'#f87171',marginBottom:12,padding:'8px 12px',background:'rgba(248,113,113,.08)',borderRadius:6}}>{bulkError}</div>}
 
             <div style={{display:'flex',gap:8,justifyContent:'flex-end'}}>
-              <button onClick={()=>setModal(null)} style={BTN()}>Cerrar</button>
+              <button onClick={()=>{setModal(null);if(fileRef.current)fileRef.current.value='';}} style={BTN()}>Cerrar</button>
               <button onClick={importBulk} disabled={!bulkFile||bulkLoading} style={{...BTN(true),opacity:!bulkFile||bulkLoading?.5:1,cursor:!bulkFile?'default':'pointer'}}>
                 {bulkLoading?'Importando…':'Importar'}
               </button>
