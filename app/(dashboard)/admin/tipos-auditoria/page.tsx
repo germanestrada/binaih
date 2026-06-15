@@ -4,17 +4,36 @@ import { useRouter } from 'next/navigation'
 import Icon from '@/components/ui/Icon'
 
 interface AuditType { id:string; name:string; description?:string; icon:string; color:string; active:boolean; is_custom:boolean; template_id?:string; min_role:string }
-interface Template  { id:string; name:string; description?:string; icon:string; color:string }
+interface Template  { id:string; name:string; description?:string; icon:string; color:string; sector?:string; subsector?:string }
 
 const ICONS  = ['📋','🛡️','🏷️','📦','🧹','📊','🔍','✅','⚠️','🏪','📐','🚨']
 const COLORS = ['#111111','#1558b0','#8b1a1a','#7a5200','#1a6b3a','#6d28d9','#0e7490','#854d0e']
+
+const SECTORS: Record<string,string[]> = {
+  'retail':    ['alimentos','moda_textil','electrodomesticos','general'],
+  'salud':     ['clinicas_hospitales','farmacias_droguerias','consultorios_medicos','laboratorios_clinicos','comun'],
+  'logistica': ['bodegas','centros_distribucion','transporte'],
+  'general':   ['comun'],
+}
+const SECTOR_LABELS: Record<string,string> = {
+  retail:'Retail', salud:'Salud', logistica:'Logística', general:'General',
+}
+const SUBSECTOR_LABELS: Record<string,string> = {
+  alimentos:'Alimentos', moda_textil:'Moda y textil', electrodomesticos:'Electrodomésticos',
+  clinicas_hospitales:'Clínicas y hospitales', farmacias_droguerias:'Farmacias y droguerías',
+  consultorios_medicos:'Consultorios médicos', laboratorios_clinicos:'Laboratorios clínicos',
+  bodegas:'Bodegas', centros_distribucion:'Centros de distribución', transporte:'Transporte',
+  comun:'Común (todos)', general:'General',
+}
+
 const INP: React.CSSProperties = {width:'100%',border:'1px solid var(--border)',borderRadius:'var(--r-md)',padding:'9px 12px',fontSize:13,fontFamily:'inherit',color:'var(--ink)',outline:'none',marginBottom:12,background:'white'}
 const BTN = (p=false): React.CSSProperties => ({background:p?'var(--ink)':'var(--surface)',color:p?'white':'var(--mid)',border:`1px solid ${p?'var(--ink)':'var(--border)'}`,padding:'8px 18px',borderRadius:'var(--r-sm)',fontSize:13,fontWeight:500,cursor:'pointer',fontFamily:'inherit'})
+const SEL: React.CSSProperties = {border:'1px solid var(--border)',borderRadius:'var(--r-sm)',padding:'7px 10px',fontSize:12,fontFamily:'inherit',color:'var(--ink)',outline:'none',background:'white',cursor:'pointer'}
 
 function Modal({title,onClose,children}:{title:string;onClose:()=>void;children:React.ReactNode}) {
   return (
     <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,.45)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center'}}>
-      <div style={{background:'var(--white)',borderRadius:'var(--r-xl)',padding:28,width:500,boxShadow:'0 24px 64px rgba(0,0,0,.25)',maxHeight:'90vh',overflowY:'auto'}}>
+      <div style={{background:'var(--white)',borderRadius:'var(--r-xl)',padding:28,width:540,boxShadow:'0 24px 64px rgba(0,0,0,.25)',maxHeight:'90vh',overflowY:'auto'}}>
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20}}>
           <div style={{fontFamily:'var(--font-serif)',fontSize:18,color:'var(--ink)'}}>{title}</div>
           <button onClick={onClose} style={{background:'none',border:'none',cursor:'pointer',color:'var(--subtle)',display:'flex'}}><Icon name="x" size={18}/></button>
@@ -35,12 +54,30 @@ export default function TiposAuditoriaPage() {
   const [error,      setError]      = useState('')
   const [form,       setForm]       = useState({name:'',description:'',icon:'📋',color:'#111111',template_id:'',min_role:'auditor'})
   const [blockedCount, setBlockedCount] = useState(0)
+  // Filtros de plantillas
+  const [tplSector,    setTplSector]    = useState('')
+  const [tplSubsector, setTplSubsector] = useState('')
 
-  const load = () => { setLoading(true); fetch('/api/admin/audit-types').then(r=>r.json()).then(d=>{setTypes(d.data??[]);setTemplates(d.templates??[]);setLoading(false)}) }
+  const load = () => {
+    setLoading(true)
+    fetch('/api/admin/audit-types').then(r=>r.json()).then(d=>{
+      setTypes(d.data??[])
+      setTemplates(d.templates??[])
+      setLoading(false)
+    })
+  }
   useEffect(()=>{load()},[])
 
-  const openCreate = () => { setForm({name:'',description:'',icon:'📋',color:'#111111',template_id:'',min_role:'auditor'}); setError(''); setModal('create') }
-  const openEdit   = (t:AuditType) => { setSelected(t); setForm({name:t.name,description:t.description??'',icon:t.icon,color:t.color,template_id:t.template_id??'',min_role:t.min_role}); setError(''); setModal('edit') }
+  const openCreate = () => {
+    setForm({name:'',description:'',icon:'📋',color:'#111111',template_id:'',min_role:'auditor'})
+    setTplSector(''); setTplSubsector('')
+    setError(''); setModal('create')
+  }
+  const openEdit = (t:AuditType) => {
+    setSelected(t)
+    setForm({name:t.name,description:t.description??'',icon:t.icon,color:t.color,template_id:t.template_id??'',min_role:t.min_role})
+    setError(''); setModal('edit')
+  }
 
   const save = async () => {
     setError('')
@@ -58,20 +95,21 @@ export default function TiposAuditoriaPage() {
   }
 
   const del = async (t:AuditType) => {
-    // Verificar si tiene auditorías asociadas
     const res  = await fetch(`/api/admin/audit-types/${t.id}/check`)
     const data = await res.json()
-    if (data.count > 0) {
-      setSelected(t)
-      setBlockedCount(data.count)
-      setModal('blocked')
-      return
-    }
+    if (data.count > 0) { setSelected(t); setBlockedCount(data.count); setModal('blocked'); return }
     if (!confirm(`¿Eliminar "${t.name}"?`)) return
     const delRes = await fetch(`/api/admin/audit-types/${t.id}`,{method:'DELETE'})
     if (!delRes.ok){const d=await delRes.json();alert(d.error??'Error');return}
     load()
   }
+
+  // Filtrar plantillas por sector/subsector
+  const filteredTemplates = templates.filter(t=>{
+    if (tplSector    && t.sector    !== tplSector)    return false
+    if (tplSubsector && t.subsector !== tplSubsector) return false
+    return true
+  })
 
   const selectedTemplate = templates.find(t=>t.id===form.template_id)
 
@@ -113,39 +151,78 @@ export default function TiposAuditoriaPage() {
         <Modal title={modal==='create'?'Nuevo tipo de auditoría':'Editar tipo'} onClose={()=>setModal(null)}>
           {modal==='create'&&(
             <div style={{marginBottom:16}}>
-              <div style={{fontSize:11,fontWeight:600,color:'var(--subtle)',textTransform:'uppercase',letterSpacing:'1px',marginBottom:8}}>Basar en plantilla (opcional)</div>
-              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginBottom:8}}>
-                <button onClick={()=>setForm(f=>({...f,template_id:''}))} style={{padding:'8px 12px',border:`2px solid ${!form.template_id?'var(--ink)':'var(--border)'}`,borderRadius:'var(--r-md)',background:!form.template_id?'var(--surface)':'white',cursor:'pointer',fontSize:12,color:'var(--mid)',fontFamily:'inherit'}}>
+              <div style={{fontSize:11,fontWeight:600,color:'var(--subtle)',textTransform:'uppercase',letterSpacing:'1px',marginBottom:8}}>
+                Basar en plantilla (opcional)
+              </div>
+
+              {/* Filtros de plantilla */}
+              <div style={{display:'flex',gap:8,marginBottom:10}}>
+                <select value={tplSector} onChange={e=>{setTplSector(e.target.value);setTplSubsector('');setForm(f=>({...f,template_id:''}))}} style={{...SEL,flex:1}}>
+                  <option value="">Todos los sectores</option>
+                  {Object.keys(SECTORS).map(s=><option key={s} value={s}>{SECTOR_LABELS[s]??s}</option>)}
+                </select>
+                {tplSector&&(
+                  <select value={tplSubsector} onChange={e=>{setTplSubsector(e.target.value);setForm(f=>({...f,template_id:''}))}} style={{...SEL,flex:1}}>
+                    <option value="">Todos los subsectores</option>
+                    {SECTORS[tplSector]?.map(s=><option key={s} value={s}>{SUBSECTOR_LABELS[s]??s}</option>)}
+                  </select>
+                )}
+              </div>
+
+              {/* Grid de plantillas filtradas */}
+              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginBottom:8,maxHeight:260,overflowY:'auto'}}>
+                <button onClick={()=>setForm(f=>({...f,template_id:''}))}
+                  style={{padding:'8px 12px',border:`2px solid ${!form.template_id?'var(--ink)':'var(--border)'}`,borderRadius:'var(--r-md)',background:!form.template_id?'var(--surface)':'white',cursor:'pointer',fontSize:12,color:'var(--mid)',fontFamily:'inherit'}}>
                   Sin plantilla (personalizado)
                 </button>
-                {templates.map(t=>(
-                  <button key={t.id} onClick={()=>setForm(f=>({...f,template_id:t.id,name:f.name||t.name,icon:t.icon,color:t.color}))} style={{display:'flex',alignItems:'center',gap:8,padding:'8px 12px',border:`2px solid ${form.template_id===t.id?'var(--ink)':'var(--border)'}`,borderRadius:'var(--r-md)',background:form.template_id===t.id?'var(--surface)':'white',cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>
-                    <span style={{fontSize:16}}>{t.icon}</span>
-                    <span style={{fontSize:12,color:'var(--ink)'}}>{t.name}</span>
+                {filteredTemplates.map(t=>(
+                  <button key={t.id} onClick={()=>setForm(f=>({...f,template_id:t.id,name:f.name||t.name,icon:t.icon,color:t.color}))}
+                    style={{display:'flex',alignItems:'center',gap:8,padding:'8px 12px',border:`2px solid ${form.template_id===t.id?'var(--ink)':'var(--border)'}`,borderRadius:'var(--r-md)',background:form.template_id===t.id?'var(--surface)':'white',cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>
+                    <span style={{fontSize:16,flexShrink:0}}>{t.icon}</span>
+                    <div style={{minWidth:0}}>
+                      <div style={{fontSize:12,color:'var(--ink)',fontWeight:form.template_id===t.id?600:400}}>{t.name}</div>
+                      {t.sector&&<div style={{fontSize:10,color:'var(--subtle)'}}>{SECTOR_LABELS[t.sector]??t.sector}{t.subsector?` · ${SUBSECTOR_LABELS[t.subsector]??t.subsector}`:''}</div>}
+                    </div>
                   </button>
                 ))}
+                {filteredTemplates.length===0&&(
+                  <div style={{gridColumn:'1/-1',padding:'16px',textAlign:'center',color:'var(--subtle)',fontSize:12}}>
+                    Sin plantillas para este filtro
+                  </div>
+                )}
               </div>
-              {selectedTemplate&&<div style={{fontSize:11,color:'var(--ok)',padding:'6px 10px',background:'var(--ok-bg)',borderRadius:'var(--r-sm)',marginBottom:4}}>✓ Se copiarán los ítems de la plantilla "{selectedTemplate.name}"</div>}
+
+              {selectedTemplate&&(
+                <div style={{fontSize:11,color:'var(--ok)',padding:'6px 10px',background:'var(--ok-bg)',borderRadius:'var(--r-sm)',marginBottom:4}}>
+                  ✓ Se copiarán los ítems de la plantilla "{selectedTemplate.name}"
+                  {selectedTemplate.sector&&<span style={{color:'var(--ok)',opacity:.7}}> — {SECTOR_LABELS[selectedTemplate.sector]??selectedTemplate.sector}</span>}
+                </div>
+              )}
             </div>
           )}
+
           <input style={INP} placeholder="Nombre del tipo *" value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))}/>
           <input style={INP} placeholder="Descripción (opcional)" value={form.description} onChange={e=>setForm(f=>({...f,description:e.target.value}))}/>
+
           <div style={{marginBottom:12}}>
             <div style={{fontSize:11,color:'var(--subtle)',marginBottom:8,fontWeight:600,textTransform:'uppercase',letterSpacing:'1px'}}>Ícono</div>
             <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
               {ICONS.map(ic=><button key={ic} onClick={()=>setForm(f=>({...f,icon:ic}))} style={{width:40,height:40,fontSize:20,borderRadius:'var(--r-md)',border:`2px solid ${form.icon===ic?'var(--ink)':'var(--border)'}`,background:form.icon===ic?'var(--surface)':'none',cursor:'pointer'}}>{ic}</button>)}
             </div>
           </div>
+
           <div style={{marginBottom:12}}>
             <div style={{fontSize:11,color:'var(--subtle)',marginBottom:8,fontWeight:600,textTransform:'uppercase',letterSpacing:'1px'}}>Color</div>
             <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
               {COLORS.map(c=><button key={c} onClick={()=>setForm(f=>({...f,color:c}))} style={{width:32,height:32,borderRadius:'var(--r-sm)',background:c,border:`3px solid ${form.color===c?'var(--ink)':'transparent'}`,cursor:'pointer'}}/>)}
             </div>
           </div>
+
           <select style={{...INP,cursor:'pointer'}} value={form.min_role} onChange={e=>setForm(f=>({...f,min_role:e.target.value}))}>
             <option value="auditor">Auditor (puede crear este tipo)</option>
             <option value="admin">Solo Admin</option>
           </select>
+
           {error&&<div style={{fontSize:12,color:'var(--err)',marginBottom:12}}>{error}</div>}
           <div style={{display:'flex',gap:8,justifyContent:'flex-end',marginTop:4}}>
             <button onClick={()=>setModal(null)} style={BTN()}>Cancelar</button>

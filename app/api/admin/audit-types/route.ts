@@ -9,7 +9,7 @@ export async function GET() {
 
   const [typesRes, templatesRes] = await Promise.all([
     sbFetch(`/audit_types?tenant_id=eq.${session.user.companyId}&select=id,name,description,icon,color,active,is_custom,template_id,min_role&order=name.asc`),
-    sbFetch(`/audit_type_templates?active=eq.true&select=id,name,description,icon,color&order=name.asc`),
+    sbFetch(`/audit_type_templates?active=eq.true&select=id,name,description,icon,color,sector,subsector&order=sector.asc,name.asc`),
   ])
 
   const types     = await typesRes.json()
@@ -47,22 +47,7 @@ export async function POST(req: Request) {
     const items    = await itemsRes.json() as any[]
 
     if (items.length > 0) {
-      const auditItems = items.map((item: any) => ({
-        audit_type_id: auditTypeId,
-        tenant_id:     session.user.companyId,
-        title:         '', // Se llena desde master_item
-        section:       item.section,
-        order_index:   item.order_index,
-        weight:        item.weight ?? 1.0,
-        max_score:     item.max_score ?? 10,
-        required:      item.required ?? true,
-        response_type: 'binary',
-        ai_enabled:    false,
-        created_by:    session.user.id,
-        // Guardamos master_item_id para referencia
-      }))
-      // Obtener títulos de master_items
-      const masterIds = items.map((i: any) => i.master_item_id)
+      const masterIds  = items.map((i: any) => i.master_item_id)
       const mastersRes = await sbFetch(`/master_items?id=in.(${masterIds.join(',')})&select=id,title,description,response_type,ai_enabled,ai_prompt,scale_min_label,scale_max_label`)
       const masters    = await mastersRes.json() as any[]
 
