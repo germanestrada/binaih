@@ -284,8 +284,23 @@ export default function ItemsMaestrosAdminPage() {
 
             {/* Resultado */}
             {bulkResult&&(
-              <div style={{background:'rgba(74,222,128,.08)',border:'1px solid rgba(74,222,128,.2)',borderRadius:8,padding:'12px 16px',marginBottom:12,fontSize:12,color:'#4ade80'}}>
-                ✓ Cargue completado — {bulkResult.created} ítems procesados{bulkResult.errors>0?`, ${bulkResult.errors} errores`:''}
+              <div style={{marginBottom:12}}>
+                <div style={{background:bulkResult.errors>0?'rgba(251,191,36,.08)':'rgba(74,222,128,.08)',border:`1px solid ${bulkResult.errors>0?'rgba(251,191,36,.2)':'rgba(74,222,128,.2)'}`,borderRadius:8,padding:'12px 16px',marginBottom:8,fontSize:12,color:bulkResult.errors>0?'#fbbf24':'#4ade80'}}>
+                  {bulkResult.errors===0?'✓':'⚠'} {bulkResult.created} procesados · {bulkResult.errors} errores de {(bulkResult.created+bulkResult.errors)} total
+                </div>
+                {bulkResult.log?.filter((l:any)=>l.status==='error').length>0&&(
+                  <div style={{background:'#0a0a0a',borderRadius:8,padding:'10px 12px',maxHeight:180,overflowY:'auto'}}>
+                    <div style={{fontSize:10,color:'#555',marginBottom:6,textTransform:'uppercase',letterSpacing:'1px'}}>Errores detallados</div>
+                    {bulkResult.log.filter((l:any)=>l.status==='error').map((l:any,i:number)=>(
+                      <div key={i} style={{fontSize:11,color:'#f87171',fontFamily:'monospace',marginBottom:3,display:'flex',gap:8}}>
+                        <span style={{color:'#444',width:20}}>F{l.row}</span>
+                        <span style={{color:'#a78bfa',flexShrink:0}}>{l.code}</span>
+                        <span style={{color:'#888',flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{l.title}</span>
+                        <span style={{color:'#f87171',flexShrink:0}}>{l.message}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
             {bulkError&&<div style={{fontSize:12,color:'#f87171',marginBottom:12,padding:'8px 12px',background:'rgba(248,113,113,.08)',borderRadius:6}}>{bulkError}</div>}
