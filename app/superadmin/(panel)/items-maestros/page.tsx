@@ -93,23 +93,20 @@ export default function ItemsMaestrosAdminPage() {
     })
   }
 
-  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
     setBulkFile(file)
     setBulkError('')
     setBulkResult(null)
     setBulkPreview([])
-    const reader = new FileReader()
-    reader.onload = ev => {
-      try {
-        const rows = parseCSV(ev.target?.result as string)
-        setBulkPreview(rows.slice(0,5))
-      } catch {
-        setBulkError('Error al leer el archivo')
-      }
+    try {
+      const text = await file.text()
+      const rows = parseCSV(text)
+      setBulkPreview(rows.slice(0, 5))
+    } catch (err) {
+      setBulkError('Error al leer el archivo: ' + String(err))
     }
-    reader.readAsText(file)
   }
 
   const importBulk = async () => {
@@ -117,6 +114,7 @@ export default function ItemsMaestrosAdminPage() {
     setBulkLoading(true); setBulkError(''); setBulkResult(null)
     const text = await bulkFile.text()
     const items = parseCSV(text)
+    if (!items.length) { setBulkError('No se encontraron filas en el archivo'); setBulkLoading(false); return }
     const res  = await fetch('/api/superadmin/master-items/bulk',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({items})})
     const data = await res.json()
     setBulkLoading(false)
