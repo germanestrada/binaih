@@ -85,11 +85,37 @@ export default function ItemsMaestrosAdminPage() {
   }
 
   const parseCSV = (text: string) => {
-    const lines = text.trim().split('\n')
-    const headers = lines[0].split(',').map(h=>h.trim())
+    const normalized = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n')
+    const lines = normalized.split('\n')
+    const firstLine = lines[0]
+    const sep = firstLine.includes(';') ? ';' : ','
+
+    const parseRow = (line: string): string[] => {
+      const cells: string[] = []
+      let i = 0
+      while (i < line.length) {
+        if (line[i] === '"') {
+          let cell = ''; i++
+          while (i < line.length) {
+            if (line[i]==='"' && line[i+1]==='"') { cell+='"'; i+=2 }
+            else if (line[i]==='"') { i++; break }
+            else { cell+=line[i++] }
+          }
+          cells.push(cell.trim())
+          if (i < line.length && line[i]===sep) i++
+        } else {
+          const end = line.indexOf(sep, i)
+          if (end===-1) { cells.push(line.slice(i).trim()); break }
+          cells.push(line.slice(i, end).trim()); i = end + 1
+        }
+      }
+      return cells
+    }
+
+    const headers = parseRow(firstLine)
     return lines.slice(1).filter(l=>l.trim()).map(line => {
-      const vals = line.split(',')
-      return Object.fromEntries(headers.map((h,i)=>[h, vals[i]?.trim()??'']))
+      const vals = parseRow(line)
+      return Object.fromEntries(headers.map((h,j)=>[h, vals[j]??'']))
     })
   }
 
