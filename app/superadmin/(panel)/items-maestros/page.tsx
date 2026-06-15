@@ -34,6 +34,7 @@ export default function ItemsMaestrosAdminPage() {
   // Delete blocked state
   const [blockedInfo, setBlockedInfo] = useState<{auditTypeItems:number;templateItems:number}|null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
+  const [fileKey, setFileKey] = useState(0)
 
   const load = () => { setLoading(true); fetch('/api/superadmin/master-items').then(r=>r.json()).then(d=>{setItems(d.data??[]);setLoading(false)}) }
   useEffect(()=>{load()},[])
@@ -133,7 +134,7 @@ export default function ItemsMaestrosAdminPage() {
         <input value={filter} onChange={e=>setFilter(e.target.value)} placeholder="Buscar ítem…"
           style={{border:'1px solid #2a2a2a',borderRadius:8,padding:'8px 12px',fontSize:12,fontFamily:'inherit',color:'white',outline:'none',background:'rgba(255,255,255,.04)',width:240}}/>
         <span style={{fontSize:11,color:'#444',fontFamily:'monospace',marginRight:'auto'}}>{filtered.length} ítems</span>
-        <button onClick={()=>{setBulkFile(null);setBulkPreview([]);setBulkResult(null);setBulkError('');if(fileRef.current)fileRef.current.value='';setModal('bulk')}} style={{...BTN(),color:'#a78bfa',borderColor:'rgba(167,139,250,.3)'}}>⬆ Cargue masivo</button>
+        <button onClick={()=>{setBulkFile(null);setBulkPreview([]);setBulkResult(null);setBulkError('');setFileKey(k=>k+1);setModal('bulk')}} style={{...BTN(),color:'#a78bfa',borderColor:'rgba(167,139,250,.3)'}}>⬆ Cargue masivo</button>
         <button onClick={()=>{setForm(EMPTY);setError('');setModal('create')}} style={BTN(true)}>+ Nuevo ítem</button>
       </div>
 
@@ -252,7 +253,7 @@ export default function ItemsMaestrosAdminPage() {
             </button>
 
             {/* File picker */}
-            <input ref={fileRef} type="file" accept=".csv" onChange={handleFile} style={{display:'none'}}/>
+            <input key={fileKey} ref={fileRef} type="file" accept=".csv" onChange={handleFile} style={{display:'none'}}/>
             <div onClick={()=>fileRef.current?.click()} style={{
               border:'1px dashed #2a2a2a',borderRadius:10,padding:'24px',textAlign:'center',cursor:'pointer',marginBottom:16,
               background:bulkFile?'rgba(74,222,128,.05)':'rgba(255,255,255,.02)',
@@ -307,7 +308,7 @@ export default function ItemsMaestrosAdminPage() {
             {bulkError&&<div style={{fontSize:12,color:'#f87171',marginBottom:12,padding:'8px 12px',background:'rgba(248,113,113,.08)',borderRadius:6}}>{bulkError}</div>}
 
             <div style={{display:'flex',gap:8,justifyContent:'flex-end'}}>
-              <button onClick={()=>{setModal(null);if(fileRef.current)fileRef.current.value='';}} style={BTN()}>Cerrar</button>
+              <button onClick={()=>{setModal(null);setFileKey(k=>k+1)}} style={BTN()}>Cerrar</button>
               <button onClick={importBulk} disabled={!bulkFile||bulkLoading} style={{...BTN(true),opacity:!bulkFile||bulkLoading?.5:1,cursor:!bulkFile?'default':'pointer'}}>
                 {bulkLoading?'Importando…':'Importar'}
               </button>
