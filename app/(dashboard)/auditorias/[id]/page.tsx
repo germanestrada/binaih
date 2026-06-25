@@ -189,34 +189,42 @@ function ItemRow({result, auditId, onUpdate}:{result:ItemResult;auditId:string;o
           <input value={val.notes} onChange={e=>setVal(p=>({...p,notes:e.target.value}))}
             placeholder="Notas adicionales (opcional)" style={{width:'100%',border:'1px solid var(--border)',borderRadius:'var(--r-sm)',padding:'7px 12px',fontSize:12,fontFamily:'inherit',outline:'none',marginBottom:12}}/>
 
-          {/* IA Analysis */}
-          {item.ai_enabled&&(
-            <div style={{marginBottom:12,padding:'10px 12px',background:'var(--surface)',borderRadius:'var(--r-sm)',border:'1px solid var(--border2)'}}>
-              <div style={{fontSize:10,fontWeight:600,color:'var(--subtle)',textTransform:'uppercase',letterSpacing:'1px',marginBottom:8}}>✨ Análisis con IA</div>
-              <AIAnalyzeButton
-                auditId={auditId}
-                itemResultId={result.id}
-                itemTitle={item.title}
-                itemDesc={item.description}
-                responseType={item.response_type}
-                aiPrompt={(item as any).ai_prompt}
-                aiCriteria={(item as any).ai_criteria}
-                maxScore={item.max_score}
-                scaleMinLabel={item.scale_min_label}
-                scaleMaxLabel={item.scale_max_label}
-                onResult={(aiResult:AIResult)=>{
-                  setVal(p=>({
-                    ...p,
-                    status:      aiResult.status,
-                    score:       String(aiResult.score),
-                    scale_value: String(aiResult.raw.scale_value??''),
-                    notes:       aiResult.reasoning,
-                  }))
-                  if(aiResult.autoApproved){ save() }
-                }}
-              />
+          {/* Evidencia fotográfica + IA */}
+          <div style={{marginBottom:12,padding:'10px 12px',background:'var(--surface)',borderRadius:'var(--r-sm)',border:'1px solid var(--border2)'}}>
+            <div style={{fontSize:10,fontWeight:600,color:'var(--subtle)',textTransform:'uppercase',letterSpacing:'1px',marginBottom:8}}>
+              {item.ai_enabled?'✨ Evidencia y análisis IA':'📷 Evidencia fotográfica'}
             </div>
-          )}
+            <AIAnalyzeButton
+              auditId={auditId}
+              itemResultId={result.id}
+              itemTitle={item.title}
+              itemDesc={item.description}
+              responseType={item.response_type}
+              aiPrompt={(item as any).ai_prompt}
+              aiCriteria={(item as any).ai_criteria}
+              maxScore={item.max_score}
+              scaleMinLabel={item.scale_min_label}
+              scaleMaxLabel={item.scale_max_label}
+              evidenceUrl={result.evidence_url}
+              onEvidenceUrl={async(url:string)=>{
+                await fetch(`/api/audits/${auditId}/items`,{
+                  method:'PATCH',
+                  headers:{'Content-Type':'application/json'},
+                  body:JSON.stringify({item_result_id:result.id,evidence_url:url}),
+                })
+              }}
+              onResult={(aiResult:AIResult)=>{
+                setVal(p=>({
+                  ...p,
+                  status:      aiResult.status,
+                  score:       String(aiResult.score),
+                  scale_value: String(aiResult.raw.scale_value??''),
+                  notes:       aiResult.reasoning,
+                }))
+                if(aiResult.autoApproved){ save() }
+              }}
+            />
+          </div>
 
           <div style={{display:'flex',gap:8,justifyContent:'flex-end'}}>
             <button onClick={()=>setOpen(false)} style={{background:'none',border:'1px solid var(--border)',color:'var(--mid)',padding:'7px 14px',borderRadius:'var(--r-sm)',fontSize:12,cursor:'pointer',fontFamily:'inherit'}}>Cancelar</button>
