@@ -198,50 +198,62 @@ export default function LandingPage() {
     setSent(true)
   }
 
-  // ── Styles ────────────────────────────────────────────────
+  // ── Design tokens (Supabase-inspired) ───────────────────────
   const NAV_H = 64
+  const BG = '#171717'
+  const SURFACE = '#1c1c1c'
+  const BORDER_SUBTLE = '#242424'
+  const BORDER = '#2e2e2e'
+  const BORDER_STRONG = '#363636'
+  const TEXT = '#fafafa'
+  const TEXT_MUTED = '#a0a0a0'
+  const TEXT_FAINT = '#707070'
+  const GREEN = '#3ecf8e'
+  const GREEN_HOVER = '#00c573'
+  const GREEN_SOFT_BORDER = 'rgba(62,207,142,.3)'
+  const GREEN_SOFT_BG = 'rgba(62,207,142,.08)'
 
   return (
-    <div style={{fontFamily:'"DM Sans",system-ui,sans-serif',color:'#111',background:'#fff',overflowX:'hidden'}}>
+    <div style={{fontFamily:'Inter,system-ui,sans-serif',color:TEXT,background:BG,overflowX:'hidden'}}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
         *{box-sizing:border-box;margin:0;padding:0}
         html{scroll-behavior:smooth}
-        body{font-family:'DM Sans',system-ui,sans-serif}
-        .serif{font-family:'DM Serif Display',Georgia,serif}
+        body{font-family:'Inter',system-ui,sans-serif;background:${BG}}
+        .mono{font-family:'JetBrains Mono',monospace}
         .fade-up{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
         .fade-up.visible{opacity:1;transform:none}
-        .card-hover{transition:transform .2s ease,box-shadow .2s ease}
-        .card-hover:hover{transform:translateY(-4px);box-shadow:0 20px 60px rgba(0,0,0,.1)}
-        .btn-primary{background:#111;color:#fff;border:none;padding:14px 28px;border-radius:10px;font-size:15px;font-weight:500;cursor:pointer;font-family:inherit;transition:background .15s,transform .1s}
-        .btn-primary:hover{background:#333;transform:translateY(-1px)}
-        .btn-secondary{background:transparent;color:#111;border:1.5px solid #ddd;padding:13px 28px;border-radius:10px;font-size:15px;font-weight:500;cursor:pointer;font-family:inherit;transition:border-color .15s,transform .1s}
-        .btn-secondary:hover{border-color:#111;transform:translateY(-1px)}
-        .tag{display:inline-flex;align-items:center;gap:7px;background:#f0f9ff;color:#0369a1;border:1px solid #bae6fd;padding:6px 14px;border-radius:100px;font-size:13px;font-weight:500}
+        .card-hover{transition:border-color .2s ease,background .2s ease,transform .2s ease}
+        .card-hover:hover{border-color:${BORDER_STRONG} !important;transform:translateY(-2px)}
+        .btn-primary{background:${GREEN};color:#0b0b0b;border:none;padding:13px 26px;border-radius:9999px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;transition:background .15s,transform .1s}
+        .btn-primary:hover{background:${GREEN_HOVER};transform:translateY(-1px)}
+        .btn-secondary{background:transparent;color:${TEXT};border:1px solid ${BORDER};padding:12px 26px;border-radius:9999px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;transition:border-color .15s,transform .1s}
+        .btn-secondary:hover{border-color:${BORDER_STRONG};transform:translateY(-1px)}
+        .tag{display:inline-flex;align-items:center;gap:8px;background:transparent;color:${GREEN};border:1px solid ${GREEN_SOFT_BORDER};padding:6px 14px;border-radius:9999px;font-size:12px;font-weight:500;letter-spacing:.4px;text-transform:uppercase;font-family:'JetBrains Mono',monospace}
         input,textarea,select{font-family:inherit}
         ::-webkit-scrollbar{width:6px}
-        ::-webkit-scrollbar-track{background:#f5f5f5}
-        ::-webkit-scrollbar-thumb{background:#ccc;border-radius:3px}
+        ::-webkit-scrollbar-track{background:${BG}}
+        ::-webkit-scrollbar-thumb{background:${BORDER_STRONG};border-radius:3px}
       `}</style>
 
       {/* ── NAV ── */}
-      <nav style={{position:'fixed',top:0,left:0,right:0,height:NAV_H,zIndex:100,transition:'background .3s,box-shadow .3s',background:scrolled?'rgba(255,255,255,.95)':'transparent',backdropFilter:scrolled?'blur(12px)':'none',boxShadow:scrolled?'0 1px 0 #eee':'none'}}>
+      <nav style={{position:'fixed',top:0,left:0,right:0,height:NAV_H,zIndex:100,transition:'background .3s,border-color .3s',background:scrolled?'rgba(23,23,23,.9)':'transparent',backdropFilter:scrolled?'blur(12px)':'none',borderBottom:scrolled?`1px solid ${BORDER_SUBTLE}`:'1px solid transparent'}}>
         <div style={{maxWidth:1160,margin:'0 auto',padding:'0 24px',height:'100%',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
           {/* Logo */}
           <a href="/" style={{display:'flex',alignItems:'center',gap:9,textDecoration:'none'}}>
-            <svg width="26" height="26" viewBox="0 0 20 20" fill="none">
-              <rect x="1" y="1" width="18" height="18" rx="4" stroke="#111" strokeWidth="1.5"/>
-              <path d="M5 10 L10 5 L15 10" stroke="#111" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M5 14 L10 9 L15 14" stroke="rgba(0,0,0,.25)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            <svg width="24" height="24" viewBox="0 0 20 20" fill="none">
+              <rect x="1" y="1" width="18" height="18" rx="4" stroke={GREEN} strokeWidth="1.5"/>
+              <path d="M5 10 L10 5 L15 10" stroke={TEXT} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M5 14 L10 9 L15 14" stroke={TEXT_FAINT} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
-            <span className="serif" style={{fontSize:19,color:'#111',letterSpacing:.3}}>TVEO</span>
+            <span style={{fontSize:17,fontWeight:500,color:TEXT,letterSpacing:.2}}>TVEO</span>
           </a>
           {/* Links */}
           <div style={{display:'flex',alignItems:'center',gap:28}}>
             {['product','pricing','faq','contact'].map(k=>(
-              <a key={k} href={`#${k}`} style={{fontSize:14,color:'#555',textDecoration:'none',fontWeight:400,transition:'color .15s'}}
-                onMouseEnter={e=>(e.target as HTMLAnchorElement).style.color='#111'}
-                onMouseLeave={e=>(e.target as HTMLAnchorElement).style.color='#555'}>
+              <a key={k} href={`#${k}`} style={{fontSize:14,color:TEXT_MUTED,textDecoration:'none',fontWeight:400,transition:'color .15s'}}
+                onMouseEnter={e=>(e.target as HTMLAnchorElement).style.color=TEXT}
+                onMouseLeave={e=>(e.target as HTMLAnchorElement).style.color=TEXT_MUTED}>
                 {(t.nav as any)[k]}
               </a>
             ))}
@@ -249,11 +261,11 @@ export default function LandingPage() {
           {/* Actions */}
           <div style={{display:'flex',alignItems:'center',gap:10}}>
             {/* Lang toggle */}
-            <button onClick={()=>setLang(l=>l==='es'?'en':'es')} style={{background:'#f5f5f5',border:'none',padding:'6px 12px',borderRadius:8,fontSize:12,cursor:'pointer',fontFamily:'inherit',fontWeight:500,color:'#555'}}>
+            <button onClick={()=>setLang(l=>l==='es'?'en':'es')} style={{background:SURFACE,border:`1px solid ${BORDER}`,padding:'6px 12px',borderRadius:8,fontSize:12,cursor:'pointer',fontFamily:'inherit',fontWeight:500,color:TEXT_MUTED}}>
               {lang==='es'?'EN':'ES'}
             </button>
-            <Link href="/login" style={{fontSize:14,color:'#555',textDecoration:'none',fontWeight:400,padding:'8px 14px'}}>{t.nav.login}</Link>
-            <a href="#contact" className="btn-primary" style={{padding:'9px 20px',fontSize:14,borderRadius:8,textDecoration:'none',display:'inline-block'}}>
+            <Link href="/login" style={{fontSize:14,color:TEXT_MUTED,textDecoration:'none',fontWeight:400,padding:'8px 14px'}}>{t.nav.login}</Link>
+            <a href="#contact" className="btn-primary" style={{padding:'9px 20px',fontSize:14,borderRadius:9999,textDecoration:'none',display:'inline-block'}}>
               {t.nav.demo}
             </a>
           </div>
@@ -261,62 +273,60 @@ export default function LandingPage() {
       </nav>
 
       {/* ── HERO ── */}
-      <section ref={heroRef} style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',padding:`${NAV_H+40}px 24px 80px`,background:'linear-gradient(180deg,#fafafa 0%,#fff 100%)',position:'relative',overflow:'hidden'}}>
-        {/* Grid background */}
-        <div style={{position:'absolute',inset:0,backgroundImage:'linear-gradient(#e5e7eb 1px,transparent 1px),linear-gradient(90deg,#e5e7eb 1px,transparent 1px)',backgroundSize:'48px 48px',opacity:.35,pointerEvents:'none'}}/>
-        {/* Blob */}
-        <div style={{position:'absolute',top:'20%',right:'-10%',width:600,height:600,background:'radial-gradient(circle,rgba(59,130,246,.08) 0%,transparent 70%)',pointerEvents:'none'}}/>
-        <div style={{position:'absolute',bottom:'10%',left:'-5%',width:400,height:400,background:'radial-gradient(circle,rgba(16,185,129,.07) 0%,transparent 70%)',pointerEvents:'none'}}/>
+      <section ref={heroRef} style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',padding:`${NAV_H+40}px 24px 80px`,background:BG,position:'relative',overflow:'hidden'}}>
+        {/* Dot grid background */}
+        <div style={{position:'absolute',inset:0,backgroundImage:`radial-gradient(${BORDER_SUBTLE} 1px,transparent 1px)`,backgroundSize:'32px 32px',opacity:.6,pointerEvents:'none'}}/>
+        {/* Faint green glow — identity marker only, kept subtle */}
+        <div style={{position:'absolute',top:'-10%',left:'50%',transform:'translateX(-50%)',width:700,height:400,background:'radial-gradient(ellipse,rgba(62,207,142,.12) 0%,transparent 70%)',pointerEvents:'none'}}/>
 
         <div style={{maxWidth:820,textAlign:'center',position:'relative'}}>
-          <div className="tag" style={{marginBottom:24}}>
-            <span style={{width:7,height:7,borderRadius:'50%',background:'#0ea5e9',display:'inline-block'}}/>
+          <div className="tag" style={{marginBottom:28}}>
+            <span style={{width:6,height:6,borderRadius:'50%',background:GREEN,display:'inline-block'}}/>
             {t.hero.badge}
           </div>
-          <h1 className="serif" style={{fontSize:'clamp(42px,6vw,72px)',lineHeight:1.08,letterSpacing:'-1.5px',color:'#0a0a0a',marginBottom:20,fontWeight:400}}>
+          <h1 style={{fontSize:'clamp(40px,6vw,68px)',lineHeight:1.0,letterSpacing:'-1.5px',color:TEXT,marginBottom:22,fontWeight:500}}>
             {t.hero.title}
           </h1>
-          <p style={{fontSize:18,color:'#555',lineHeight:1.65,maxWidth:600,margin:'0 auto 36px',fontWeight:300}}>
+          <p style={{fontSize:18,color:TEXT_MUTED,lineHeight:1.65,maxWidth:600,margin:'0 auto 36px',fontWeight:400}}>
             {t.hero.sub}
           </p>
           <div style={{display:'flex',gap:12,justifyContent:'center',flexWrap:'wrap',marginBottom:18}}>
-            <a href="/demo" className="btn-primary" style={{textDecoration:'none',padding:'15px 32px',fontSize:16,borderRadius:12,display:'inline-flex',alignItems:'center',gap:8}}>
-              <span style={{width:8,height:8,borderRadius:'50%',background:'#60a5fa',display:'inline-block'}}/>
+            <a href="/demo" className="btn-primary" style={{textDecoration:'none',padding:'15px 30px',fontSize:15,borderRadius:9999,display:'inline-flex',alignItems:'center',gap:8}}>
               {lang==='es'?'Explorar demo en vivo':'Try live demo'}
             </a>
-            <a href="#contact" className="btn-secondary" style={{textDecoration:'none',padding:'15px 32px',fontSize:16,borderRadius:12}}>
+            <a href="#contact" className="btn-secondary" style={{textDecoration:'none',padding:'14px 30px',fontSize:15,borderRadius:9999}}>
               {t.hero.cta1}
             </a>
           </div>
-          <p style={{fontSize:13,color:'#aaa'}}>{t.hero.trust}</p>
+          <p className="mono" style={{fontSize:12,color:TEXT_FAINT,letterSpacing:.3}}>{t.hero.trust}</p>
         </div>
       </section>
 
       {/* ── STATS ── */}
-      <section style={{background:'#0a0a0a',padding:'56px 24px'}}>
+      <section style={{background:BG,padding:'56px 24px',borderTop:`1px solid ${BORDER_SUBTLE}`,borderBottom:`1px solid ${BORDER_SUBTLE}`}}>
         <div style={{maxWidth:900,margin:'0 auto',display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:0}}>
           {t.stats.map((s,i)=>(
-            <div key={i} style={{textAlign:'center',padding:'20px',borderRight:i<3?'1px solid rgba(255,255,255,.08)':'none'}}>
-              <div className="serif" style={{fontSize:42,color:'white',lineHeight:1,marginBottom:8,letterSpacing:'-1px'}}>{s.value}</div>
-              <div style={{fontSize:13,color:'rgba(255,255,255,.45)',lineHeight:1.4}}>{s.label}</div>
+            <div key={i} style={{textAlign:'center',padding:'20px',borderRight:i<3?`1px solid ${BORDER_SUBTLE}`:'none'}}>
+              <div style={{fontSize:38,color:GREEN,lineHeight:1,marginBottom:8,letterSpacing:'-1px',fontWeight:500}}>{s.value}</div>
+              <div style={{fontSize:13,color:TEXT_MUTED,lineHeight:1.4}}>{s.label}</div>
             </div>
           ))}
         </div>
       </section>
 
       {/* ── FEATURES ── */}
-      <section id="product" style={{padding:'100px 24px',background:'#fff'}}>
+      <section id="product" style={{padding:'100px 24px',background:BG}}>
         <div style={{maxWidth:1100,margin:'0 auto'}}>
           <div style={{textAlign:'center',marginBottom:64}}>
-            <h2 className="serif" style={{fontSize:'clamp(32px,4vw,48px)',color:'#0a0a0a',marginBottom:14,fontWeight:400,letterSpacing:'-.5px'}}>{t.features.title}</h2>
-            <p style={{fontSize:17,color:'#666',maxWidth:480,margin:'0 auto',fontWeight:300}}>{t.features.sub}</p>
+            <h2 style={{fontSize:'clamp(30px,4vw,44px)',color:TEXT,marginBottom:14,fontWeight:500,letterSpacing:'-.5px'}}>{t.features.title}</h2>
+            <p style={{fontSize:16,color:TEXT_MUTED,maxWidth:480,margin:'0 auto',fontWeight:400}}>{t.features.sub}</p>
           </div>
-          <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:24}}>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:20}}>
             {t.features.items.map((f,i)=>(
-              <div key={i} className="card-hover" style={{background:'#fafafa',border:'1px solid #eee',borderRadius:16,padding:'28px 24px'}}>
-                <div style={{fontSize:32,marginBottom:14}}>{f.icon}</div>
-                <h3 style={{fontSize:17,fontWeight:600,color:'#111',marginBottom:8}}>{f.title}</h3>
-                <p style={{fontSize:14,color:'#666',lineHeight:1.6}}>{f.desc}</p>
+              <div key={i} className="card-hover" style={{background:SURFACE,border:`1px solid ${BORDER}`,borderRadius:12,padding:'28px 24px'}}>
+                <div style={{fontSize:28,marginBottom:14}}>{f.icon}</div>
+                <h3 style={{fontSize:16,fontWeight:500,color:TEXT,marginBottom:8}}>{f.title}</h3>
+                <p style={{fontSize:14,color:TEXT_MUTED,lineHeight:1.6}}>{f.desc}</p>
               </div>
             ))}
           </div>
@@ -324,45 +334,45 @@ export default function LandingPage() {
       </section>
 
       {/* ── PLANS ── */}
-      <section id="pricing" style={{padding:'100px 24px',background:'#f9f9f9'}}>
+      <section id="pricing" style={{padding:'100px 24px',background:BG,borderTop:`1px solid ${BORDER_SUBTLE}`}}>
         <div style={{maxWidth:1000,margin:'0 auto'}}>
           <div style={{textAlign:'center',marginBottom:48}}>
-            <h2 className="serif" style={{fontSize:'clamp(32px,4vw,48px)',color:'#0a0a0a',marginBottom:14,fontWeight:400,letterSpacing:'-.5px'}}>{t.plans.title}</h2>
-            <p style={{fontSize:17,color:'#666',marginBottom:28,fontWeight:300}}>{t.plans.sub}</p>
+            <h2 style={{fontSize:'clamp(30px,4vw,44px)',color:TEXT,marginBottom:14,fontWeight:500,letterSpacing:'-.5px'}}>{t.plans.title}</h2>
+            <p style={{fontSize:16,color:TEXT_MUTED,marginBottom:28,fontWeight:400}}>{t.plans.sub}</p>
             {/* Toggle */}
-            <div style={{display:'inline-flex',background:'#eee',borderRadius:100,padding:4,gap:2}}>
+            <div style={{display:'inline-flex',background:SURFACE,border:`1px solid ${BORDER}`,borderRadius:9999,padding:4,gap:2}}>
               {[false,true].map(a=>(
-                <button key={String(a)} onClick={()=>setAnnual(a)} style={{padding:'7px 20px',borderRadius:100,border:'none',cursor:'pointer',fontFamily:'inherit',fontSize:14,fontWeight:annual===a?500:400,background:annual===a?'#fff':'transparent',color:annual===a?'#111':'#777',transition:'all .2s',boxShadow:annual===a?'0 1px 4px rgba(0,0,0,.1)':'none'}}>
+                <button key={String(a)} onClick={()=>setAnnual(a)} style={{padding:'7px 20px',borderRadius:9999,border:'none',cursor:'pointer',fontFamily:'inherit',fontSize:14,fontWeight:annual===a?500:400,background:annual===a?GREEN:'transparent',color:annual===a?'#0b0b0b':TEXT_MUTED,transition:'all .2s'}}>
                   {a?t.plans.annual:t.plans.monthly}
-                  {a&&<span style={{marginLeft:6,fontSize:11,color:'#16a34a',fontWeight:600}}>{t.plans.save}</span>}
+                  {a&&<span style={{marginLeft:6,fontSize:11,color:annual===a?'#0b0b0b':GREEN,fontWeight:600}}>{t.plans.save}</span>}
                 </button>
               ))}
             </div>
           </div>
           <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:20,alignItems:'start'}}>
             {t.plans.items.map((p,i)=>(
-              <div key={i} className="card-hover" style={{background:'#fff',border:p.popular?'2px solid #111':'1px solid #e5e5e5',borderRadius:20,padding:'32px 28px',position:'relative'}}>
+              <div key={i} className="card-hover" style={{background:SURFACE,border:p.popular?`1px solid ${GREEN_SOFT_BORDER}`:`1px solid ${BORDER}`,borderRadius:16,padding:'32px 28px',position:'relative'}}>
                 {p.popular&&(
-                  <div style={{position:'absolute',top:-14,left:'50%',transform:'translateX(-50%)',background:'#111',color:'#fff',fontSize:12,fontWeight:600,padding:'4px 16px',borderRadius:100,whiteSpace:'nowrap'}}>
+                  <div style={{position:'absolute',top:-13,left:'50%',transform:'translateX(-50%)',background:GREEN,color:'#0b0b0b',fontSize:12,fontWeight:600,padding:'4px 16px',borderRadius:9999,whiteSpace:'nowrap'}}>
                     {lang==='es'?'Más popular':'Most popular'}
                   </div>
                 )}
                 <div style={{marginBottom:20}}>
-                  <h3 style={{fontSize:20,fontWeight:600,color:'#111',marginBottom:6}}>{p.name}</h3>
+                  <h3 style={{fontSize:18,fontWeight:500,color:TEXT,marginBottom:6}}>{p.name}</h3>
                   <div style={{display:'flex',alignItems:'baseline',gap:4}}>
-                    <span className="serif" style={{fontSize:42,color:'#111',letterSpacing:'-1px'}}>{annual?p.priceAnnual:p.price}</span>
-                    {p.period&&<span style={{fontSize:14,color:'#888'}}>{p.period}</span>}
+                    <span style={{fontSize:38,color:TEXT,letterSpacing:'-1px',fontWeight:500}}>{annual?p.priceAnnual:p.price}</span>
+                    {p.period&&<span style={{fontSize:14,color:TEXT_FAINT}}>{p.period}</span>}
                   </div>
                 </div>
                 <ul style={{listStyle:'none',marginBottom:28,display:'flex',flexDirection:'column',gap:10}}>
                   {p.features.map((f,j)=>(
-                    <li key={j} style={{display:'flex',alignItems:'center',gap:10,fontSize:14,color:'#444'}}>
-                      <span style={{width:18,height:18,borderRadius:'50%',background:'#f0fdf4',border:'1px solid #86efac',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,fontSize:11,color:'#16a34a',fontWeight:700}}>✓</span>
+                    <li key={j} style={{display:'flex',alignItems:'center',gap:10,fontSize:14,color:TEXT_MUTED}}>
+                      <span style={{width:18,height:18,borderRadius:'50%',background:GREEN_SOFT_BG,border:`1px solid ${GREEN_SOFT_BORDER}`,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,fontSize:11,color:GREEN,fontWeight:700}}>✓</span>
                       {f}
                     </li>
                   ))}
                 </ul>
-                <a href={i===2?'#contact':'/demo'} className={p.popular?'btn-primary':'btn-secondary'} style={{display:'block',textAlign:'center',textDecoration:'none',padding:'12px',borderRadius:10,fontSize:14,fontWeight:500,width:'100%',border:p.popular?'none':'1.5px solid #ddd',background:p.popular?'#111':'transparent',color:p.popular?'#fff':'#111'}}>
+                <a href={i===2?'#contact':'/demo'} className={p.popular?'btn-primary':'btn-secondary'} style={{display:'block',textAlign:'center',textDecoration:'none',padding:'12px',borderRadius:9999,fontSize:14,fontWeight:500,width:'100%'}}>
                   {i===2?t.plans.contact:i===0?lang==='es'?'Ver demo':'Try demo':t.plans.cta}
                 </a>
               </div>
@@ -372,17 +382,17 @@ export default function LandingPage() {
       </section>
 
       {/* ── TESTIMONIALS ── */}
-      <section style={{padding:'100px 24px',background:'#0a0a0a'}}>
+      <section style={{padding:'100px 24px',background:BG,borderTop:`1px solid ${BORDER_SUBTLE}`}}>
         <div style={{maxWidth:1000,margin:'0 auto'}}>
-          <h2 className="serif" style={{fontSize:'clamp(32px,4vw,48px)',color:'white',marginBottom:56,textAlign:'center',fontWeight:400,letterSpacing:'-.5px'}}>{t.testimonials.title}</h2>
+          <h2 style={{fontSize:'clamp(30px,4vw,44px)',color:TEXT,marginBottom:56,textAlign:'center',fontWeight:500,letterSpacing:'-.5px'}}>{t.testimonials.title}</h2>
           <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:20}}>
             {t.testimonials.items.map((item,i)=>(
-              <div key={i} style={{background:'rgba(255,255,255,.04)',border:'1px solid rgba(255,255,255,.08)',borderRadius:16,padding:'28px 24px'}}>
-                <div style={{fontSize:28,color:'rgba(255,255,255,.15)',fontFamily:'Georgia,serif',lineHeight:.8,marginBottom:16}}>"</div>
-                <p style={{fontSize:15,color:'rgba(255,255,255,.7)',lineHeight:1.65,marginBottom:20,fontWeight:300}}>{item.quote}</p>
-                <div style={{borderTop:'1px solid rgba(255,255,255,.08)',paddingTop:16}}>
-                  <div style={{fontSize:13,fontWeight:600,color:'white'}}>{item.name}</div>
-                  <div style={{fontSize:12,color:'rgba(255,255,255,.35)',marginTop:2}}>{item.company}</div>
+              <div key={i} className="card-hover" style={{background:SURFACE,border:`1px solid ${BORDER}`,borderRadius:12,padding:'28px 24px'}}>
+                <div className="mono" style={{fontSize:24,color:GREEN,opacity:.5,lineHeight:.8,marginBottom:16}}>"</div>
+                <p style={{fontSize:14,color:TEXT_MUTED,lineHeight:1.65,marginBottom:20,fontWeight:400}}>{item.quote}</p>
+                <div style={{borderTop:`1px solid ${BORDER_SUBTLE}`,paddingTop:16}}>
+                  <div style={{fontSize:13,fontWeight:500,color:TEXT}}>{item.name}</div>
+                  <div style={{fontSize:12,color:TEXT_FAINT,marginTop:2}}>{item.company}</div>
                 </div>
               </div>
             ))}
@@ -391,18 +401,18 @@ export default function LandingPage() {
       </section>
 
       {/* ── FAQ ── */}
-      <section id="faq" style={{padding:'100px 24px',background:'#fff'}}>
+      <section id="faq" style={{padding:'100px 24px',background:BG,borderTop:`1px solid ${BORDER_SUBTLE}`}}>
         <div style={{maxWidth:680,margin:'0 auto'}}>
-          <h2 className="serif" style={{fontSize:'clamp(32px,4vw,48px)',color:'#0a0a0a',marginBottom:48,textAlign:'center',fontWeight:400,letterSpacing:'-.5px'}}>{t.faq.title}</h2>
+          <h2 style={{fontSize:'clamp(30px,4vw,44px)',color:TEXT,marginBottom:48,textAlign:'center',fontWeight:500,letterSpacing:'-.5px'}}>{t.faq.title}</h2>
           <div style={{display:'flex',flexDirection:'column',gap:0}}>
             {t.faq.items.map((item,i)=>(
-              <div key={i} style={{borderBottom:'1px solid #eee',overflow:'hidden'}}>
+              <div key={i} style={{borderBottom:`1px solid ${BORDER_SUBTLE}`,overflow:'hidden'}}>
                 <button onClick={()=>setOpenFaq(openFaq===i?null:i)} style={{width:'100%',display:'flex',justifyContent:'space-between',alignItems:'center',padding:'22px 0',background:'none',border:'none',cursor:'pointer',fontFamily:'inherit',textAlign:'left'}}>
-                  <span style={{fontSize:16,fontWeight:500,color:'#111',paddingRight:20}}>{item.q}</span>
-                  <span style={{fontSize:20,color:'#aaa',transition:'transform .2s',transform:openFaq===i?'rotate(45deg)':'rotate(0)',flexShrink:0}}>+</span>
+                  <span style={{fontSize:15,fontWeight:500,color:TEXT,paddingRight:20}}>{item.q}</span>
+                  <span style={{fontSize:18,color:openFaq===i?GREEN:TEXT_FAINT,transition:'transform .2s,color .2s',transform:openFaq===i?'rotate(45deg)':'rotate(0)',flexShrink:0}}>+</span>
                 </button>
                 <div style={{maxHeight:openFaq===i?'200px':'0',overflow:'hidden',transition:'max-height .3s ease'}}>
-                  <p style={{fontSize:15,color:'#666',lineHeight:1.65,paddingBottom:20}}>{item.a}</p>
+                  <p style={{fontSize:14,color:TEXT_MUTED,lineHeight:1.65,paddingBottom:20}}>{item.a}</p>
                 </div>
               </div>
             ))}
@@ -411,12 +421,12 @@ export default function LandingPage() {
       </section>
 
       {/* ── CONTACT ── */}
-      <section id="contact" style={{padding:'100px 24px',background:'#f9f9f9'}}>
+      <section id="contact" style={{padding:'100px 24px',background:BG,borderTop:`1px solid ${BORDER_SUBTLE}`}}>
         <div style={{maxWidth:520,margin:'0 auto',textAlign:'center'}}>
-          <h2 className="serif" style={{fontSize:'clamp(32px,4vw,44px)',color:'#0a0a0a',marginBottom:12,fontWeight:400,letterSpacing:'-.5px'}}>{t.contact.title}</h2>
-          <p style={{fontSize:16,color:'#666',marginBottom:40,lineHeight:1.6,fontWeight:300}}>{t.contact.sub}</p>
+          <h2 style={{fontSize:'clamp(28px,4vw,40px)',color:TEXT,marginBottom:12,fontWeight:500,letterSpacing:'-.5px'}}>{t.contact.title}</h2>
+          <p style={{fontSize:15,color:TEXT_MUTED,marginBottom:40,lineHeight:1.6,fontWeight:400}}>{t.contact.sub}</p>
           {sent?(
-            <div style={{background:'#f0fdf4',border:'1px solid #86efac',borderRadius:12,padding:'24px',fontSize:15,color:'#16a34a',fontWeight:500}}>
+            <div style={{background:GREEN_SOFT_BG,border:`1px solid ${GREEN_SOFT_BORDER}`,borderRadius:12,padding:'24px',fontSize:14,color:GREEN,fontWeight:500}}>
               ✓ {t.contact.sent}
             </div>
           ):(
@@ -428,18 +438,18 @@ export default function LandingPage() {
               ].map(f=>(
                 <input key={f.k} type={f.type} required placeholder={f.label} value={(form as any)[f.k]}
                   onChange={e=>setForm(p=>({...p,[f.k]:e.target.value}))}
-                  style={{border:'1px solid #ddd',borderRadius:10,padding:'13px 16px',fontSize:15,outline:'none',background:'white',transition:'border-color .15s'}}
-                  onFocus={e=>(e.target as HTMLInputElement).style.borderColor='#111'}
-                  onBlur={e=>(e.target as HTMLInputElement).style.borderColor='#ddd'}
+                  style={{border:`1px solid ${BORDER}`,borderRadius:8,padding:'13px 16px',fontSize:14,outline:'none',background:SURFACE,color:TEXT,transition:'border-color .15s'}}
+                  onFocus={e=>(e.target as HTMLInputElement).style.borderColor=GREEN}
+                  onBlur={e=>(e.target as HTMLInputElement).style.borderColor=BORDER}
                 />
               ))}
               <textarea required placeholder={t.contact.message} value={form.message}
                 onChange={e=>setForm(p=>({...p,message:e.target.value}))}
-                rows={4} style={{border:'1px solid #ddd',borderRadius:10,padding:'13px 16px',fontSize:15,outline:'none',resize:'vertical',background:'white',fontFamily:'inherit',transition:'border-color .15s'}}
-                onFocus={e=>(e.target as HTMLTextAreaElement).style.borderColor='#111'}
-                onBlur={e=>(e.target as HTMLTextAreaElement).style.borderColor='#ddd'}
+                rows={4} style={{border:`1px solid ${BORDER}`,borderRadius:8,padding:'13px 16px',fontSize:14,outline:'none',resize:'vertical',background:SURFACE,color:TEXT,fontFamily:'inherit',transition:'border-color .15s'}}
+                onFocus={e=>(e.target as HTMLTextAreaElement).style.borderColor=GREEN}
+                onBlur={e=>(e.target as HTMLTextAreaElement).style.borderColor=BORDER}
               />
-              <button type="submit" className="btn-primary" style={{padding:'14px',fontSize:16,borderRadius:10,width:'100%'}}>
+              <button type="submit" className="btn-primary" style={{padding:'14px',fontSize:15,borderRadius:9999,width:'100%'}}>
                 {t.contact.send}
               </button>
             </form>
@@ -448,35 +458,35 @@ export default function LandingPage() {
       </section>
 
       {/* ── FOOTER ── */}
-      <footer style={{background:'#0a0a0a',padding:'64px 24px 32px',color:'rgba(255,255,255,.45)'}}>
+      <footer style={{background:BG,padding:'64px 24px 32px',color:TEXT_MUTED,borderTop:`1px solid ${BORDER_SUBTLE}`}}>
         <div style={{maxWidth:1100,margin:'0 auto'}}>
           <div style={{display:'grid',gridTemplateColumns:'2fr 1fr 1fr 1fr',gap:40,marginBottom:48}}>
             <div>
               <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:16}}>
-                <svg width="22" height="22" viewBox="0 0 20 20" fill="none">
-                  <rect x="1" y="1" width="18" height="18" rx="4" stroke="white" strokeWidth="1.5"/>
-                  <path d="M5 10 L10 5 L15 10" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M5 14 L10 9 L15 14" stroke="rgba(255,255,255,.3)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <rect x="1" y="1" width="18" height="18" rx="4" stroke={GREEN} strokeWidth="1.5"/>
+                  <path d="M5 10 L10 5 L15 10" stroke={TEXT} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M5 14 L10 9 L15 14" stroke={TEXT_FAINT} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
-                <span className="serif" style={{fontSize:17,color:'white'}}>TVEO</span>
+                <span style={{fontSize:16,fontWeight:500,color:TEXT}}>TVEO</span>
               </div>
-              <p style={{fontSize:13,lineHeight:1.7,maxWidth:240}}>Plataforma de auditorías inteligentes con IA para retail, logística y manufactura.</p>
+              <p style={{fontSize:13,lineHeight:1.7,maxWidth:240,color:TEXT_FAINT}}>Plataforma de auditorías inteligentes con IA para retail, logística y manufactura.</p>
             </div>
             {(['product','company','legal'] as const).map(section=>(
               <div key={section}>
-                <div style={{fontSize:12,fontWeight:600,color:'rgba(255,255,255,.6)',textTransform:'uppercase',letterSpacing:'1.2px',marginBottom:16}}>{t.footer[section]}</div>
+                <div className="mono" style={{fontSize:11,fontWeight:500,color:TEXT_MUTED,textTransform:'uppercase',letterSpacing:'1.2px',marginBottom:16}}>{t.footer[section]}</div>
                 <ul style={{listStyle:'none',display:'flex',flexDirection:'column',gap:10}}>
                   {t.footer.links[section].map((link,j)=>(
-                    <li key={j}><a href="#" style={{fontSize:13,color:'rgba(255,255,255,.4)',textDecoration:'none',transition:'color .15s'}}
-                      onMouseEnter={e=>(e.target as HTMLAnchorElement).style.color='white'}
-                      onMouseLeave={e=>(e.target as HTMLAnchorElement).style.color='rgba(255,255,255,.4)'}>{link}</a></li>
+                    <li key={j}><a href="#" style={{fontSize:13,color:TEXT_FAINT,textDecoration:'none',transition:'color .15s'}}
+                      onMouseEnter={e=>(e.target as HTMLAnchorElement).style.color=GREEN}
+                      onMouseLeave={e=>(e.target as HTMLAnchorElement).style.color=TEXT_FAINT}>{link}</a></li>
                   ))}
                 </ul>
               </div>
             ))}
           </div>
-          <div style={{borderTop:'1px solid rgba(255,255,255,.07)',paddingTop:24,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-            <span style={{fontSize:12}}>{t.footer.copy}</span>
+          <div style={{borderTop:`1px solid ${BORDER_SUBTLE}`,paddingTop:24,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+            <span style={{fontSize:12,color:TEXT_FAINT}}>{t.footer.copy}</span>
           </div>
         </div>
       </footer>
