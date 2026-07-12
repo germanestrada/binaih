@@ -58,7 +58,7 @@ export async function POST(req: Request) {
       name:       admin_name,
       email:      admin_email,
       password:   placeholderHash,
-      status:     'active',
+      status:     'pending',
       created_by: session!.id,
     }),
   })

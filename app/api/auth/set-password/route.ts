@@ -30,9 +30,15 @@ export async function POST(req: Request) {
 
   const passwordHash = bcrypt.hashSync(password, 10)
 
+  // Buscar el usuario para saber si hay que activarlo (pending → active)
+  const userRes = await sbFetch(`/users?id=eq.${invite.user_id}&select=status`)
+  const userRows = await userRes.json() as any[]
+  const updates: Record<string, string> = { password: passwordHash }
+  if (userRows[0]?.status === 'pending') updates.status = 'active'
+
   const updateRes = await sbFetch(`/users?id=eq.${invite.user_id}`, {
     method: 'PATCH',
-    body: JSON.stringify({ password: passwordHash }),
+    body: JSON.stringify(updates),
   })
   if (!updateRes.ok) return NextResponse.json({ error: 'No se pudo actualizar la contraseña' }, { status: 500 })
 

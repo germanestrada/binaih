@@ -36,25 +36,42 @@ export default function UsuariosPage() {
   const [modal,    setModal]    = useState<'create'|'edit'|null>(null)
   const [selected, setSelected] = useState<User|null>(null)
   const [error,    setError]    = useState('')
+  const [notice,   setNotice]   = useState('')
+  const [resending,setResending]= useState<string|null>(null)
   const [form,     setForm]     = useState({name:'',email:'',password:'',role_name:'viewer',zone:'',status:'active'})
 
   const load = () => { setLoading(true); fetch('/api/admin/users').then(r=>r.json()).then(d=>{setUsers(d.data??[]);setLoading(false)}) }
   useEffect(()=>{load()},[])
 
-  const openCreate = () => { setForm({name:'',email:'',password:'',role_name:'viewer',zone:'',status:'active'}); setError(''); setModal('create') }
-  const openEdit   = (u:User) => { setSelected(u); setForm({name:u.name,email:u.email,password:'',role_name:u.role_name,zone:u.zone??'',status:u.status}); setError(''); setModal('edit') }
+  const openCreate = () => { setForm({name:'',email:'',password:'',role_name:'viewer',zone:'',status:'active'}); setError(''); setNotice(''); setModal('create') }
+  const openEdit   = (u:User) => { setSelected(u); setForm({name:u.name,email:u.email,password:'',role_name:u.role_name,zone:u.zone??'',status:u.status}); setError(''); setNotice(''); setModal('edit') }
 
   const save = async () => {
-    setError('')
+    setError(''); setNotice('')
     const isCreate = modal==='create'
     const url  = isCreate?'/api/admin/users':`/api/admin/users/${selected?.id}`
     const body: Record<string,string|null> = {name:form.name,role_name:form.role_name,zone:form.zone||null,status:form.status}
-    if (isCreate){body.email=form.email;body.password=form.password}
+    if (isCreate) body.email=form.email
     else if(form.password)body.password=form.password
     const res  = await fetch(url,{method:isCreate?'POST':'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
     const data = await res.json()
     if(!res.ok){setError(data.error??'Error');return}
+    if (isCreate) {
+      if (data.inviteSent) setNotice(`Usuario creado. Se envió la invitación a ${form.email} para que defina su contraseña.`)
+      else if (data.inviteError) setNotice(`Usuario creado, pero la invitación no se pudo enviar (${data.inviteError}). Puedes reenviarla desde la lista.`)
+      load()
+      setTimeout(()=>{setModal(null);setNotice('')}, 3500)
+      return
+    }
     setModal(null);load()
+  }
+
+  const resendInvite = async (u:User) => {
+    setResending(u.id)
+    const res = await fetch(`/api/admin/users/${u.id}/resend-invite`,{method:'POST'})
+    const data = await res.json()
+    setResending(null)
+    alert(res.ok ? `Invitación reenviada a ${u.email}` : (data.error ?? 'Error al reenviar'))
   }
 
   // Solo inactivar — nunca eliminar
@@ -89,6 +106,11 @@ export default function UsuariosPage() {
                 {u.last_login&&<span style={{fontSize:10,color:'var(--subtle)',fontFamily:'var(--font-mono)'}}>Último: {new Date(u.last_login).toLocaleDateString('es-CO')}</span>}
                 <span style={{fontSize:11,fontWeight:500,padding:'2px 9px',borderRadius:20,background:b.bg,color:b.color}}>{b.label}</span>
                 <div style={{display:'flex',gap:6}}>
+                  {u.status==='pending'&&(
+                    <button onClick={()=>resendInvite(u)} disabled={resending===u.id} style={{background:'none',border:'1px solid var(--accent-border)',padding:'5px 10px',borderRadius:'var(--r-sm)',cursor:resending===u.id?'default':'pointer',fontSize:11,color:'var(--accent)',fontFamily:'inherit'}}>
+                      {resending===u.id?'Enviando…':'Reenviar invitación'}
+                    </button>
+                  )}
                   <button onClick={()=>router.push(`/admin/usuarios/${u.id}`)} style={{background:'none',border:'1px solid var(--border)',padding:'5px 10px',borderRadius:'var(--r-sm)',cursor:'pointer',fontSize:11,color:'var(--mid)',fontFamily:'inherit'}}>Ver ficha</button>
                   <button onClick={()=>openEdit(u)} style={{background:'none',border:'1px solid var(--border)',padding:'5px 10px',borderRadius:'var(--r-sm)',cursor:'pointer',fontSize:11,color:'var(--mid)',fontFamily:'inherit'}}>Editar</button>
                   {/* Solo inactivar — no eliminar */}
@@ -105,7 +127,13 @@ export default function UsuariosPage() {
         <Modal title={modal==='create'?'Nuevo usuario':'Editar usuario'} onClose={()=>setModal(null)}>
           <input style={INP} placeholder="Nombre completo" value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))}/>
           {modal==='create'&&<input style={INP} type="email" placeholder="Correo" value={form.email} onChange={e=>setForm(f=>({...f,email:e.target.value}))}/>}
-          <input style={INP} type="password" placeholder={modal==='edit'?'Nueva contraseña (opcional)':'Contraseña'} value={form.password} onChange={e=>setForm(f=>({...f,password:e.target.value}))}/>
+          {modal==='create' ? (
+            <div style={{fontSize:11,color:'var(--subtle)',marginBottom:12,lineHeight:1.5}}>
+              Le enviaremos un correo para que defina su propia contraseña.
+            </div>
+          ) : (
+            <input style={INP} type="password" placeholder="Nueva contraseña (opcional)" value={form.password} onChange={e=>setForm(f=>({...f,password:e.target.value}))}/>
+          )}
           <select style={{...INP,cursor:'pointer'}} value={form.role_name} onChange={e=>setForm(f=>({...f,role_name:e.target.value}))}>
             {ROLES.map(r=><option key={r} value={r}>{r}</option>)}
           </select>
@@ -113,10 +141,13 @@ export default function UsuariosPage() {
             <option value="">Sin zona</option>
             {ZONES.map(z=><option key={z} value={z}>{z}</option>)}
           </select>
-          <select style={{...INP,cursor:'pointer'}} value={form.status} onChange={e=>setForm(f=>({...f,status:e.target.value}))}>
-            <option value="active">Activo</option>
-            <option value="inactive">Inactivo</option>
-          </select>
+          {modal==='edit'&&(
+            <select style={{...INP,cursor:'pointer'}} value={form.status} onChange={e=>setForm(f=>({...f,status:e.target.value}))}>
+              <option value="active">Activo</option>
+              <option value="inactive">Inactivo</option>
+            </select>
+          )}
+          {notice&&<div style={{fontSize:12,color:'var(--ok)',background:'var(--ok-bg)',borderRadius:'var(--r-sm)',padding:'8px 12px',marginBottom:12,lineHeight:1.5}}>{notice}</div>}
           {error&&<div style={{fontSize:12,color:'var(--err)',marginBottom:12}}>{error}</div>}
           <div style={{display:'flex',gap:8,justifyContent:'flex-end',marginTop:4}}>
             <button onClick={()=>setModal(null)} style={BTN()}>Cancelar</button>
