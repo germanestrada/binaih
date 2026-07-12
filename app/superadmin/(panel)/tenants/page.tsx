@@ -31,7 +31,8 @@ export default function TenantsPage() {
   const [modal,   setModal]   = useState<'create'|'edit'|null>(null)
   const [selected,setSelected]= useState<Tenant|null>(null)
   const [error,   setError]   = useState('')
-  const [form,    setForm]    = useState({name:'',nit:'',sector:'',plan_id:'',status:'trial',trial_ends_at:''})
+  const [notice,  setNotice]  = useState('')
+  const [form,    setForm]    = useState({name:'',nit:'',sector:'',plan_id:'',status:'trial',trial_ends_at:'',admin_name:'',admin_email:''})
 
   const load = () => {
     setLoading(true)
@@ -44,22 +45,33 @@ export default function TenantsPage() {
 
   const openCreate = () => {
     const trialEnd = new Date(Date.now()+30*86400000).toISOString().slice(0,10)
-    setForm({name:'',nit:'',sector:'',plan_id:plans[0]?.id??'',status:'trial',trial_ends_at:trialEnd})
-    setError(''); setModal('create')
+    setForm({name:'',nit:'',sector:'',plan_id:plans[0]?.id??'',status:'trial',trial_ends_at:trialEnd,admin_name:'',admin_email:''})
+    setError(''); setNotice(''); setModal('create')
   }
   const openEdit = (t:Tenant) => {
     setSelected(t)
-    setForm({name:t.name,nit:t.nit??'',sector:t.sector??'',plan_id:t.plan_id,status:t.status,trial_ends_at:t.trial_ends_at?.slice(0,10)??''})
-    setError(''); setModal('edit')
+    setForm({name:t.name,nit:t.nit??'',sector:t.sector??'',plan_id:t.plan_id,status:t.status,trial_ends_at:t.trial_ends_at?.slice(0,10)??'',admin_name:'',admin_email:''})
+    setError(''); setNotice(''); setModal('edit')
   }
 
   const save = async () => {
-    setError('')
+    setError(''); setNotice('')
     const isCreate = modal==='create'
     const url = isCreate?'/api/superadmin/tenants':`/api/superadmin/tenants/${selected?.id}`
     const res  = await fetch(url,{method:isCreate?'POST':'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(form)})
     const data = await res.json()
     if(!res.ok){setError(data.error??'Error');return}
+    if (isCreate) {
+      if (data.inviteSent) {
+        setNotice(`Tenant creado. Se envió la invitación a ${form.admin_email} para definir su contraseña.`)
+      } else if (data.inviteError) {
+        setNotice(`Tenant y usuario admin creados, pero la invitación no se pudo enviar (${data.inviteError}). Puedes reenviarla luego.`)
+      }
+      load()
+      // Mantener el modal un momento para que se lea el aviso, luego cerrar
+      setTimeout(()=>{setModal(null);setNotice('')}, 3500)
+      return
+    }
     setModal(null);load()
   }
 
@@ -112,6 +124,21 @@ export default function TenantsPage() {
           {form.status==='trial'&&(
             <input style={INP} type="date" value={form.trial_ends_at} onChange={f('trial_ends_at')} placeholder="Fin del trial"/>
           )}
+
+          {modal==='create'&&(
+            <>
+              <div style={{fontSize:10,fontWeight:600,color:'var(--mid)',textTransform:'uppercase',letterSpacing:'1.2px',margin:'14px 0 8px',paddingTop:12,borderTop:'1px solid var(--border2)'}}>
+                Usuario admin del tenant
+              </div>
+              <input style={INP} placeholder="Nombre completo *" value={form.admin_name} onChange={f('admin_name')}/>
+              <input style={INP} type="email" placeholder="Email *" value={form.admin_email} onChange={f('admin_email')}/>
+              <div style={{fontSize:11,color:'var(--subtle)',marginBottom:10,lineHeight:1.5}}>
+                Se le enviará un correo para que defina su propia contraseña. Desde ahí podrá crear y dar acceso a los demás usuarios de su equipo.
+              </div>
+            </>
+          )}
+
+          {notice&&<div style={{fontSize:12,color:'var(--accent)',background:'var(--accent-bg)',border:'1px solid var(--accent-border)',borderRadius:8,padding:'8px 12px',marginBottom:12,lineHeight:1.5}}>{notice}</div>}
           {error&&<div style={{fontSize:12,color:'var(--err)',marginBottom:12}}>{error}</div>}
           <div style={{display:'flex',gap:8,justifyContent:'flex-end',marginTop:4}}>
             <button onClick={()=>setModal(null)} style={BTN()}>Cancelar</button>

@@ -71,7 +71,7 @@ export default function AdminPage() {
           </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 16 }}>
             <span style={{ fontFamily: 'var(--font-serif)', fontSize: 24, color: 'var(--ink)' }}>{plan.name}</span>
-            <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 10px', borderRadius: 20, background: 'var(--ink)', color: 'white' }}>{plan.tier}</span>
+            <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 10px', borderRadius: 20, background: 'var(--accent)', color: 'var(--accent-ink)' }}>{plan.tier}</span>
             <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 10px', borderRadius: 20, background: plan.status === 'active' ? 'var(--ok-bg)' : 'var(--warn-bg)', color: plan.status === 'active' ? 'var(--ok)' : 'var(--warn)' }}>{plan.status}</span>
           </div>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>

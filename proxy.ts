@@ -10,7 +10,7 @@ const PROTECTED_TENANT = [
 
 // Rutas públicas que nunca requieren auth
 const PUBLIC_PATHS = [
-  '/', '/login', '/demo', '/superadmin/login',
+  '/', '/login', '/demo', '/superadmin/login', '/set-password',
   '/api/auth', '/api/superadmin/auth', '/api/demo-login',
   '/_next', '/favicon', '/robots',
 ]

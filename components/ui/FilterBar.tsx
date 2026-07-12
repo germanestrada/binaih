@@ -41,7 +41,7 @@ export default function FilterBar({ fields, values, onChange, onClear, count, la
           {label}
           {activeCount > 0 && (
             <span style={{
-              background: 'var(--ink)', color: 'white',
+              background: 'var(--accent)', color: 'var(--accent-ink)',
               borderRadius: '50%', width: 16, height: 16,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: 10, fontWeight: 700,
@@ -60,12 +60,12 @@ export default function FilterBar({ fields, values, onChange, onClear, count, la
             <span key={k} style={{
               display: 'flex', alignItems: 'center', gap: 5,
               fontSize: 11, padding: '3px 10px', borderRadius: 20,
-              background: 'var(--ink)', color: 'white', fontWeight: 500,
+              background: 'var(--accent)', color: 'var(--accent-ink)', fontWeight: 500,
             }}>
               {field?.label}: {label2}
               <button onClick={() => onChange(k, '')} style={{
                 background: 'none', border: 'none', cursor: 'pointer',
-                color: 'white', display: 'flex', padding: 0, opacity: .7,
+                color: 'var(--accent-ink)', display: 'flex', padding: 0, opacity: .7,
               }}>✕</button>
             </span>
           )

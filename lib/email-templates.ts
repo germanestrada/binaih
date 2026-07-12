@@ -136,7 +136,34 @@ export function auditCompletedEmail(data: {
   }
 }
 
-// ── Límite de plan alcanzado ─────────────────────────────
+// ── Invitación — definir contraseña ───────────────────────
+export function setPasswordInviteEmail(data: {
+  recipientName: string
+  tenantName:    string
+  setPasswordUrl: string
+  expiresInDays: number
+}): { subject: string; html: string } {
+  return {
+    subject: `Bienvenido a TVEO — activa tu cuenta de ${data.tenantName}`,
+    html: wrap(`
+      <h1 style="font-size:22px;font-weight:300;color:#111;margin:0 0 8px">
+        Tu cuenta está lista
+      </h1>
+      <p style="color:#666;font-size:14px;margin:0 0 24px">
+        Hola ${data.recipientName}, se creó tu cuenta de administrador para
+        <strong>${data.tenantName}</strong> en TVEO. Para empezar, define tu contraseña.
+      </p>
+      <a href="${data.setPasswordUrl}" style="
+        display:inline-block;background:#111;color:white;text-decoration:none;
+        padding:12px 24px;border-radius:8px;font-size:14px;font-weight:500;
+      ">Definir mi contraseña →</a>
+      <p style="color:#999;font-size:12px;margin:24px 0 0">
+        Este enlace expira en ${data.expiresInDays} días. Si no esperabas este correo,
+        puedes ignorarlo con confianza.
+      </p>
+    `),
+  }
+}
 export function planLimitEmail(data: {
   adminName:    string
   tenantName:   string

@@ -54,7 +54,7 @@ export default function StoreFilters({ totalFiltered }: { totalFiltered: number 
           {active > 0 && (
             <span style={{
               fontSize: 10, fontWeight: 700,
-              background: 'var(--ink)', color: 'white',
+              background: 'var(--accent)', color: 'var(--accent-ink)',
               width: 16, height: 16, borderRadius: '50%',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>

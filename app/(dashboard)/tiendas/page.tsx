@@ -83,7 +83,7 @@ function TiendasContent() {
         {/* Export */}
         <button
           onClick={() => exportCSV(filtered)}
-          style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'var(--ink)', color: 'white', border: 'none', padding: '7px 14px', borderRadius: 'var(--r-sm)', fontSize: 12, cursor: 'pointer', fontFamily: 'var(--font-sans)', fontWeight: 500, flexShrink: 0 }}>
+          style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'var(--accent)', color: 'var(--accent-ink)', border: 'none', padding: '7px 14px', borderRadius: 'var(--r-sm)', fontSize: 12, cursor: 'pointer', fontFamily: 'var(--font-sans)', fontWeight: 500, flexShrink: 0 }}>
           <Icon name="export" size={13} color="white" /> CSV
         </button>
       </div>
@@ -125,13 +125,13 @@ function TiendasContent() {
               const store = filtered.find(s => s.id === selectedId)
               if (!store) return null
               return (
-                <div style={{ position: 'absolute', bottom: 20, left: '50%', transform: 'translateX(-50%)', background: 'var(--ink)', color: 'white', padding: '12px 16px', borderRadius: 'var(--r-lg)', display: 'flex', alignItems: 'center', gap: 14, boxShadow: '0 4px 24px rgba(0,0,0,.3)', zIndex: 1000, minWidth: 280 }}>
+                <div style={{ position: 'absolute', bottom: 20, left: '50%', transform: 'translateX(-50%)', background: 'var(--white)', color: 'var(--ink)', padding: '12px 16px', borderRadius: 'var(--r-lg)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 14, boxShadow: '0 4px 24px rgba(0,0,0,.3)', zIndex: 1000, minWidth: 280 }}>
                   <div style={{ fontFamily: 'var(--font-serif)', fontSize: 28, lineHeight: 1, color: store.score >= 75 ? '#6ee7a0' : '#fca5a5' }}>{store.score}</div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 13, fontWeight: 500, marginBottom: 2 }}>{store.name}</div>
                     <div style={{ fontSize: 11, color: 'rgba(255,255,255,.45)' }}>{store.city} · {store.zone}</div>
                   </div>
-                  <a href={`/tiendas/${store.id}`} style={{ fontSize: 11, color: 'white', border: '1px solid rgba(255,255,255,.2)', padding: '5px 12px', borderRadius: 'var(--r-sm)', whiteSpace: 'nowrap' }}>
+                  <a href={`/tiendas/${store.id}`} style={{ fontSize: 11, color: 'var(--accent)', border: '1px solid var(--border)', padding: '5px 12px', borderRadius: 'var(--r-sm)', whiteSpace: 'nowrap' }}>
                     Ver detalle →
                   </a>
                   <button onClick={() => setSelectedId(null)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,.4)', cursor: 'pointer', padding: 4, display: 'flex' }}>
@@ -149,7 +149,7 @@ function TiendasContent() {
 
 function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'var(--ink)', color: 'white', fontSize: 11, padding: '3px 8px 3px 10px', borderRadius: 20, fontWeight: 500 }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'var(--accent)', color: 'var(--accent-ink)', fontSize: 11, padding: '3px 8px 3px 10px', borderRadius: 20, fontWeight: 500 }}>
       {label}
       <button onClick={onRemove} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,.6)', cursor: 'pointer', padding: 0, display: 'flex', lineHeight: 1 }}>
         <Icon name="x" size={11} color="currentColor" />

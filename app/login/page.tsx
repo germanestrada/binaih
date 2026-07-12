@@ -95,8 +95,8 @@ function LoginForm() {
           )}
 
           <button type="submit" disabled={loading} style={{
-            background: loading ? 'var(--subtle)' : 'var(--ink)',
-            color: 'white', border: 'none', borderRadius: 'var(--r-md)',
+            background: loading ? 'var(--subtle)' : 'var(--accent)',
+            color: 'var(--accent-ink)', border: 'none', borderRadius: 'var(--r-md)',
             padding: '12px', fontSize: 14, fontWeight: 500,
             cursor: loading ? 'default' : 'pointer',
             fontFamily: 'inherit', marginTop: 4, transition: 'background .15s',
