@@ -31,11 +31,27 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   const findings = await findingsRes.json() as any[]
   const history  = await historyRes.json()  as any[]
 
+  // La última auditoría (completada primero, si no hay ninguna completada usa la más reciente)
+  const lastAudit   = audits.find(a => a.status === 'completed') ?? audits[0]
+  const lastAuditId = lastAudit?.id
+
+  // Logs de análisis de IA de esa última auditoría
+  let aiLogs: any[] = []
+  if (lastAuditId) {
+    const aiLogsRes = await fetch(
+      `${url}/rest/v1/ai_analysis_logs?audit_id=eq.${lastAuditId}&select=id,provider,model,proposed_status,proposed_score,confidence,success,duration_ms,created_at,error_message&order=created_at.desc`,
+      { headers }
+    )
+    aiLogs = await aiLogsRes.json() as any[]
+  }
+
   return NextResponse.json({
     ...location,
     score:        location.current_score ?? audits[0]?.score ?? 0,
     audits,
     findings,
     scoreHistory: history,
+    aiLogs,
+    lastAuditId,
   })
 }
