@@ -1,10 +1,10 @@
 import type { GaugeData } from '@/types/kpi'
 
 function gaugeColor(value: number): { stroke: string; text: string; bg: string } {
-  if (value >= 90) return { stroke: '#1a6b3a', text: '#1a6b3a', bg: '#f0faf4' }
-  if (value >= 75) return { stroke: '#2d6a1f', text: '#2d6a1f', bg: '#f5f9f0' }
-  if (value >= 61) return { stroke: '#7a5200', text: '#7a5200', bg: '#fffbf0' }
-  return               { stroke: '#8b1a1a', text: '#8b1a1a', bg: '#fff5f5' }
+  if (value >= 90) return { stroke: '#3ecf8e', text: '#3ecf8e', bg: 'rgba(62,207,142,.08)' }
+  if (value >= 75) return { stroke: '#84cc16', text: '#84cc16', bg: 'rgba(132,204,22,.08)' }
+  if (value >= 61) return { stroke: '#f0b429', text: '#f0b429', bg: 'rgba(240,180,41,.08)' }
+  return               { stroke: '#f87171', text: '#f87171', bg: 'rgba(248,113,113,.08)' }
 }
 
 export default function GaugeCard({ gauge }: { gauge: GaugeData }) {

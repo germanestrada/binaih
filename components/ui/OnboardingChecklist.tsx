@@ -68,11 +68,11 @@ export default function OnboardingChecklist() {
           <div style="position:relative;width:36px;height:36px;flex-shrink:0">
             <svg width="36" height="36" viewBox="0 0 36 36">
               <circle cx="18" cy="18" r="14" fill="none" stroke="var(--border2)" stroke-width="3"/>
-              <circle cx="18" cy="18" r="14" fill="none" stroke="#1558b0" stroke-width="3"
+              <circle cx="18" cy="18" r="14" fill="none" stroke="var(--accent)" stroke-width="3"
                 stroke-dasharray="${pct * 0.88} 88" stroke-linecap="round"
                 transform="rotate(-90 18 18)"/>
             </svg>
-            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#1558b0">${pct}%</div>
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:var(--accent)">${pct}%</div>
           </div>
           <div style="flex:1">
             <div style="font-size:13px;font-weight:500;color:var(--ink)">Configura tu cuenta — ${done}/${total} completado</div>
@@ -86,7 +86,7 @@ export default function OnboardingChecklist() {
         // Progress bar
         const bar = document.createElement('div')
         bar.style.cssText = 'height:2px;background:var(--border2);margin:0 16px'
-        bar.innerHTML = `<div style="height:100%;width:${pct}%;background:#1558b0;border-radius:1px;transition:width .5s ease"></div>`
+        bar.innerHTML = `<div style="height:100%;width:${pct}%;background:var(--accent);border-radius:1px;transition:width .5s ease"></div>`
         wrapper.appendChild(bar)
 
         // Items
@@ -98,14 +98,14 @@ export default function OnboardingChecklist() {
             const row    = document.createElement('div')
             row.style.cssText = `display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:${i < ITEMS.length-1 ? '1px solid var(--border2)' : 'none'};cursor:${isDone ? 'default' : 'pointer'};opacity:${isDone ? 0.6 : 1}`
             row.innerHTML = `
-              <div style="width:22px;height:22px;border-radius:50%;flex-shrink:0;background:${isDone ? '#1558b0' : 'var(--surface)'};border:2px solid ${isDone ? '#1558b0' : 'var(--border)'};display:flex;align-items:center;justify-content:center">
+              <div style="width:22px;height:22px;border-radius:50%;flex-shrink:0;background:${isDone ? 'var(--accent)' : 'var(--surface)'};border:2px solid ${isDone ? 'var(--accent)' : 'var(--border)'};display:flex;align-items:center;justify-content:center">
                 ${isDone ? '<span style="font-size:11px;color:white;font-weight:700">✓</span>' : ''}
               </div>
               <div style="flex:1;min-width:0">
                 <div style="font-size:13px;color:var(--ink);font-weight:500;text-decoration:${isDone ? 'line-through' : 'none'}">${item.label}</div>
                 <div style="font-size:11px;color:var(--subtle);margin-top:1px">${item.desc}</div>
               </div>
-              ${!isDone ? `<div style="font-size:11px;color:#1558b0;font-weight:500;flex-shrink:0">${item.isTour ? 'Iniciar →' : 'Ir →'}</div>` : ''}
+              ${!isDone ? `<div style="font-size:11px;color:var(--accent);font-weight:500;flex-shrink:0">${item.isTour ? 'Iniciar →' : 'Ir →'}</div>` : ''}
             `
             if (!isDone) {
               row.onclick = () => {

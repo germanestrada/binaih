@@ -88,11 +88,11 @@ export default function SessionGuard() {
       <div style={boxStyle}>
         <div style={{fontSize:32,marginBottom:12}}>🔒</div>
         <h2 style={{fontSize:18,fontWeight:600,marginBottom:8}}>Sesión expirada</h2>
-        <p style={{fontSize:14,color:'#666',marginBottom:24,lineHeight:1.5}}>
+        <p style={{fontSize:14,color:'var(--mid)',marginBottom:24,lineHeight:1.5}}>
           Tu sesión ha expirado por seguridad. Vuelve a ingresar para continuar.
         </p>
         <button onClick={handleRelogin} style={{
-          background:'#111',color:'#fff',border:'none',padding:'12px 28px',
+          background:'var(--accent)',color:'var(--accent-ink)',border:'none',padding:'12px 28px',
           borderRadius:8,fontSize:14,fontWeight:500,cursor:'pointer',width:'100%',
         }}>Volver a ingresar</button>
       </div>
@@ -104,16 +104,16 @@ export default function SessionGuard() {
       <div style={boxStyle}>
         <div style={{fontSize:32,marginBottom:12}}>⏰</div>
         <h2 style={{fontSize:18,fontWeight:600,marginBottom:8}}>¿Sigues ahí?</h2>
-        <p style={{fontSize:14,color:'#666',marginBottom:8,lineHeight:1.5}}>
+        <p style={{fontSize:14,color:'var(--mid)',marginBottom:8,lineHeight:1.5}}>
           Tu sesión cerrará en <strong>{countdown}</strong> segundos por inactividad.
         </p>
         <div style={{display:'flex',gap:10,marginTop:20}}>
           <button onClick={handleStay} style={{
-            flex:1,background:'#111',color:'#fff',border:'none',padding:'11px',
+            flex:1,background:'var(--accent)',color:'var(--accent-ink)',border:'none',padding:'11px',
             borderRadius:8,fontSize:14,fontWeight:500,cursor:'pointer',
           }}>Sigo aquí</button>
           <button onClick={()=>{setShowWarn(false);signOut({callbackUrl:'/login'})}} style={{
-            flex:1,background:'none',color:'#666',border:'1px solid #ddd',padding:'11px',
+            flex:1,background:'none',color:'var(--mid)',border:'1px solid var(--border)',padding:'11px',
             borderRadius:8,fontSize:14,cursor:'pointer',fontFamily:'inherit',
           }}>Cerrar sesión</button>
         </div>

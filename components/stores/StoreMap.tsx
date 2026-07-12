@@ -9,10 +9,10 @@ interface StoreMapProps {
 }
 
 function scoreColor(score: number) {
-  if (score >= 90) return { fill: '#1a6b3a', border: '#0f4022' }
-  if (score >= 75) return { fill: '#111111', border: '#000000' }
-  if (score >= 60) return { fill: '#7a5200', border: '#4a3100' }
-  return                  { fill: '#8b1a1a', border: '#5a1010' }
+  if (score >= 90) return { fill: '#3ecf8e', border: '#171717' }
+  if (score >= 75) return { fill: '#84cc16', border: '#171717' }
+  if (score >= 60) return { fill: '#f0b429', border: '#171717' }
+  return                  { fill: '#f87171', border: '#171717' }
 }
 
 function makePinSVG(score: number, selected: boolean): string {

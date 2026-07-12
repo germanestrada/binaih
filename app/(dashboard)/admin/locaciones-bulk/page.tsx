@@ -139,7 +139,7 @@ export default function CargueLocacionesPage() {
                 <button onClick={()=>{setPreview(false);setRows([])}} style={{background:'none',border:'1px solid var(--border)',color:'var(--mid)',padding:'10px 20px',borderRadius:'var(--r-sm)',fontSize:13,cursor:'pointer',fontFamily:'inherit'}}>
                   Cancelar
                 </button>
-                <button onClick={upload} disabled={loading} style={{background:loading?'var(--subtle)':'var(--ink)',color:'white',border:'none',padding:'10px 24px',borderRadius:'var(--r-sm)',fontSize:13,fontWeight:500,cursor:loading?'default':'pointer',fontFamily:'inherit',display:'flex',alignItems:'center',gap:7}}>
+                <button onClick={upload} disabled={loading} style={{background:loading?'var(--subtle)':'var(--ink)',color:'var(--accent-ink)',border:'none',padding:'10px 24px',borderRadius:'var(--r-sm)',fontSize:13,fontWeight:500,cursor:loading?'default':'pointer',fontFamily:'inherit',display:'flex',alignItems:'center',gap:7}}>
                   <Icon name="check" size={13} color="white"/>
                   {loading?'Importando…':`Confirmar e importar ${rows.length} locaciones`}
                 </button>
@@ -174,7 +174,7 @@ export default function CargueLocacionesPage() {
                 <button onClick={()=>{setResult(null);setRows([])}} style={{background:'none',border:'1px solid var(--border)',color:'var(--mid)',padding:'10px 20px',borderRadius:'var(--r-sm)',fontSize:13,cursor:'pointer',fontFamily:'inherit'}}>
                   Importar más
                 </button>
-                <button onClick={()=>router.push('/admin/locaciones')} style={{background:'var(--ink)',color:'white',border:'none',padding:'10px 24px',borderRadius:'var(--r-sm)',fontSize:13,fontWeight:500,cursor:'pointer',fontFamily:'inherit'}}>
+                <button onClick={()=>router.push('/admin/locaciones')} style={{background:'var(--accent)',color:'var(--accent-ink)',border:'none',padding:'10px 24px',borderRadius:'var(--r-sm)',fontSize:13,fontWeight:500,cursor:'pointer',fontFamily:'inherit'}}>
                   Ver locaciones →
                 </button>
               </div>

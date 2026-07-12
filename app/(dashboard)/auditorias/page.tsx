@@ -139,7 +139,7 @@ function AuditoriasContent() {
                       onClick={e=>{e.stopPropagation();router.push(`/auditorias/${a.id}`)}}
                       style={{
                         display:'flex',alignItems:'center',gap:6,
-                        background:'var(--ink)',color:'white',border:'none',
+                        background:'var(--accent)',color:'var(--accent-ink)',border:'none',
                         padding:'7px 14px',borderRadius:'var(--r-sm)',fontSize:12,
                         fontWeight:500,cursor:'pointer',fontFamily:'inherit',flexShrink:0,
                       }}

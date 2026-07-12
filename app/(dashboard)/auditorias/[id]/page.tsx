@@ -228,7 +228,7 @@ function ItemRow({result, auditId, onUpdate}:{result:ItemResult;auditId:string;o
 
           <div style={{display:'flex',gap:8,justifyContent:'flex-end'}}>
             <button onClick={()=>setOpen(false)} style={{background:'none',border:'1px solid var(--border)',color:'var(--mid)',padding:'7px 14px',borderRadius:'var(--r-sm)',fontSize:12,cursor:'pointer',fontFamily:'inherit'}}>Cancelar</button>
-            <button onClick={save} disabled={saving} style={{background:'var(--ink)',color:'white',border:'none',padding:'7px 16px',borderRadius:'var(--r-sm)',fontSize:12,fontWeight:500,cursor:saving?'default':'pointer',fontFamily:'inherit'}}>
+            <button onClick={save} disabled={saving} style={{background:'var(--accent)',color:'var(--accent-ink)',border:'none',padding:'7px 16px',borderRadius:'var(--r-sm)',fontSize:12,fontWeight:500,cursor:saving?'default':'pointer',fontFamily:'inherit'}}>
               {saving?'Guardando…':'Guardar respuesta'}
             </button>
           </div>
@@ -367,7 +367,7 @@ export default function AuditoriaDetailPage() {
           {/* Acciones */}
           {canEdit&&status.next&&(
             <button onClick={()=>changeStatus(status.next!)} disabled={saving} style={{
-              background:'var(--ink)',color:'white',border:'none',padding:'10px',
+              background:'var(--accent)',color:'var(--accent-ink)',border:'none',padding:'10px',
               borderRadius:'var(--r-md)',fontSize:13,fontWeight:500,
               cursor:saving?'default':'pointer',fontFamily:'inherit',width:'100%',
             }}>

@@ -13,10 +13,10 @@ interface Metrics {
 
 function StatCard({label,value,sub,color='white'}:{label:string;value:number|string;sub?:string;color?:string}) {
   return (
-    <div style={{background:'#111',border:'1px solid #1e1e1e',borderRadius:12,padding:'18px 20px'}}>
-      <div style={{fontSize:10,color:'#444',textTransform:'uppercase',letterSpacing:'1.2px',marginBottom:8,fontWeight:600}}>{label}</div>
+    <div style={{background:'var(--white)',border:'1px solid var(--border2)',borderRadius:12,padding:'18px 20px'}}>
+      <div style={{fontSize:10,color:'var(--mid)',textTransform:'uppercase',letterSpacing:'1.2px',marginBottom:8,fontWeight:600}}>{label}</div>
       <div style={{fontSize:32,fontWeight:300,color,lineHeight:1,fontFamily:'Georgia,serif'}}>{value}</div>
-      {sub&&<div style={{fontSize:11,color:'#444',marginTop:6}}>{sub}</div>}
+      {sub&&<div style={{fontSize:11,color:'var(--mid)',marginTop:6}}>{sub}</div>}
     </div>
   )
 }
@@ -29,14 +29,14 @@ export default function SuperAdminMetricsPage() {
     fetch('/api/superadmin/metrics').then(r=>r.json()).then(d=>{setData(d);setLoading(false)})
   },[])
 
-  if(loading) return <div style={{padding:32,color:'#444',fontSize:13}}>Cargando métricas…</div>
-  if(!data)   return <div style={{padding:32,color:'#444',fontSize:13}}>Error al cargar.</div>
+  if(loading) return <div style={{padding:32,color:'var(--mid)',fontSize:13}}>Cargando métricas…</div>
+  if(!data)   return <div style={{padding:32,color:'var(--mid)',fontSize:13}}>Error al cargar.</div>
 
   const {totals,tenantBreakdown} = data
 
   return (
     <div style={{padding:'28px 32px'}}>
-      <div style={{fontSize:10,fontWeight:600,color:'#444',textTransform:'uppercase',letterSpacing:'1.2px',marginBottom:20}}>
+      <div style={{fontSize:10,fontWeight:600,color:'var(--mid)',textTransform:'uppercase',letterSpacing:'1.2px',marginBottom:20}}>
         Métricas globales de la plataforma
       </div>
 
@@ -45,33 +45,33 @@ export default function SuperAdminMetricsPage() {
         <StatCard label="Usuarios"          value={totals.users}           sub={`${totals.activeUsers} activos`}/>
         <StatCard label="Locaciones"        value={totals.locations}/>
         <StatCard label="Auditorías"        value={totals.audits}          sub={`${totals.auditsThisMonth} este mes`}/>
-        <StatCard label="Análisis IA"       value={totals.aiAnalyses}      sub={`${totals.aiSuccessRate}% tasa de éxito`} color={totals.aiSuccessRate>=80?'#4ade80':totals.aiSuccessRate>=60?'#facc15':'#f87171'}/>
+        <StatCard label="Análisis IA"       value={totals.aiAnalyses}      sub={`${totals.aiSuccessRate}% tasa de éxito`} color={totals.aiSuccessRate>=80?'var(--accent)':totals.aiSuccessRate>=60?'var(--warn)':'var(--err)'}/>
       </div>
 
       {/* Tabla de tenants */}
-      <div style={{fontSize:10,fontWeight:600,color:'#444',textTransform:'uppercase',letterSpacing:'1.2px',marginBottom:12}}>
+      <div style={{fontSize:10,fontWeight:600,color:'var(--mid)',textTransform:'uppercase',letterSpacing:'1.2px',marginBottom:12}}>
         Uso por tenant
       </div>
-      <div style={{background:'#111',border:'1px solid #1e1e1e',borderRadius:12,overflow:'hidden'}}>
-        <div style={{display:'grid',gridTemplateColumns:'2fr 80px 80px 80px 80px 80px',gap:0,padding:'10px 16px',borderBottom:'1px solid #1e1e1e',fontSize:10,fontWeight:600,color:'#444',textTransform:'uppercase',letterSpacing:'1px'}}>
+      <div style={{background:'var(--white)',border:'1px solid var(--border2)',borderRadius:12,overflow:'hidden'}}>
+        <div style={{display:'grid',gridTemplateColumns:'2fr 80px 80px 80px 80px 80px',gap:0,padding:'10px 16px',borderBottom:'1px solid var(--border2)',fontSize:10,fontWeight:600,color:'var(--mid)',textTransform:'uppercase',letterSpacing:'1px'}}>
           {['Tenant','Estado','Usuarios','Locaciones','Auditorías','IA'].map(h=><div key={h}>{h}</div>)}
         </div>
         {tenantBreakdown.map((t:any,i:number)=>(
-          <div key={t.id} style={{display:'grid',gridTemplateColumns:'2fr 80px 80px 80px 80px 80px',gap:0,padding:'12px 16px',borderBottom:i<tenantBreakdown.length-1?'1px solid #161616':'none',alignItems:'center'}}>
+          <div key={t.id} style={{display:'grid',gridTemplateColumns:'2fr 80px 80px 80px 80px 80px',gap:0,padding:'12px 16px',borderBottom:i<tenantBreakdown.length-1?'1px solid var(--border2)':'none',alignItems:'center'}}>
             <div>
               <div style={{fontSize:13,fontWeight:500,color:'white'}}>{t.name}</div>
-              <div style={{fontSize:10,color:'#444',fontFamily:'monospace',marginTop:2}}>{t.id}</div>
+              <div style={{fontSize:10,color:'var(--mid)',fontFamily:'monospace',marginTop:2}}>{t.id}</div>
             </div>
             <div>
               <span style={{fontSize:11,fontWeight:500,padding:'2px 8px',borderRadius:20,
                 background:t.status==='active'?'rgba(74,222,128,.1)':t.status==='trial'?'rgba(250,204,21,.1)':'rgba(255,255,255,.05)',
-                color:t.status==='active'?'#4ade80':t.status==='trial'?'#facc15':'#555',
+                color:t.status==='active'?'var(--accent)':t.status==='trial'?'var(--warn)':'var(--mid)',
               }}>{t.status}</span>
             </div>
-            <div style={{fontSize:13,color:'#888'}}>{t.users}</div>
-            <div style={{fontSize:13,color:'#888'}}>{t.locs}</div>
-            <div style={{fontSize:13,color:'#888'}}>{t.audits}</div>
-            <div style={{fontSize:13,color:'#888'}}>{t.aiLogs}</div>
+            <div style={{fontSize:13,color:'var(--subtle)'}}>{t.users}</div>
+            <div style={{fontSize:13,color:'var(--subtle)'}}>{t.locs}</div>
+            <div style={{fontSize:13,color:'var(--subtle)'}}>{t.audits}</div>
+            <div style={{fontSize:13,color:'var(--subtle)'}}>{t.aiLogs}</div>
           </div>
         ))}
       </div>

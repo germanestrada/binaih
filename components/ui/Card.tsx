@@ -9,7 +9,7 @@ export default function Card({ children, className='', style={}, onClick }: Card
   return (
     <div
       onClick={onClick}
-      style={{ background:'#fff',border:'1px solid var(--border)',borderRadius:16,overflow:'hidden',cursor:onClick?'pointer':'default',...style }}
+      style={{ background:'var(--white)',border:'1px solid var(--border)',borderRadius:16,overflow:'hidden',cursor:onClick?'pointer':'default',...style }}
       className={className}
     >
       {children}

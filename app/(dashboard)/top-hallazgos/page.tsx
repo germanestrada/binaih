@@ -93,7 +93,7 @@ export default function TopHallazgosPage() {
                   </div>
                   {/* Barra de frecuencia */}
                   <div style={{height:6,background:'var(--border2)',borderRadius:3,overflow:'hidden'}}>
-                    <div style={{height:'100%',width:`${pct}%`,background:'var(--ink)',borderRadius:3,transition:'width .5s ease'}}/>
+                    <div style={{height:'100%',width:`${pct}%`,background:'var(--accent)',borderRadius:3,transition:'width .5s ease'}}/>
                   </div>
                 </div>
               )

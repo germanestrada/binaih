@@ -50,7 +50,7 @@ export default function PlanPage() {
       <div style={{background:'var(--white)',border:'1px solid var(--border)',borderRadius:'var(--r-lg)',padding:24,marginBottom:24}}>
         <div style={{display:'flex',alignItems:'baseline',gap:12,marginBottom:16}}>
           <span style={{fontFamily:'var(--font-serif)',fontSize:28,color:'var(--ink)'}}>{plan.name}</span>
-          <span style={{fontSize:12,fontWeight:600,padding:'3px 12px',borderRadius:20,background:'var(--ink)',color:'white'}}>{plan.tier?.toUpperCase()}</span>
+          <span style={{fontSize:12,fontWeight:600,padding:'3px 12px',borderRadius:20,background:'var(--accent)',color:'var(--accent-ink)'}}>{plan.tier?.toUpperCase()}</span>
           <span style={{fontSize:12,fontWeight:600,padding:'3px 12px',borderRadius:20,background:plan.status==='active'?'var(--ok-bg)':'var(--warn-bg)',color:plan.status==='active'?'var(--ok)':'var(--warn)'}}>{plan.status}</span>
         </div>
         {plan.trialEndsAt&&(

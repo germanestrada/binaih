@@ -27,12 +27,12 @@ const ACTION_COLOR: Record<string,string> = {
   delete_audits:   'var(--err)',
   delete_location: 'var(--err)',
   export_data:     'var(--ok)',
-  bulk_import:     '#1558b0',
+  bulk_import:     'var(--accent)',
   update_config:   'var(--warn)',
 }
 const ROLE_BADGE: Record<string,{bg:string;color:string}> = {
-  admin:   {bg:'#111',     color:'white'},
-  auditor: {bg:'#1558b022',color:'#1558b0'},
+  admin:   {bg:'var(--accent)', color:'var(--accent-ink)'},
+  auditor: {bg:'var(--accent-bg)',color:'var(--accent)'},
   viewer:  {bg:'var(--surface)',color:'var(--mid)'},
 }
 const STATUS_BADGE: Record<string,{bg:string;color:string;label:string}> = {
@@ -97,9 +97,9 @@ export default function UserDetailPage() {
         <div style={{display:'flex',alignItems:'center',gap:20}}>
           {/* Avatar */}
           <div style={{
-            width:64,height:64,borderRadius:'50%',background:'var(--ink)',
+            width:64,height:64,borderRadius:'50%',background:'var(--accent)',
             display:'flex',alignItems:'center',justifyContent:'center',
-            fontSize:22,fontWeight:600,color:'white',flexShrink:0,
+            fontSize:22,fontWeight:600,color:'var(--accent-ink)',flexShrink:0,
           }}>
             {initials}
           </div>

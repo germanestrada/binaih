@@ -157,7 +157,7 @@ export default function IALogsPage() {
         <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,.8)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center'}} onClick={()=>setPreview(null)}>
           <div style={{position:'relative',maxWidth:'80vw',maxHeight:'80vh'}}>
             <img src={preview} alt="evidencia" style={{maxWidth:'100%',maxHeight:'80vh',borderRadius:'var(--r-lg)',objectFit:'contain'}}/>
-            <button onClick={()=>setPreview(null)} style={{position:'absolute',top:-12,right:-12,background:'var(--ink)',border:'none',color:'white',width:28,height:28,borderRadius:'50%',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>
+            <button onClick={()=>setPreview(null)} style={{position:'absolute',top:-12,right:-12,background:'var(--accent)',border:'none',color:'var(--accent-ink)',width:28,height:28,borderRadius:'50%',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>
               <Icon name="x" size={14} color="white"/>
             </button>
           </div>

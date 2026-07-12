@@ -41,7 +41,7 @@ export default function DemoPage() {
             <div style={{ color:'white', fontSize:18, marginBottom:8 }}>Preparando tu demo…</div>
             <div style={{ color:'#555', fontSize:13 }}>Cargando FashionCo · 15 tiendas · datos reales</div>
             <div style={{
-              width:40, height:4, background:'#1558b0', borderRadius:2,
+              width:40, height:4, background:'var(--accent)', borderRadius:2,
               margin:'24px auto 0', animation:'pulse 1.2s ease-in-out infinite',
             }}/>
             <style>{`@keyframes pulse{0%,100%{opacity:.3;width:40px}50%{opacity:1;width:120px}}`}</style>
@@ -49,7 +49,7 @@ export default function DemoPage() {
         ) : (
           <>
             <div style={{ color:'#f87171', fontSize:16, marginBottom:16 }}>{error}</div>
-            <a href="/" style={{ color:'#60a5fa', fontSize:13 }}>← Volver al inicio</a>
+            <a href="/" style={{ color:'var(--accent)', fontSize:13 }}>← Volver al inicio</a>
           </>
         )}
       </div>

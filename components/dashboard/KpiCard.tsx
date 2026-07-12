@@ -8,24 +8,24 @@ interface KpiCardProps { kpi: KpiCardType; onClick?: () => void }
 function getKpiColor(id: string, value: number): { text: string; bg: string; bar: number } {
   // Score promedio — escala degradada 0→100
   if (id === 'score') {
-    if (value >= 90) return { text: '#1a6b3a', bg: '#f0faf4', bar: value }
-    if (value >= 75) return { text: '#2d6a1f', bg: '#f5f9f0', bar: value }
-    if (value >= 61) return { text: '#7a5200', bg: '#fffbf0', bar: value }
-    return               { text: '#8b1a1a', bg: '#fff5f5', bar: value }
+    if (value >= 90) return { text: '#3ecf8e', bg: 'rgba(62,207,142,.1)', bar: value }
+    if (value >= 75) return { text: '#84cc16', bg: 'rgba(132,204,22,.1)', bar: value }
+    if (value >= 61) return { text: '#f0b429', bg: 'rgba(240,180,41,.1)', bar: value }
+    return               { text: '#f87171', bg: 'rgba(248,113,113,.1)', bar: value }
   }
   // Críticas y hallazgos — inverso: más es peor
   if (id === 'critical' || id === 'findings') {
-    if (value === 0)  return { text: '#1a6b3a', bg: '#f0faf4', bar: 0   }
-    if (value <= 3)   return { text: '#7a5200', bg: '#fffbf0', bar: 40  }
-    if (value <= 8)   return { text: '#a04000', bg: '#fff3ed', bar: 65  }
-    return               { text: '#8b1a1a', bg: '#fff5f5', bar: 90  }
+    if (value === 0)  return { text: '#3ecf8e', bg: 'rgba(62,207,142,.1)', bar: 0   }
+    if (value <= 3)   return { text: '#f0b429', bg: 'rgba(240,180,41,.1)', bar: 40  }
+    if (value <= 8)   return { text: '#fb923c', bg: 'rgba(251,146,60,.1)', bar: 65  }
+    return               { text: '#f87171', bg: 'rgba(248,113,113,.1)', bar: 90  }
   }
   // Auditadas / cobertura — más es mejor
   if (id === 'audited') {
-    if (value >= 90) return { text: '#1a6b3a', bg: '#f0faf4', bar: value }
-    if (value >= 70) return { text: '#2d6a1f', bg: '#f5f9f0', bar: value }
-    if (value >= 50) return { text: '#7a5200', bg: '#fffbf0', bar: value }
-    return               { text: '#8b1a1a', bg: '#fff5f5', bar: value }
+    if (value >= 90) return { text: '#3ecf8e', bg: 'rgba(62,207,142,.1)', bar: value }
+    if (value >= 70) return { text: '#84cc16', bg: 'rgba(132,204,22,.1)', bar: value }
+    if (value >= 50) return { text: '#f0b429', bg: 'rgba(240,180,41,.1)', bar: value }
+    return               { text: '#f87171', bg: 'rgba(248,113,113,.1)', bar: value }
   }
   return { text: 'var(--ink)', bg: 'var(--white)', bar: -1 }
 }

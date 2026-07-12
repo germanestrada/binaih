@@ -13,13 +13,13 @@ interface TenantDetail {
 interface Usage { users:number; locations:number; audits:number; aiLogs:number }
 
 const STATUS_OPTS = ['active','trial','suspended','cancelled']
-const INP: React.CSSProperties = {width:'100%',border:'1px solid #2a2a2a',borderRadius:8,padding:'8px 12px',fontSize:12,fontFamily:'inherit',color:'white',outline:'none',marginBottom:8,background:'rgba(255,255,255,.04)'}
-const BTN = (p=false): React.CSSProperties => ({background:p?'white':'rgba(255,255,255,.06)',color:p?'#0a0a0a':'#888',border:`1px solid ${p?'white':'#2a2a2a'}`,padding:'7px 16px',borderRadius:8,fontSize:12,fontWeight:500,cursor:'pointer',fontFamily:'inherit'})
+const INP: React.CSSProperties = {width:'100%',border:'1px solid var(--border)',borderRadius:8,padding:'8px 12px',fontSize:12,fontFamily:'inherit',color:'white',outline:'none',marginBottom:8,background:'rgba(255,255,255,.04)'}
+const BTN = (p=false): React.CSSProperties => ({background:p?'white':'rgba(255,255,255,.06)',color:p?'var(--surface)':'var(--subtle)',border:`1px solid ${p?'white':'var(--border)'}`,padding:'7px 16px',borderRadius:8,fontSize:12,fontWeight:500,cursor:'pointer',fontFamily:'inherit'})
 
 function Section({title,children}:{title:string;children:React.ReactNode}) {
   return (
-    <div style={{background:'#111',border:'1px solid #1e1e1e',borderRadius:12,padding:'20px',marginBottom:16}}>
-      <div style={{fontSize:11,fontWeight:600,color:'#444',textTransform:'uppercase',letterSpacing:'1.2px',marginBottom:16}}>{title}</div>
+    <div style={{background:'var(--white)',border:'1px solid var(--border2)',borderRadius:12,padding:'20px',marginBottom:16}}>
+      <div style={{fontSize:11,fontWeight:600,color:'var(--mid)',textTransform:'uppercase',letterSpacing:'1.2px',marginBottom:16}}>{title}</div>
       {children}
     </div>
   )
@@ -27,9 +27,9 @@ function Section({title,children}:{title:string;children:React.ReactNode}) {
 
 function Field({label,value,mono=false}:{label:string;value?:string|null;mono?:boolean}) {
   return (
-    <div style={{borderBottom:'1px solid #1a1a1a',padding:'8px 0'}}>
-      <div style={{fontSize:10,color:'#444',textTransform:'uppercase',letterSpacing:'1px',marginBottom:3,fontWeight:600}}>{label}</div>
-      <div style={{fontSize:12,color:value?'#ccc':'#333',fontFamily:mono?'monospace':'inherit'}}>{value||'—'}</div>
+    <div style={{borderBottom:'1px solid var(--border2)',padding:'8px 0'}}>
+      <div style={{fontSize:10,color:'var(--mid)',textTransform:'uppercase',letterSpacing:'1px',marginBottom:3,fontWeight:600}}>{label}</div>
+      <div style={{fontSize:12,color:value?'var(--ink2)':'var(--subtle)',fontFamily:mono?'monospace':'inherit'}}>{value||'—'}</div>
     </div>
   )
 }
@@ -68,18 +68,18 @@ export default function TenantDetailPage() {
 
   const f = (k:string) => (e:React.ChangeEvent<HTMLInputElement|HTMLSelectElement>) => setForm((p:any)=>({...p,[k]:e.target.value}))
 
-  if(loading) return <div style={{padding:32,color:'#444',fontSize:13}}>Cargando…</div>
-  if(!tenant) return <div style={{padding:32,color:'#444',fontSize:13}}>Tenant no encontrado.</div>
+  if(loading) return <div style={{padding:32,color:'var(--mid)',fontSize:13}}>Cargando…</div>
+  if(!tenant) return <div style={{padding:32,color:'var(--mid)',fontSize:13}}>Tenant no encontrado.</div>
 
-  const sc = tenant.status==='active'?{bg:'rgba(74,222,128,.1)',c:'#4ade80'}:tenant.status==='trial'?{bg:'rgba(250,204,21,.1)',c:'#facc15'}:{bg:'rgba(255,255,255,.05)',c:'#555'}
+  const sc = tenant.status==='active'?{bg:'rgba(74,222,128,.1)',c:'var(--accent)'}:tenant.status==='trial'?{bg:'rgba(250,204,21,.1)',c:'var(--warn)'}:{bg:'rgba(255,255,255,.05)',c:'var(--mid)'}
 
   return (
     <div style={{padding:'28px 32px'}}>
       <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:24}}>
-        <button onClick={()=>router.push('/superadmin/tenants')} style={{background:'none',border:'none',color:'#555',cursor:'pointer',fontSize:13,fontFamily:'inherit'}}>← Tenants</button>
+        <button onClick={()=>router.push('/superadmin/tenants')} style={{background:'none',border:'none',color:'var(--mid)',cursor:'pointer',fontSize:13,fontFamily:'inherit'}}>← Tenants</button>
         <div style={{flex:1}}>
           <div style={{fontSize:22,fontWeight:300,color:'white'}}>{tenant.name}</div>
-          <div style={{fontSize:11,color:'#444',fontFamily:'monospace',marginTop:2}}>{tenant.id}</div>
+          <div style={{fontSize:11,color:'var(--mid)',fontFamily:'monospace',marginTop:2}}>{tenant.id}</div>
         </div>
         <span style={{fontSize:12,fontWeight:500,padding:'4px 12px',borderRadius:20,background:sc.bg,color:sc.c}}>{tenant.status}</span>
         <button onClick={()=>editing?save():setEditing(true)} disabled={saving} style={BTN(editing)}>
@@ -97,8 +97,8 @@ export default function TenantDetailPage() {
             {label:'Auditorías',  value:usage.audits},
             {label:'Análisis IA', value:usage.aiLogs},
           ].map(s=>(
-            <div key={s.label} style={{background:'#111',border:'1px solid #1e1e1e',borderRadius:12,padding:'16px 18px'}}>
-              <div style={{fontSize:10,color:'#444',textTransform:'uppercase',letterSpacing:'1px',marginBottom:6,fontWeight:600}}>{s.label}</div>
+            <div key={s.label} style={{background:'var(--white)',border:'1px solid var(--border2)',borderRadius:12,padding:'16px 18px'}}>
+              <div style={{fontSize:10,color:'var(--mid)',textTransform:'uppercase',letterSpacing:'1px',marginBottom:6,fontWeight:600}}>{s.label}</div>
               <div style={{fontSize:28,fontWeight:300,color:'white',fontFamily:'Georgia,serif'}}>{s.value}</div>
             </div>
           ))}
@@ -110,14 +110,14 @@ export default function TenantDetailPage() {
           <Section title="Identificación">
             {editing?(
               <>
-                <div style={{fontSize:10,color:'#444',marginBottom:3}}>Nombre</div><input style={INP} value={form.name??''} onChange={f('name')}/>
-                <div style={{fontSize:10,color:'#444',marginBottom:3}}>NIT / Tax ID</div><input style={INP} value={form.nit??form.tax_id??''} onChange={f('nit')}/>
-                <div style={{fontSize:10,color:'#444',marginBottom:3}}>Sector</div><input style={INP} value={form.sector??''} onChange={f('sector')}/>
-                <div style={{fontSize:10,color:'#444',marginBottom:3}}>Estado</div>
+                <div style={{fontSize:10,color:'var(--mid)',marginBottom:3}}>Nombre</div><input style={INP} value={form.name??''} onChange={f('name')}/>
+                <div style={{fontSize:10,color:'var(--mid)',marginBottom:3}}>NIT / Tax ID</div><input style={INP} value={form.nit??form.tax_id??''} onChange={f('nit')}/>
+                <div style={{fontSize:10,color:'var(--mid)',marginBottom:3}}>Sector</div><input style={INP} value={form.sector??''} onChange={f('sector')}/>
+                <div style={{fontSize:10,color:'var(--mid)',marginBottom:3}}>Estado</div>
                 <select style={{...INP,cursor:'pointer'}} value={form.status??''} onChange={f('status')}>
                   {STATUS_OPTS.map(s=><option key={s} value={s}>{s}</option>)}
                 </select>
-                <div style={{fontSize:10,color:'#444',marginBottom:3}}>Fin del trial</div>
+                <div style={{fontSize:10,color:'var(--mid)',marginBottom:3}}>Fin del trial</div>
                 <input style={INP} type="date" value={form.trial_ends_at?.slice(0,10)??''} onChange={f('trial_ends_at')}/>
               </>
             ):(
@@ -135,9 +135,9 @@ export default function TenantDetailPage() {
           <Section title="Contacto">
             {editing?(
               <>
-                <div style={{fontSize:10,color:'#444',marginBottom:3}}>Nombre contacto</div><input style={INP} value={form.contact_name??''} onChange={f('contact_name')}/>
-                <div style={{fontSize:10,color:'#444',marginBottom:3}}>Email</div><input style={INP} value={form.contact_email??''} onChange={f('contact_email')}/>
-                <div style={{fontSize:10,color:'#444',marginBottom:3}}>Teléfono</div><input style={INP} value={form.contact_phone??''} onChange={f('contact_phone')}/>
+                <div style={{fontSize:10,color:'var(--mid)',marginBottom:3}}>Nombre contacto</div><input style={INP} value={form.contact_name??''} onChange={f('contact_name')}/>
+                <div style={{fontSize:10,color:'var(--mid)',marginBottom:3}}>Email</div><input style={INP} value={form.contact_email??''} onChange={f('contact_email')}/>
+                <div style={{fontSize:10,color:'var(--mid)',marginBottom:3}}>Teléfono</div><input style={INP} value={form.contact_phone??''} onChange={f('contact_phone')}/>
               </>
             ):(
               <>
@@ -155,7 +155,7 @@ export default function TenantDetailPage() {
               <>
                 {[['billing_address','Dirección'],['billing_city','Ciudad'],['billing_state','Dpto/Estado'],['billing_country','País'],['billing_zip','Código postal']].map(([k,l])=>(
                   <div key={k}>
-                    <div style={{fontSize:10,color:'#444',marginBottom:3}}>{l}</div>
+                    <div style={{fontSize:10,color:'var(--mid)',marginBottom:3}}>{l}</div>
                     <input style={INP} value={(form as any)[k]??''} onChange={f(k)}/>
                   </div>
                 ))}

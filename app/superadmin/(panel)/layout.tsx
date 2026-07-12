@@ -34,17 +34,17 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
   const [dismissed2FA, setDismissed2FA] = useState(false)
 
   if (loading) return (
-    <div style={{ minHeight: '100vh', background: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#555', fontSize: 13 }}>
+    <div style={{ minHeight: '100vh', background: 'var(--surface)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--mid)', fontSize: 13 }}>
       Verificando acceso…
     </div>
   )
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#0a0a0a', fontFamily: 'system-ui,sans-serif' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--surface)', fontFamily: 'system-ui,sans-serif' }}>
       {/* Sidebar */}
-      <aside style={{ width: 220, borderRight: '1px solid #1a1a1a', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
+      <aside style={{ width: 220, borderRight: '1px solid var(--border2)', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
         {/* Header */}
-        <div style={{ padding: '20px 16px', borderBottom: '1px solid #1a1a1a' }}>
+        <div style={{ padding: '20px 16px', borderBottom: '1px solid var(--border2)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
             <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
               <rect x="1" y="1" width="18" height="18" rx="4" stroke="white" strokeWidth="1.5"/>
@@ -52,14 +52,14 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
               <path d="M5 14 L10 9 L15 14" stroke="rgba(255,255,255,.3)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
             <span style={{ fontSize: 15, color: 'white' }}>TVEO</span>
-            <span style={{ fontSize: 9, color: '#444', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '2px' }}>ADMIN</span>
+            <span style={{ fontSize: 9, color: 'var(--mid)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '2px' }}>ADMIN</span>
           </div>
           {admin && (
             <div>
               <div style={{ fontSize: 12, color: 'white', fontWeight: 500 }}>{admin.name}</div>
-              <div style={{ fontSize: 10, color: '#555', marginTop: 2 }}>{admin.email}</div>
+              <div style={{ fontSize: 10, color: 'var(--mid)', marginTop: 2 }}>{admin.email}</div>
               {!admin.totpEnabled && (
-                <div style={{ fontSize: 10, color: '#f59e0b', marginTop: 4, padding: '3px 8px', background: 'rgba(245,158,11,.1)', borderRadius: 4 }}>
+                <div style={{ fontSize: 10, color: 'var(--warn)', marginTop: 4, padding: '3px 8px', background: 'rgba(245,158,11,.1)', borderRadius: 4 }}>
                   ⚠️ 2FA no activado
                 </div>
               )}
@@ -76,7 +76,7 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
                 width: '100%', display: 'flex', alignItems: 'center', gap: 10,
                 padding: '8px 10px', borderRadius: 8, marginBottom: 2,
                 background: active ? 'rgba(255,255,255,.08)' : 'none',
-                color: active ? 'white' : '#555',
+                color: active ? 'white' : 'var(--mid)',
                 border: 'none', cursor: 'pointer', fontFamily: 'inherit',
                 fontSize: 13, fontWeight: active ? 500 : 400, textAlign: 'left',
                 transition: 'all .15s',
@@ -92,15 +92,15 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
         </nav>
 
         {/* Footer */}
-        <div style={{ padding: '12px', borderTop: '1px solid #1a1a1a' }}>
+        <div style={{ padding: '12px', borderTop: '1px solid var(--border2)' }}>
           <button onClick={logout} style={{
-            width: '100%', background: 'none', border: '1px solid #222',
-            color: '#555', padding: '8px', borderRadius: 8,
+            width: '100%', background: 'none', border: '1px solid var(--border)',
+            color: 'var(--mid)', padding: '8px', borderRadius: 8,
             fontSize: 12, cursor: 'pointer', fontFamily: 'inherit',
             transition: 'all .15s',
           }}
             onMouseEnter={e => (e.currentTarget as HTMLButtonElement).style.color = 'white'}
-            onMouseLeave={e => (e.currentTarget as HTMLButtonElement).style.color = '#555'}
+            onMouseLeave={e => (e.currentTarget as HTMLButtonElement).style.color = 'var(--mid)'}
           >
             Cerrar sesión
           </button>
@@ -111,7 +111,7 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
       {admin&&!admin.totpEnabled&&!dismissed2FA&&(
         <div style={{position:'fixed',top:0,left:0,right:0,zIndex:200,background:'#92400e',color:'white',padding:'12px 24px',display:'flex',alignItems:'center',gap:12,fontSize:13}}>
           <span style={{fontSize:16}}>⚠️</span>
-          <span style={{flex:1,fontWeight:500}}>Tu cuenta no tiene 2FA activado. El acceso super-admin sin 2FA es un riesgo de seguridad crítico. <a href="/superadmin/admins" style={{color:'#fcd34d',textDecoration:'underline'}}>Activar ahora →</a></span>
+          <span style={{flex:1,fontWeight:500}}>Tu cuenta no tiene 2FA activado. El acceso super-admin sin 2FA es un riesgo de seguridad crítico. <a href="/superadmin/admins" style={{color:'var(--warn)',textDecoration:'underline'}}>Activar ahora →</a></span>
           <button onClick={()=>setDismissed2FA(true)} style={{background:'none',border:'none',color:'rgba(255,255,255,.6)',cursor:'pointer',fontSize:18,padding:0}}>✕</button>
         </div>
       )}

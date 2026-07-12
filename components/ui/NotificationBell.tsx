@@ -95,16 +95,16 @@ export default function NotificationBell() {
           position:'absolute', top:'calc(100% + 8px)', right:0,
           width:360, background:'white', borderRadius:12,
           boxShadow:'0 8px 32px rgba(0,0,0,.15)',
-          border:'1px solid #e5e7eb', zIndex:500,
+          border:'1px solid var(--border)', zIndex:500,
           overflow:'hidden',
         }}>
           {/* Header */}
-          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 16px',borderBottom:'1px solid #f0f0f0'}}>
-            <div style={{fontSize:13,fontWeight:600,color:'#111'}}>
-              Notificaciones {unread > 0 && <span style={{fontSize:11,color:'#6b7280',fontWeight:400}}>({unread} sin leer)</span>}
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 16px',borderBottom:'1px solid var(--border2)'}}>
+            <div style={{fontSize:13,fontWeight:600,color:'var(--ink)'}}>
+              Notificaciones {unread > 0 && <span style={{fontSize:11,color:'var(--mid)',fontWeight:400}}>({unread} sin leer)</span>}
             </div>
             {unread > 0 && (
-              <button onClick={markAllRead} style={{fontSize:11,color:'#1558b0',background:'none',border:'none',cursor:'pointer',fontFamily:'inherit'}}>
+              <button onClick={markAllRead} style={{fontSize:11,color:'var(--accent)',background:'none',border:'none',cursor:'pointer',fontFamily:'inherit'}}>
                 Marcar todas como leídas
               </button>
             )}
@@ -113,9 +113,9 @@ export default function NotificationBell() {
           {/* Lista */}
           <div style={{maxHeight:400,overflowY:'auto'}}>
             {loading ? (
-              <div style={{padding:'24px',textAlign:'center',color:'#9ca3af',fontSize:13}}>Cargando…</div>
+              <div style={{padding:'24px',textAlign:'center',color:'var(--subtle)',fontSize:13}}>Cargando…</div>
             ) : notifs.length === 0 ? (
-              <div style={{padding:'32px',textAlign:'center',color:'#9ca3af',fontSize:13}}>
+              <div style={{padding:'32px',textAlign:'center',color:'var(--subtle)',fontSize:13}}>
                 Sin notificaciones
               </div>
             ) : notifs.map((n, i) => (
@@ -124,24 +124,24 @@ export default function NotificationBell() {
                 onClick={() => markRead(n.id, n.link)}
                 style={{
                   display:'flex', gap:12, padding:'12px 16px',
-                  borderBottom: i < notifs.length-1 ? '1px solid #f9f9f9' : 'none',
+                  borderBottom: i < notifs.length-1 ? '1px solid var(--border2)' : 'none',
                   cursor: n.link ? 'pointer' : 'default',
-                  background: n.read ? 'white' : '#f0f7ff',
+                  background: n.read ? 'var(--white)' : 'var(--accent-bg)',
                   transition:'background .1s',
                 }}
-                onMouseEnter={e => { if (n.link) (e.currentTarget as HTMLDivElement).style.background = '#f5f5f5' }}
-                onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.background = n.read ? 'white' : '#f0f7ff'}
+                onMouseEnter={e => { if (n.link) (e.currentTarget as HTMLDivElement).style.background = 'var(--border2)' }}
+                onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.background = n.read ? 'var(--white)' : 'var(--accent-bg)'}
               >
                 <div style={{fontSize:20,flexShrink:0,lineHeight:1.4}}>{TYPE_ICON[n.type] ?? '🔔'}</div>
                 <div style={{flex:1,minWidth:0}}>
-                  <div style={{fontSize:12,fontWeight:n.read?400:600,color:'#111',marginBottom:2}}>{n.title}</div>
-                  <div style={{fontSize:11,color:'#6b7280',lineHeight:1.5}}>{n.body}</div>
-                  <div style={{fontSize:10,color:'#d1d5db',marginTop:4}}>
+                  <div style={{fontSize:12,fontWeight:n.read?400:600,color:'var(--ink)',marginBottom:2}}>{n.title}</div>
+                  <div style={{fontSize:11,color:'var(--mid)',lineHeight:1.5}}>{n.body}</div>
+                  <div style={{fontSize:10,color:'var(--subtle)',marginTop:4}}>
                     {new Date(n.created_at).toLocaleDateString('es-CO',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}
                   </div>
                 </div>
                 {!n.read && (
-                  <div style={{width:8,height:8,borderRadius:'50%',background:'#1558b0',flexShrink:0,marginTop:4}}/>
+                  <div style={{width:8,height:8,borderRadius:'50%',background:'var(--accent)',flexShrink:0,marginTop:4}}/>
                 )}
               </div>
             ))}

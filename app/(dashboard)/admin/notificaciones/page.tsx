@@ -56,7 +56,7 @@ export default function NotificacionesPage() {
         <div style={{display:'flex',gap:10,alignItems:'center'}}>
           <button onClick={testEmail} disabled={testing} style={{
             display:'flex',alignItems:'center',gap:7,
-            background:'var(--ink)',color:'white',border:'none',
+            background:'var(--accent)',color:'var(--accent-ink)',border:'none',
             padding:'9px 18px',borderRadius:'var(--r-sm)',fontSize:13,
             fontWeight:500,cursor:testing?'default':'pointer',fontFamily:'inherit',
           }}>
