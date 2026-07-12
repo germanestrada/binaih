@@ -76,12 +76,12 @@ export default function LogsAccionesPage() {
       {/* Filtros */}
       <div style={{display:'flex',gap:10,marginBottom:16,alignItems:'center'}}>
         <select value={filterUser} onChange={e=>setFilterUser(e.target.value)}
-          style={{border:'1px solid var(--border)',borderRadius:'var(--r-sm)',padding:'7px 10px',fontSize:12,fontFamily:'inherit',outline:'none',background:'white',cursor:'pointer'}}>
+          style={{border:'1px solid var(--border)',borderRadius:'var(--r-sm)',padding:'7px 10px',fontSize:12,fontFamily:'inherit',outline:'none',background:'var(--white)',cursor:'pointer'}}>
           <option value="">Todos los usuarios</option>
           {users.map(u=><option key={u.id} value={u.id}>{u.name}</option>)}
         </select>
         <select value={filterType} onChange={e=>setFilterType(e.target.value)}
-          style={{border:'1px solid var(--border)',borderRadius:'var(--r-sm)',padding:'7px 10px',fontSize:12,fontFamily:'inherit',outline:'none',background:'white',cursor:'pointer'}}>
+          style={{border:'1px solid var(--border)',borderRadius:'var(--r-sm)',padding:'7px 10px',fontSize:12,fontFamily:'inherit',outline:'none',background:'var(--white)',cursor:'pointer'}}>
           <option value="">Todos los tipos</option>
           {entityTypes.map(t=><option key={t} value={t}>{t}</option>)}
         </select>

@@ -4,7 +4,7 @@ import Icon from '@/components/ui/Icon'
 
 interface Stats { plan:any; usage:any; tenant:any }
 
-const INP: React.CSSProperties = {width:'100%',border:'1px solid var(--border)',borderRadius:'var(--r-md)',padding:'8px 12px',fontSize:13,fontFamily:'inherit',color:'var(--ink)',outline:'none',marginBottom:0,background:'white'}
+const INP: React.CSSProperties = {width:'100%',border:'1px solid var(--border)',borderRadius:'var(--r-md)',padding:'8px 12px',fontSize:13,fontFamily:'inherit',color:'var(--ink)',outline:'none',marginBottom:0,background:'var(--white)'}
 
 function Field({label,value,mono=false}:{label:string;value?:string|null;mono?:boolean}) {
   return (

@@ -104,7 +104,7 @@ export default function FilterBar({ fields, values, onChange, onClear, count, la
                     border: '1px solid var(--border)', borderRadius: 'var(--r-sm)',
                     padding: '7px 10px', fontSize: 12, fontFamily: 'inherit',
                     color: 'var(--ink)', outline: 'none', cursor: 'pointer',
-                    minWidth: 160, background: 'white',
+                    minWidth: 160, background: 'var(--white)',
                   }}
                 >
                   <option value="">{field.placeholder ?? 'Todos'}</option>

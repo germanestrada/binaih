@@ -40,9 +40,9 @@ const SUBSECTOR_LABELS: Record<string,string> = {
   comun:'Común (todos)', general:'General',
 }
 
-const INP: React.CSSProperties = {width:'100%',border:'1px solid var(--border)',borderRadius:'var(--r-md)',padding:'8px 12px',fontSize:13,fontFamily:'inherit',color:'var(--ink)',outline:'none',marginBottom:10,background:'white'}
+const INP: React.CSSProperties = {width:'100%',border:'1px solid var(--border)',borderRadius:'var(--r-md)',padding:'8px 12px',fontSize:13,fontFamily:'inherit',color:'var(--ink)',outline:'none',marginBottom:10,background:'var(--white)'}
 const BTN = (p=false): React.CSSProperties => ({background:p?'var(--ink)':'var(--surface)',color:p?'white':'var(--mid)',border:`1px solid ${p?'var(--ink)':'var(--border)'}`,padding:'7px 16px',borderRadius:'var(--r-sm)',fontSize:12,fontWeight:500,cursor:'pointer',fontFamily:'inherit'})
-const SEL: React.CSSProperties = {border:'1px solid var(--border)',borderRadius:'var(--r-sm)',padding:'7px 10px',fontSize:12,fontFamily:'inherit',color:'var(--ink)',outline:'none',background:'white',cursor:'pointer'}
+const SEL: React.CSSProperties = {border:'1px solid var(--border)',borderRadius:'var(--r-sm)',padding:'7px 10px',fontSize:12,fontFamily:'inherit',color:'var(--ink)',outline:'none',background:'var(--white)',cursor:'pointer'}
 
 function Modal({title,onClose,children,wide}:{title:string;onClose:()=>void;children:React.ReactNode;wide?:boolean}) {
   return (
@@ -328,7 +328,7 @@ export default function TipoAuditoriaDetailPage() {
                   {alreadyAdded?(
                     <span style={{fontSize:11,color:'var(--ok)',fontWeight:600,flexShrink:0}}>✓ Agregado</span>
                   ):(
-                    <button onClick={()=>addFromMaster(m)} style={{background:'var(--ink)',color:'white',border:'none',padding:'5px 12px',borderRadius:'var(--r-sm)',fontSize:11,cursor:'pointer',fontFamily:'inherit',flexShrink:0}}>
+                    <button onClick={()=>addFromMaster(m)} style={{background:'var(--accent)',color:'var(--accent-ink)',border:'none',padding:'5px 12px',borderRadius:'var(--r-sm)',fontSize:11,cursor:'pointer',fontFamily:'inherit',flexShrink:0}}>
                       + Agregar
                     </button>
                   )}

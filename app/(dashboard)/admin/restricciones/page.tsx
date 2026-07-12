@@ -13,7 +13,7 @@ interface User { id:string; name:string; email:string; role_name:string }
 const DAYS = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb']
 const ROLES = ['admin','auditor','viewer']
 const DEFAULT_SCHEDULE = DAYS.map((_,i)=>({enabled:i>=1&&i<=5,start:'07:00',end:'19:00'}))
-const INP: React.CSSProperties = {border:'1px solid var(--border)',borderRadius:'var(--r-sm)',padding:'7px 10px',fontSize:12,fontFamily:'inherit',color:'var(--ink)',outline:'none',background:'white'}
+const INP: React.CSSProperties = {border:'1px solid var(--border)',borderRadius:'var(--r-sm)',padding:'7px 10px',fontSize:12,fontFamily:'inherit',color:'var(--ink)',outline:'none',background:'var(--white)'}
 const BTN = (p=false): React.CSSProperties => ({background:p?'var(--ink)':'var(--surface)',color:p?'white':'var(--mid)',border:`1px solid ${p?'var(--ink)':'var(--border)'}`,padding:'7px 16px',borderRadius:'var(--r-sm)',fontSize:12,fontWeight:500,cursor:'pointer',fontFamily:'inherit'})
 
 function Modal({title,onClose,children}:{title:string;onClose:()=>void;children:React.ReactNode}) {
