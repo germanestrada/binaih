@@ -114,8 +114,8 @@ export default function ItemsTenantPage() {
             <button key={v} onClick={()=>setShowOnly(v)} style={{
               padding:'7px 12px',fontSize:12,border:'none',cursor:'pointer',
               fontFamily:'inherit',
-              background:showOnly===v?'var(--ink)':'var(--white)',
-              color:showOnly===v?'white':'var(--subtle)',
+              background:showOnly===v?'var(--accent)':'var(--white)',
+              color:showOnly===v?'var(--accent-ink)':'var(--subtle)',
             }}>{v==='all'?'Todos':v==='active'?'Activos':'Inactivos'}</button>
           ))}
         </div>
@@ -153,7 +153,7 @@ export default function ItemsTenantPage() {
                       disabled={isSaving}
                       style={{
                         width:40,height:22,borderRadius:11,border:'none',cursor:'pointer',
-                        background:item.active?'var(--ink)':'var(--border)',
+                        background:item.active?'var(--accent)':'var(--border)',
                         position:'relative',transition:'background .2s',flexShrink:0,
                       }}
                     >

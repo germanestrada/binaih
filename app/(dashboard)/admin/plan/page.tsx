@@ -90,7 +90,7 @@ export default function PlanPage() {
           Empresa contratante
         </div>
         <button onClick={()=>editing?save():setEditing(true)} disabled={saving} style={{
-          background:editing?'var(--ink)':'none',color:editing?'white':'var(--mid)',
+          background:editing?'var(--accent)':'none',color:editing?'var(--accent-ink)':'var(--mid)',
           border:'1px solid var(--border)',padding:'6px 16px',borderRadius:'var(--r-sm)',
           fontSize:12,cursor:'pointer',fontFamily:'inherit',fontWeight:500,
         }}>

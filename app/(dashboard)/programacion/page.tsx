@@ -74,7 +74,7 @@ export default function ProgramacionPage() {
   useEffect(()=>{load()},[load])
 
   const INP: React.CSSProperties = {width:'100%',border:'1px solid var(--border)',borderRadius:'var(--r-sm)',padding:'8px 10px',fontSize:13,fontFamily:'inherit',color:'var(--ink)',outline:'none',marginBottom:10}
-  const BTN = (p=false): React.CSSProperties => ({background:p?'var(--ink)':'var(--surface)',color:p?'white':'var(--mid)',border:`1px solid ${p?'var(--ink)':'var(--border)'}`,padding:'8px 18px',borderRadius:'var(--r-sm)',fontSize:13,fontWeight:500,cursor:'pointer',fontFamily:'inherit'})
+  const BTN = (p=false): React.CSSProperties => ({background:p?'var(--accent)':'var(--surface)',color:p?'var(--accent-ink)':'var(--mid)',border:`1px solid ${p?'var(--accent)':'var(--border)'}`,padding:'8px 18px',borderRadius:'var(--r-sm)',fontSize:13,fontWeight:500,cursor:'pointer',fontFamily:'inherit'})
 
   const f = (k:string) => (e:React.ChangeEvent<HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement>) =>
     setForm((p:any)=>({...p,[k]:e.target.value}))
@@ -142,7 +142,7 @@ export default function ProgramacionPage() {
       <div style={{display:'flex',alignItems:'center',gap:12,padding:'12px 24px',borderBottom:'1px solid var(--border)',background:'var(--white)',flexShrink:0}}>
         <div style={{display:'flex',border:'1px solid var(--border)',borderRadius:'var(--r-sm)',overflow:'hidden'}}>
           {(['calendar','list'] as const).map(v=>(
-            <button key={v} onClick={()=>setView(v)} style={{padding:'7px 14px',fontSize:12,border:'none',cursor:'pointer',fontFamily:'inherit',background:view===v?'var(--ink)':'var(--white)',color:view===v?'white':'var(--subtle)'}}>
+            <button key={v} onClick={()=>setView(v)} style={{padding:'7px 14px',fontSize:12,border:'none',cursor:'pointer',fontFamily:'inherit',background:view===v?'var(--accent)':'var(--white)',color:view===v?'var(--accent-ink)':'var(--subtle)'}}>
               {v==='calendar'?'📅 Calendario':'📋 Lista'}
             </button>
           ))}
@@ -269,7 +269,7 @@ export default function ProgramacionPage() {
               <div style={{display:'flex',gap:6,flexWrap:'wrap'}}>
                 {DAYS.map((d,i)=>{
                   const sel = (form.week_days??[]).includes(i)
-                  return <button key={i} type="button" onClick={()=>setForm((p:any)=>({...p,week_days:sel?p.week_days.filter((x:number)=>x!==i):[...(p.week_days??[]),i].sort()}))} style={{padding:'5px 10px',borderRadius:'var(--r-sm)',border:'1px solid var(--border)',cursor:'pointer',fontSize:12,fontFamily:'inherit',background:sel?'var(--ink)':'var(--surface)',color:sel?'white':'var(--mid)',transition:'all .15s'}}>{d}</button>
+                  return <button key={i} type="button" onClick={()=>setForm((p:any)=>({...p,week_days:sel?p.week_days.filter((x:number)=>x!==i):[...(p.week_days??[]),i].sort()}))} style={{padding:'5px 10px',borderRadius:'var(--r-sm)',border:'1px solid var(--border)',cursor:'pointer',fontSize:12,fontFamily:'inherit',background:sel?'var(--accent)':'var(--surface)',color:sel?'var(--accent-ink)':'var(--mid)',transition:'all .15s'}}>{d}</button>
                 })}
               </div>
             </div>

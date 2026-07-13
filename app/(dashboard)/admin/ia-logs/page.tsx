@@ -83,8 +83,8 @@ export default function IALogsPage() {
           {(['all','success','failed'] as const).map(v=>(
             <button key={v} onClick={()=>setFilter(v)} style={{
               padding:'6px 14px',fontSize:12,border:'none',cursor:'pointer',fontFamily:'inherit',
-              background:filter===v?'var(--ink)':'var(--white)',
-              color:filter===v?'white':'var(--subtle)',
+              background:filter===v?'var(--accent)':'var(--white)',
+              color:filter===v?'var(--accent-ink)':'var(--subtle)',
             }}>{v==='all'?'Todos':v==='success'?'Exitosos':'Fallidos'}</button>
           ))}
         </div>

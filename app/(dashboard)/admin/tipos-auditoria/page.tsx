@@ -27,7 +27,7 @@ const SUBSECTOR_LABELS: Record<string,string> = {
 }
 
 const INP: React.CSSProperties = {width:'100%',border:'1px solid var(--border)',borderRadius:'var(--r-md)',padding:'9px 12px',fontSize:13,fontFamily:'inherit',color:'var(--ink)',outline:'none',marginBottom:12,background:'var(--white)'}
-const BTN = (p=false): React.CSSProperties => ({background:p?'var(--ink)':'var(--surface)',color:p?'white':'var(--mid)',border:`1px solid ${p?'var(--ink)':'var(--border)'}`,padding:'8px 18px',borderRadius:'var(--r-sm)',fontSize:13,fontWeight:500,cursor:'pointer',fontFamily:'inherit'})
+const BTN = (p=false): React.CSSProperties => ({background:p?'var(--accent)':'var(--surface)',color:p?'var(--accent-ink)':'var(--mid)',border:`1px solid ${p?'var(--accent)':'var(--border)'}`,padding:'8px 18px',borderRadius:'var(--r-sm)',fontSize:13,fontWeight:500,cursor:'pointer',fontFamily:'inherit'})
 const SEL: React.CSSProperties = {border:'1px solid var(--border)',borderRadius:'var(--r-sm)',padding:'7px 10px',fontSize:12,fontFamily:'inherit',color:'var(--ink)',outline:'none',background:'var(--white)',cursor:'pointer'}
 
 function Modal({title,onClose,children}:{title:string;onClose:()=>void;children:React.ReactNode}) {
@@ -172,12 +172,12 @@ export default function TiposAuditoriaPage() {
               {/* Grid de plantillas filtradas */}
               <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginBottom:8,maxHeight:260,overflowY:'auto'}}>
                 <button onClick={()=>setForm(f=>({...f,template_id:''}))}
-                  style={{padding:'8px 12px',border:`2px solid ${!form.template_id?'var(--ink)':'var(--border)'}`,borderRadius:'var(--r-md)',background:!form.template_id?'var(--surface)':'white',cursor:'pointer',fontSize:12,color:'var(--mid)',fontFamily:'inherit'}}>
+                  style={{padding:'8px 12px',border:`2px solid ${!form.template_id?'var(--ink)':'var(--border)'}`,borderRadius:'var(--r-md)',background:!form.template_id?'var(--surface)':'var(--white)',cursor:'pointer',fontSize:12,color:'var(--mid)',fontFamily:'inherit'}}>
                   Sin plantilla (personalizado)
                 </button>
                 {filteredTemplates.map(t=>(
                   <button key={t.id} onClick={()=>setForm(f=>({...f,template_id:t.id,name:f.name||t.name,icon:t.icon,color:t.color}))}
-                    style={{display:'flex',alignItems:'center',gap:8,padding:'8px 12px',border:`2px solid ${form.template_id===t.id?'var(--ink)':'var(--border)'}`,borderRadius:'var(--r-md)',background:form.template_id===t.id?'var(--surface)':'white',cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>
+                    style={{display:'flex',alignItems:'center',gap:8,padding:'8px 12px',border:`2px solid ${form.template_id===t.id?'var(--ink)':'var(--border)'}`,borderRadius:'var(--r-md)',background:form.template_id===t.id?'var(--surface)':'var(--white)',cursor:'pointer',textAlign:'left',fontFamily:'inherit'}}>
                     <span style={{fontSize:16,flexShrink:0}}>{t.icon}</span>
                     <div style={{minWidth:0}}>
                       <div style={{fontSize:12,color:'var(--ink)',fontWeight:form.template_id===t.id?600:400}}>{t.name}</div>

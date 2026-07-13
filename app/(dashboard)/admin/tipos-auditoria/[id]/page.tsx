@@ -41,7 +41,7 @@ const SUBSECTOR_LABELS: Record<string,string> = {
 }
 
 const INP: React.CSSProperties = {width:'100%',border:'1px solid var(--border)',borderRadius:'var(--r-md)',padding:'8px 12px',fontSize:13,fontFamily:'inherit',color:'var(--ink)',outline:'none',marginBottom:10,background:'var(--white)'}
-const BTN = (p=false): React.CSSProperties => ({background:p?'var(--ink)':'var(--surface)',color:p?'white':'var(--mid)',border:`1px solid ${p?'var(--ink)':'var(--border)'}`,padding:'7px 16px',borderRadius:'var(--r-sm)',fontSize:12,fontWeight:500,cursor:'pointer',fontFamily:'inherit'})
+const BTN = (p=false): React.CSSProperties => ({background:p?'var(--accent)':'var(--surface)',color:p?'var(--accent-ink)':'var(--mid)',border:`1px solid ${p?'var(--accent)':'var(--border)'}`,padding:'7px 16px',borderRadius:'var(--r-sm)',fontSize:12,fontWeight:500,cursor:'pointer',fontFamily:'inherit'})
 const SEL: React.CSSProperties = {border:'1px solid var(--border)',borderRadius:'var(--r-sm)',padding:'7px 10px',fontSize:12,fontFamily:'inherit',color:'var(--ink)',outline:'none',background:'var(--white)',cursor:'pointer'}
 
 function Modal({title,onClose,children,wide}:{title:string;onClose:()=>void;children:React.ReactNode;wide?:boolean}) {

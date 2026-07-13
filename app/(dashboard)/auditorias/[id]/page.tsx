@@ -159,9 +159,9 @@ function ItemRow({result, auditId, onUpdate}:{result:ItemResult;auditId:string;o
               <div style={{display:'flex',gap:6}}>
                 {Array.from({length:item.response_type==='scale_5'?5:10},(_,i)=>i+1).map(n=>(
                   <button key={n} onClick={()=>setVal(p=>({...p,scale_value:String(n),status:'compliant'}))} style={{
-                    flex:1,padding:'8px 0',borderRadius:'var(--r-sm)',border:`2px solid ${val.scale_value===String(n)?'var(--ink)':'var(--border)'}`,
-                    background:val.scale_value===String(n)?'var(--ink)':'white',
-                    color:val.scale_value===String(n)?'white':'var(--mid)',
+                    flex:1,padding:'8px 0',borderRadius:'var(--r-sm)',border:`2px solid ${val.scale_value===String(n)?'var(--accent)':'var(--border)'}`,
+                    background:val.scale_value===String(n)?'var(--accent)':'var(--white)',
+                    color:val.scale_value===String(n)?'var(--accent-ink)':'var(--mid)',
                     fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:'inherit',
                   }}>{n}</button>
                 ))}

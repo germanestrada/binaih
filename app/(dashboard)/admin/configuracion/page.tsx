@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 
 interface Config { id:string; key:string; value:string; type:string; group_name:string; label:string; description?:string; is_secret:boolean; active:boolean }
-const BTN = (p=false): React.CSSProperties => ({background:p?'var(--ink)':'var(--surface)',color:p?'white':'var(--mid)',border:`1px solid ${p?'var(--ink)':'var(--border)'}`,padding:'7px 16px',borderRadius:'var(--r-sm)',fontSize:12,fontWeight:500,cursor:'pointer',fontFamily:'inherit'})
+const BTN = (p=false): React.CSSProperties => ({background:p?'var(--accent)':'var(--surface)',color:p?'var(--accent-ink)':'var(--mid)',border:`1px solid ${p?'var(--accent)':'var(--border)'}`,padding:'7px 16px',borderRadius:'var(--r-sm)',fontSize:12,fontWeight:500,cursor:'pointer',fontFamily:'inherit'})
 
 export default function ConfigPage() {
   const [configs,setConfigs] = useState<Config[]>([])
