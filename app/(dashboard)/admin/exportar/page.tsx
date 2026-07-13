@@ -43,7 +43,7 @@ export default function ExportarPage() {
             <button
               onClick={()=>download(e.type)}
               disabled={loading===e.type}
-              style={{display:'flex',alignItems:'center',gap:6,background:loading===e.type?'var(--surface)':'var(--ink)',color:loading===e.type?'var(--subtle)':'white',border:'none',padding:'9px 16px',borderRadius:'var(--r-sm)',fontSize:12,fontWeight:500,cursor:loading===e.type?'default':'pointer',fontFamily:'inherit'}}
+              style={{display:'flex',alignItems:'center',gap:6,background:loading===e.type?'var(--surface)':'var(--accent)',color:loading===e.type?'var(--subtle)':'var(--accent-ink)',border:'none',padding:'9px 16px',borderRadius:'var(--r-sm)',fontSize:12,fontWeight:500,cursor:loading===e.type?'default':'pointer',fontFamily:'inherit'}}
             >
               <Icon name="export" size={13} color="currentColor"/>
               {loading===e.type?'Generando…':'Descargar CSV'}

@@ -55,8 +55,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <button key={item.href} onClick={() => router.push(item.href)} style={{
                 width: '100%', display: 'flex', alignItems: 'center', gap: 10,
                 padding: '8px 10px', borderRadius: 'var(--r-sm)', marginBottom: 2,
-                background: active ? 'var(--ink)' : 'none',
-                color: active ? 'white' : 'var(--mid)',
+                background: active ? 'var(--accent)' : 'none',
+                color: active ? 'var(--accent-ink)' : 'var(--mid)',
                 border: 'none', cursor: 'pointer', fontFamily: 'inherit',
                 fontSize: 13, fontWeight: active ? 500 : 400, textAlign: 'left',
               }}>
@@ -78,8 +78,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   <button key={item.href} onClick={() => router.push(item.href)} style={{
                     width: '100%', display: 'flex', alignItems: 'center', gap: 10,
                     padding: '8px 10px', borderRadius: 'var(--r-sm)', marginBottom: 2,
-                    background: active ? 'var(--ink)' : 'none',
-                    color: active ? 'white' : 'var(--mid)',
+                    background: active ? 'var(--accent)' : 'none',
+                    color: active ? 'var(--accent-ink)' : 'var(--mid)',
                     border: 'none', cursor: 'pointer', fontFamily: 'inherit',
                     fontSize: 13, fontWeight: active ? 500 : 400, textAlign: 'left',
                     transition: 'all .15s',

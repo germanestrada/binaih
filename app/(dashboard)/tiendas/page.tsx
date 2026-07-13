@@ -71,8 +71,8 @@ function TiendasContent() {
             <button key={v} onClick={() => setView(v)} style={{
               padding: '6px 14px', fontSize: 11, border: 'none', cursor: 'pointer',
               fontFamily: 'var(--font-sans)', fontWeight: 500,
-              background: view === v ? 'var(--ink)' : 'var(--white)',
-              color:      view === v ? 'white'      : 'var(--subtle)',
+              background: view === v ? 'var(--accent)' : 'var(--white)',
+              color:      view === v ? 'var(--accent-ink)' : 'var(--subtle)',
               transition: 'all .15s',
             }}>
               {v === 'list' ? 'Lista' : v === 'split' ? 'Split' : 'Mapa'}
